@@ -8,11 +8,11 @@ import (
 )
 
 type DbConfig struct {
-	UserName string // `env:"POSTGRES_USER" env-default:"root"`
-	Password string // `env:"POSTGRES_PASSWORD" env-default:"123"`
-	Host     string // `env:"POSTGRES_HOST" env-default:"localhost"`
-	Port     int    // `env:"POSTGRES_PORT" env-default:"5432"`
-	DbName   string // `env:"POSTGRES_DB" env-default:"yandex"`
+	Host     string
+	Port     int
+	DbName   string
+	User     string
+	Password string
 }
 
 type DB struct {
@@ -22,7 +22,7 @@ type DB struct {
 
 func New(ctx context.Context, config *DbConfig) (*DB, error) {
 	var dbURL string = fmt.Sprintf("postgresql://%s:%s@%s:%d/%s",
-		config.UserName,
+		config.User,
 		config.Password,
 		config.Host,
 		config.Port,
