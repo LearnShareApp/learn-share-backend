@@ -1,4 +1,4 @@
-package registration
+package login
 
 type request struct {
 	Email    string `json:"email"`

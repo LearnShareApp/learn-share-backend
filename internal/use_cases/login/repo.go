@@ -1,4 +1,4 @@
-package registration
+package login
 
 import (
 	"context"
@@ -7,5 +7,5 @@ import (
 
 type repo interface {
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
-	CreateUser(ctx context.Context, user *entities.User) (int64, error)
+	GetUserByEmail(ctx context.Context, email string) (*entities.User, error)
 }

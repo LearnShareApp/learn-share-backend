@@ -1,4 +1,4 @@
-package registration
+package login
 
 import (
 	"encoding/json"
@@ -35,14 +35,14 @@ func MakeHandler(s *Service, log *zap.Logger) func(w http.ResponseWriter, r *htt
 
 		token, err := s.Do(r.Context(), user)
 		if err != nil {
-			if errors.Is(err, serviceErrors.ErrorUserExists) {
-				if err = jsonutils.RespondWithError(w, http.StatusConflict, err.Error()); err != nil {
+			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
+				if err = jsonutils.RespondWith401(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
 
-			} else if errors.Is(err, serviceErrors.ErrorPasswordTooShort) {
-				if err = jsonutils.RespondWith400(w, err.Error()); err != nil {
+			} else if errors.Is(err, serviceErrors.ErrorPasswordIncorrect) {
+				if err = jsonutils.RespondWith401(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
@@ -59,7 +59,7 @@ func MakeHandler(s *Service, log *zap.Logger) func(w http.ResponseWriter, r *htt
 		var resp response
 		resp.Token = token
 
-		respondErr := jsonutils.SuccessRespondWith201(w, resp)
+		respondErr := jsonutils.SuccessRespondWith200(w, resp)
 		if respondErr != nil {
 			log.Error("failed to send response", zap.Error(respondErr))
 		}

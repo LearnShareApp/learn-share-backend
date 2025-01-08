@@ -25,7 +25,7 @@ func main() {
 
 	log.Info(cfg.LogConfig())
 
-	app, err := application.New(ctx, *cfg, log.Named("application_logger"))
+	app, err := application.New(ctx, *cfg, log)
 
 	if err != nil {
 		log.Error("failed to create application", zap.Error(err))

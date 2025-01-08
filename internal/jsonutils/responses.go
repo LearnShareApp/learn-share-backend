@@ -53,3 +53,15 @@ func RespondWith500(w http.ResponseWriter) error {
 		http.StatusInternalServerError,
 		http.StatusText(http.StatusInternalServerError))
 }
+
+func SuccessRespondWith200(w http.ResponseWriter, payload interface{}) error {
+	return RespondWithJSON(w,
+		http.StatusOK,
+		payload)
+}
+
+func SuccessRespondWith201(w http.ResponseWriter, payload interface{}) error {
+	return RespondWithJSON(w,
+		http.StatusCreated,
+		payload)
+}

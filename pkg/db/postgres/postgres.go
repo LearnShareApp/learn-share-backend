@@ -3,8 +3,8 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"sync"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type DbConfig struct {
@@ -15,35 +15,24 @@ type DbConfig struct {
 	Password string
 }
 
-type DB struct {
-	ConnPool      *pgxpool.Pool
-	closeConnOnce sync.Once
-}
-
-func New(ctx context.Context, config *DbConfig) (*DB, error) {
-	var dbURL string = fmt.Sprintf("postgresql://%s:%s@%s:%d/%s",
+func New(ctx context.Context, config *DbConfig) (*sqlx.DB, error) {
+	var dsn string = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%d",
 		config.User,
 		config.Password,
+		config.DbName,
 		config.Host,
 		config.Port,
-		config.DbName,
 	)
 
-	conn, err := pgxpool.New(ctx, dbURL)
+	db, err := sqlx.ConnectContext(ctx, "postgres", dsn)
+
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, err
 	}
 
-	return &DB{
-		ConnPool:      conn,
-		closeConnOnce: sync.Once{},
-	}, nil
-}
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
 
-func (db *DB) Ping(ctx context.Context) error {
-	return db.ConnPool.Ping(ctx)
-}
-
-func (db *DB) ClosePoolConn() {
-	db.closeConnOnce.Do(db.ConnPool.Close)
+	return db, nil
 }

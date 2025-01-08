@@ -2,13 +2,16 @@ package rest
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"time"
 
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/middlewares"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/login"
+	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/registration"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 const (
@@ -21,7 +24,8 @@ type ServerConfig struct {
 }
 
 type Services struct {
-	RegSrv *registration.Service
+	RegSrv   *registration.Service
+	LoginSrv *login.Service
 }
 
 type Server struct {
@@ -30,17 +34,19 @@ type Server struct {
 }
 
 func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server {
-	router := mux.NewRouter()
+	router := chi.NewRouter()
 
-	router.Use()
+	router.Use(middlewares.LoggerMiddleware(log.Named("log_middleware")))
 
-	regHandler := registration.MakeHandler(services.RegSrv, log.Named("registration_service"))
+	regHandler := registration.MakeHandler(services.RegSrv, log)
+	loginHandler := login.MakeHandler(services.LoginSrv, log)
 
-	apiRouter := mux.NewRouter().PathPrefix("/api").Subrouter()
+	apiRouter := chi.NewRouter()
 
-	apiRouter.HandleFunc("/signup", regHandler).Methods("POST")
+	apiRouter.Post("/signup", regHandler)
+	apiRouter.Post("/login", loginHandler)
 
-	router.PathPrefix("/api").Handler(apiRouter)
+	router.Mount("/api", apiRouter)
 
 	return &Server{
 		server: &http.Server{
@@ -57,7 +63,7 @@ func (s *Server) Start() error {
 	eg := errgroup.Group{}
 
 	eg.Go(func() error {
-		s.logger.Info("starting Rest server", zap.String("port", s.server.Addr))
+		s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
 		return s.server.ListenAndServe()
 	})
 

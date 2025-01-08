@@ -11,11 +11,10 @@ import (
 )
 
 type Config struct {
-	Db   postgres.DbConfig
-	Rest rest.ServerConfig
-	Jwt  struct {
-		SecretKey string
-	}
+	Db        postgres.DbConfig
+	Server    rest.ServerConfig
+	IsInitDb  bool
+	SecretKey string
 }
 
 func LoadConfig() (*Config, error) {
@@ -44,7 +43,7 @@ func LoadConfig() (*Config, error) {
 
 	// Server config
 	var err error
-	config.Rest.Port, err = getEnvAsInt("SERVER_PORT")
+	config.Server.Port, err = getEnvAsInt("SERVER_PORT")
 	if err != nil {
 		return nil, fmt.Errorf("invalid SERVER_PORT: %w", err)
 	}
@@ -60,8 +59,15 @@ func LoadConfig() (*Config, error) {
 	config.Db.User = os.Getenv("DB_USER")
 	config.Db.Password = os.Getenv("DB_PASSWORD")
 
+	// Should Init Db
+	value := os.Getenv("IS_INIT_DB")
+	config.IsInitDb, err = strconv.ParseBool(value)
+	if err != nil {
+		return nil, fmt.Errorf("invalid IS_INIT_DB: %w", err)
+	}
+
 	// JWT secret key
-	config.Jwt.SecretKey = os.Getenv("SECRET_KEY")
+	config.SecretKey = os.Getenv("SECRET_KEY")
 
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("config validation failed: %w", err)
@@ -99,7 +105,7 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("database user cannot be empty")
 	}
 
-	if c.Jwt.SecretKey == "" {
+	if c.SecretKey == "" {
 		return fmt.Errorf("jwt secret key cannot be empty")
 	}
 
