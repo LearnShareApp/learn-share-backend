@@ -48,8 +48,9 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	loginSrv := login.NewService(repo, jwtService)
 
 	services := &rest.Services{
-		RegSrv:   registrationSrv,
-		LoginSrv: loginSrv,
+		RegSrv:     registrationSrv,
+		LoginSrv:   loginSrv,
+		JwtService: jwtService,
 	}
 
 	restServer := rest.NewServer(services, config.Server, log)

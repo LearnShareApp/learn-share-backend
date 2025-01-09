@@ -101,3 +101,7 @@ func (s *Service) ExtractUserID(claims jwt.MapClaims) (int64, error) {
 	}
 	return int64(userID), nil
 }
+
+func (s *Service) GetUserKey() string {
+	return UserIDKey
+}

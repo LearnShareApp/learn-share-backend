@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"net/http"
 	"time"
 
@@ -24,8 +25,9 @@ type ServerConfig struct {
 }
 
 type Services struct {
-	RegSrv   *registration.Service
-	LoginSrv *login.Service
+	RegSrv     *registration.Service
+	LoginSrv   *login.Service
+	JwtService *jwt.Service
 }
 
 type Server struct {
@@ -45,6 +47,11 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 
 	apiRouter.Post("/signup", regHandler)
 	apiRouter.Post("/login", loginHandler)
+
+	apiRouter.Group(func(apiRouter chi.Router) {
+		apiRouter.Use(middlewares.JWTMiddleware(services.JwtService, log.Named("jwt_middleware")))
+		//apiRouter.Post("/manage", CreateAsset)
+	})
 
 	router.Mount("/api", apiRouter)
 
