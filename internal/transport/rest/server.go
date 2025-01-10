@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get"
 	"net/http"
 	"time"
 
@@ -26,14 +27,27 @@ type ServerConfig struct {
 }
 
 type Services struct {
-	RegSrv     *registration.Service
-	LoginSrv   *login.Service
-	JwtService *jwt.Service
+	JwtSrv         *jwt.Service
+	RegSrv         *registration.Service
+	LoginSrv       *login.Service
+	GetCategorySrv *get.Service
 }
 
 type Server struct {
 	server *http.Server
 	logger *zap.Logger
+}
+
+func NewServices(jwtSrv *jwt.Service,
+	reg *registration.Service,
+	login *login.Service,
+	getCategories *get.Service) *Services {
+	return &Services{
+		JwtSrv:         jwtSrv,
+		RegSrv:         reg,
+		LoginSrv:       login,
+		GetCategorySrv: getCategories,
+	}
 }
 
 func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server {
@@ -43,14 +57,16 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 
 	regHandler := registration.MakeHandler(services.RegSrv, log)
 	loginHandler := login.MakeHandler(services.LoginSrv, log)
+	getCategoriesHandler := get.MakeHandler(services.GetCategorySrv, log)
 
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Post("/signup", regHandler)
 	apiRouter.Post("/login", loginHandler)
+	apiRouter.Get("/categories", getCategoriesHandler)
 
 	apiRouter.Group(func(apiRouter chi.Router) {
-		apiRouter.Use(middlewares.JWTMiddleware(services.JwtService, log.Named("jwt_middleware")))
+		apiRouter.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
 		//apiRouter.Post("/manage", CreateAsset)
 	})
 

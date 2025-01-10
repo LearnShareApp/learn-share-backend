@@ -7,6 +7,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/login"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/registration"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
@@ -48,11 +49,9 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	registrationSrv := registration.NewService(repo, jwtService)
 	loginSrv := login.NewService(repo, jwtService)
 
-	services := &rest.Services{
-		RegSrv:     registrationSrv,
-		LoginSrv:   loginSrv,
-		JwtService: jwtService,
-	}
+	getCategoriesSrv := get.NewService(repo)
+
+	services := rest.NewServices(jwtService, registrationSrv, loginSrv, getCategoriesSrv)
 
 	restServer := rest.NewServer(services, config.Server, log)
 
