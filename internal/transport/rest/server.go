@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"net/http"
@@ -75,4 +76,22 @@ func (s *Server) Start() error {
 	})
 
 	return eg.Wait()
+}
+
+// GracefulStop корректная остановка сервера
+func (s *Server) GracefulStop(ctx context.Context) error {
+	// Создаем контекст с таймаутом
+	shutdownCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	s.logger.Info("shutting down Rest server", zap.String("address", s.server.Addr))
+
+	// Остановка сервера
+	if err := s.server.Shutdown(shutdownCtx); err != nil {
+		err = fmt.Errorf("failed to shutdown rest server: %w", err)
+		return err
+	}
+
+	s.logger.Info("rest server stopped")
+	return nil
 }

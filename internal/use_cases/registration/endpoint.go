@@ -8,6 +8,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"go.uber.org/zap"
 	"net/http"
+	"time"
 )
 
 func MakeHandler(s *Service, log *zap.Logger) func(w http.ResponseWriter, r *http.Request) {
@@ -21,16 +22,26 @@ func MakeHandler(s *Service, log *zap.Logger) func(w http.ResponseWriter, r *htt
 			return
 		}
 
-		if req.Email == "" || req.Password == "" {
-			if err := jsonutils.RespondWith400(w, "email or password is empty"); err != nil {
+		if req.Email == "" || req.Password == "" || req.Name == "" || req.Surname == "" { //  || req.Avatar == ""
+			if err := jsonutils.RespondWith400(w, "email, name, surname or password is empty"); err != nil {
+				log.Error("failed to send response", zap.Error(err))
+			}
+			return
+		}
+
+		if req.Birthdate.Before(time.Date(1900, 01, 01, 0, 0, 0, 0, time.UTC)) {
+			if err := jsonutils.RespondWith400(w, "birthdate is missed or too old"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
 		}
 
 		user := &entities.User{
-			Email:    req.Email,
-			Password: req.Password,
+			Email:     req.Email,
+			Password:  req.Password,
+			Name:      req.Name,
+			Surname:   req.Surname,
+			Birthdate: req.Birthdate,
 		}
 
 		token, err := s.Do(r.Context(), user)

@@ -39,7 +39,12 @@ func createUsersTable(ctx context.Context, tx *sqlx.Tx) error {
     CREATE TABLE IF NOT EXISTS public.users(
         id SERIAL PRIMARY KEY NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        name TEXT NOT NULL,
+        surname TEXT NOT NULL,
+        password TEXT NOT NULL,
+        registration_date TIMESTAMPTZ DEFAULT NOW(),
+        birthdate DATE NOT NULL,
+        avatar TEXT
     );
     `
 

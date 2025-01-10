@@ -22,13 +22,13 @@ func (r *Repository) ExistsByEmail(ctx context.Context, email string) (bool, err
 
 func (r *Repository) CreateUser(ctx context.Context, user *entities.User) (int64, error) {
 	const req = `
-	INSERT INTO users (email, password) 
-	VALUES ($1, $2)
+	INSERT INTO users (email, password, name, surname, birthdate) 
+	VALUES ($1, $2, $3, $4, $5)
 	RETURNING id
 	`
 
 	var userID int64
-	if err := r.db.QueryRowContext(ctx, req, user.Email, user.Password).Scan(&userID); err != nil {
+	if err := r.db.QueryRowContext(ctx, req, user.Email, user.Password, user.Name, user.Surname, user.Birthdate).Scan(&userID); err != nil {
 		return 0, err
 	}
 	return userID, nil
@@ -46,6 +46,23 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*entitie
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user by email: %w", err)
+	}
+
+	return &user, nil
+}
+
+func (r *Repository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
+	query := `SELECT id, email, password FROM public.users WHERE id = $1`
+
+	var user entities.User
+	err := r.db.GetContext(ctx, &user, query, id)
+
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to find user by id: %w", err)
 	}
 
 	return &user, nil

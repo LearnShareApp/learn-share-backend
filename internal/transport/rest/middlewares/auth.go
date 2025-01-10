@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"context"
+	"errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
@@ -13,6 +14,7 @@ type TokenValidator interface {
 	ValidateJWTToken(tokenString string) (jwt.MapClaims, error)
 	ExtractUserID(claims jwt.MapClaims) (int64, error)
 	GetUserKey() string
+	GetExpiredError() error
 }
 
 // JWTMiddleware middleware для проверки JWT токена
@@ -44,6 +46,14 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 				claims, err := validator.ValidateJWTToken(tokenString)
 
 				if err != nil {
+					if errors.Is(err, validator.GetExpiredError()) {
+						log.Error(err.Error())
+						if err = jsonutils.RespondWith401(w, "token expired"); err != nil {
+							log.Error(err.Error())
+						}
+						return
+					}
+
 					log.Error(err.Error())
 					if err = jsonutils.RespondWith401(w, "Failed to validate token"); err != nil {
 						log.Error(err.Error())

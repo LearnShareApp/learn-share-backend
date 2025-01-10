@@ -12,6 +12,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+	"os"
 )
 
 type Application struct {
@@ -70,10 +71,24 @@ func (app *Application) Run() error {
 
 // Shutdown gracefully останавливает приложение
 func (app *Application) Shutdown(ctx context.Context) error {
+
+	app.log.Info("shutting down application...")
+
+	go func() {
+		<-ctx.Done()
+		if ctx.Err() == context.DeadlineExceeded {
+			app.log.Error("graceful shutdown timed out... forcing exit")
+			os.Exit(1)
+		}
+	}()
+
+	if err := app.server.GracefulStop(ctx); err != nil {
+		return err
+	}
+
 	if err := app.db.Close(); err != nil {
 		app.log.Error("failed to close database", zap.Error(err))
 	}
 
-	// TODO stop rest server
 	return nil
 }

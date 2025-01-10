@@ -1,13 +1,16 @@
 package jwt
 
 import (
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
 
-const (
-	UserIDKey = "user_id"
+const UserIDKey = "user_id"
+
+var (
+	ErrorTokenExpired = errors.New("token is expired")
 )
 
 type Service struct {
@@ -71,26 +74,30 @@ func (s *Service) GenerateJWTToken(userId int64) (string, error) {
 
 // ValidateJWTToken проверяет валидность JWT-токена
 func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
-	// Парсим и проверяем токен
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Убеждаемся, что метод подписи соответствует ожидаемому
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return s.secretKey, nil
 	})
 
-	// Проверяем наличие ошибок при парсинге
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
-	// Извлекаем claims, если токен валиден
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims, nil
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, fmt.Errorf("invalid token")
 	}
 
-	return nil, fmt.Errorf("invalid token")
+	// Дополнительная проверка времени истечения
+	if exp, ok := claims["exp"].(float64); ok {
+		if time.Now().Unix() > int64(exp) {
+			return nil, ErrorTokenExpired
+		}
+	}
+
+	return claims, nil
 }
 
 // ExtractUserID извлекает ID пользователя из claims
@@ -104,4 +111,8 @@ func (s *Service) ExtractUserID(claims jwt.MapClaims) (int64, error) {
 
 func (s *Service) GetUserKey() string {
 	return UserIDKey
+}
+
+func (s *Service) GetExpiredError() error {
+	return ErrorTokenExpired
 }
