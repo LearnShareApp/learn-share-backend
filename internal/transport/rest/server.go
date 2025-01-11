@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/registration"
 	"github.com/go-chi/chi/v5"
+
+	_ "github.com/LearnShareApp/learn-share-backend/docs"
 )
 
 const (
@@ -54,6 +57,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	router := chi.NewRouter()
 
 	router.Use(middlewares.LoggerMiddleware(log.Named("log_middleware")))
+	router.Use(middlewares.CorsMiddleware)
 
 	regHandler := registration.MakeHandler(services.RegSrv, log)
 	loginHandler := login.MakeHandler(services.LoginSrv, log)
@@ -61,9 +65,9 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 
 	apiRouter := chi.NewRouter()
 
-	apiRouter.Post("/signup", regHandler)
-	apiRouter.Post("/login", loginHandler)
-	apiRouter.Get("/categories", getCategoriesHandler)
+	apiRouter.Post(registration.Route, regHandler)
+	apiRouter.Post(login.Route, loginHandler)
+	apiRouter.Get(get.Route, getCategoriesHandler)
 
 	apiRouter.Group(func(apiRouter chi.Router) {
 		apiRouter.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
@@ -71,6 +75,11 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	})
 
 	router.Mount("/api", apiRouter)
+
+	// Добавляем swagger endpoint
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("./swagger/doc.json"), // URL указывающий на JSON документацию
+	))
 
 	return &Server{
 		server: &http.Server{

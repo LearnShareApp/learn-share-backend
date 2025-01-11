@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+type ErrorStruct struct {
+	Error string `json:"error"`
+}
+
 func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) error {
 	response, err := json.Marshal(payload)
 	if err != nil {
@@ -29,9 +33,7 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) error
 func RespondWithError(w http.ResponseWriter, code int, message string) error {
 	return RespondWithJSON(w,
 		code,
-		struct {
-			Error string `json:"error"`
-		}{
+		ErrorStruct{
 			Error: message,
 		})
 }

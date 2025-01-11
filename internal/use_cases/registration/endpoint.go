@@ -11,7 +11,21 @@ import (
 	"time"
 )
 
-func MakeHandler(s *Service, log *zap.Logger) func(w http.ResponseWriter, r *http.Request) {
+const Route = "/signup"
+
+// MakeHandler returns http.HandlerFunc
+// @Summary Register new user
+// @Description Register a new user (student) in the system
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body request true "Registration Info"
+// @Success 201 {object} response
+// @Failure 400 {object} errorResponse
+// @Failure 409 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /api/signup [post]
+func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req request
 

@@ -1,0 +1,171 @@
+definitions:
+  get.category:
+    properties:
+      min_age:
+        example: 12
+        type: integer
+      name:
+        example: Programing
+        type: string
+    type: object
+  get.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  get.response:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/get.category'
+        type: array
+    type: object
+  login.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  login.request:
+    properties:
+      email:
+        example: john@gmail.com
+        type: string
+      password:
+        example: strongpass123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  login.response:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  registration.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  registration.request:
+    description: User registration request
+    properties:
+      birthdate:
+        example: "2000-01-01T00:00:00Z"
+        type: string
+      email:
+        example: john@gmail.com
+        type: string
+      name:
+        example: John
+        type: string
+      password:
+        example: strongpass123
+        type: string
+      surname:
+        example: Smith
+        type: string
+    required:
+    - birthdate
+    - email
+    - name
+    - password
+    - surname
+    type: object
+  registration.response:
+    description: User registration response
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/categories:
+    get:
+      description: Get list of all categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/get.errorResponse'
+      summary: Get categories
+      tags:
+      - categories
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with email and password
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/login.request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/login.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/login.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/login.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/login.errorResponse'
+      summary: Login user
+      tags:
+      - auth
+  /api/signup:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user (student) in the system
+      parameters:
+      - description: Registration Info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/registration.request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/registration.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/registration.errorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/registration.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/registration.errorResponse'
+      summary: Register new user
+      tags:
+      - auth
+swagger: "2.0"

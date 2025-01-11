@@ -10,7 +10,21 @@ import (
 	"net/http"
 )
 
-func MakeHandler(s *Service, log *zap.Logger) func(w http.ResponseWriter, r *http.Request) {
+const Route = "/login"
+
+// MakeHandler returns http.HandlerFunc
+// @Summary Login user
+// @Description Login with email and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body request true "Login Credentials"
+// @Success 200 {object} response
+// @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /api/login [post]
+func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req request
 

@@ -6,7 +6,17 @@ import (
 	"net/http"
 )
 
-func MakeHandler(s *Service, log *zap.Logger) func(w http.ResponseWriter, r *http.Request) {
+const Route = "/categories"
+
+// MakeHandler returns http.HandlerFunc
+// @Summary Get categories
+// @Description Get list of all categories
+// @Tags categories
+// @Produce json
+// @Success 200 {object} response
+// @Failure 500 {object} errorResponse
+// @Router /api/categories [get]
+func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		categories, err := s.Do(r.Context())
