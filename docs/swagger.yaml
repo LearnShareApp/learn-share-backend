@@ -1,6 +1,9 @@
 definitions:
   get.category:
     properties:
+      id:
+        example: 1
+        type: integer
       min_age:
         example: 12
         type: integer

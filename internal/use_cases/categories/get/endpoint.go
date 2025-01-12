@@ -33,6 +33,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		}
 		for _, c := range categories {
 			resp.Categories = append(resp.Categories, category{
+				Id:     int(c.Id),
 				Name:   c.Name,
 				MinAge: int(c.MinAge),
 			})

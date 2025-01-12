@@ -7,6 +7,7 @@ type response struct {
 }
 
 type category struct {
+	Id     int    `json:"id" example:"1"`
 	Name   string `json:"name" example:"Programing"`
 	MinAge int    `json:"min_age" example:"12"`
 }

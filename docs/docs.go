@@ -150,6 +150,10 @@ const docTemplate = `{
         "get.category": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "min_age": {
                     "type": "integer",
                     "example": 12
