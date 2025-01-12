@@ -1,4 +1,4 @@
-package get
+package get_categories
 
 import (
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
@@ -15,7 +15,7 @@ const Route = "/categories"
 // @Produce json
 // @Success 200 {object} response
 // @Failure 500 {object} errorResponse
-// @Router /api/categories [get]
+// @Router /categories [get]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

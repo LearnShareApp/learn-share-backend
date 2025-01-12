@@ -7,9 +7,10 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/login"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/registration"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/user/get_profile"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -49,9 +50,10 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	registrationSrv := registration.NewService(repo, jwtService)
 	loginSrv := login.NewService(repo, jwtService)
 
-	getCategoriesSrv := get.NewService(repo)
+	getCategoriesSrv := get_categories.NewService(repo)
+	getProfileSrv := get_profile.NewService(repo)
 
-	services := rest.NewServices(jwtService, registrationSrv, loginSrv, getCategoriesSrv)
+	services := rest.NewServices(jwtService, registrationSrv, loginSrv, getCategoriesSrv, getProfileSrv)
 
 	restServer := rest.NewServer(services, config.Server, log)
 

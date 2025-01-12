@@ -1,4 +1,4 @@
-package get
+package get_categories
 
 import "github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 

@@ -1,5 +1,6 @@
+basePath: /api
 definitions:
-  get.category:
+  get_categories.category:
     properties:
       id:
         example: 1
@@ -11,17 +12,40 @@ definitions:
         example: Programing
         type: string
     type: object
-  get.errorResponse:
+  get_categories.errorResponse:
     properties:
       error:
         type: string
     type: object
-  get.response:
+  get_categories.response:
     properties:
       categories:
         items:
-          $ref: '#/definitions/get.category'
+          $ref: '#/definitions/get_categories.category'
         type: array
+    type: object
+  get_profile.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  get_profile.response:
+    properties:
+      birthdate:
+        example: "2002-09-09T10:10:10+09:00"
+        type: string
+      email:
+        example: qwerty@example.com
+        type: string
+      name:
+        example: John
+        type: string
+      registration_date:
+        example: "2022-09-09T10:10:10+09:00"
+        type: string
+      surname:
+        example: Smith
+        type: string
     type: object
   login.errorResponse:
     properties:
@@ -83,27 +107,17 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: ruslanrbb8@gmail.com
+    name: Ruslan's Support
+    url: https://t.me/Ruslan20007
+  description: back-end part for mobile application.
+  title: Learn-Share API
+  version: "1.0"
 paths:
-  /api/categories:
-    get:
-      description: Get list of all categories
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/get.response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/get.errorResponse'
-      summary: Get categories
-      tags:
-      - categories
-  /api/login:
+  /auth/login:
     post:
       consumes:
       - application/json
@@ -137,7 +151,7 @@ paths:
       summary: Login user
       tags:
       - auth
-  /api/signup:
+  /auth/signup:
     post:
       consumes:
       - application/json
@@ -171,4 +185,50 @@ paths:
       summary: Register new user
       tags:
       - auth
+  /categories:
+    get:
+      description: Get list of all categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_categories.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/get_categories.errorResponse'
+      summary: Get categories
+      tags:
+      - categories
+  /user/profile:
+    get:
+      description: 'Get info about user by jwt token (in Authorization enter: Bearer
+        <your_jwt_token>)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_profile.response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/get_profile.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/get_profile.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - user
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

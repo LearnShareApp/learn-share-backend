@@ -21,60 +21,57 @@ type TokenValidator interface {
 func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 			// Получаем заголовок Authorization
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
 				if err := jsonutils.RespondWith401(w, "missed Authorization header (required)"); err != nil {
-					log.Error(err.Error())
-					return
+					log.Error("failed to write response", zap.Error(err))
 				}
-
-				// Проверяем формат заголовка (Bearer Token)
-				parts := strings.Split(authHeader, " ")
-				if len(parts) != 2 || parts[0] != "Bearer" {
-					if err := jsonutils.RespondWith401(w, "Invalid token format"); err != nil {
-						log.Error(err.Error())
-					}
-					return
-				}
-
-				// Извлекаем токен
-				tokenString := parts[1]
-
-				// Валидируем токен с помощью переданного валидатора
-				claims, err := validator.ValidateJWTToken(tokenString)
-
-				if err != nil {
-					if errors.Is(err, validator.GetExpiredError()) {
-						log.Error(err.Error())
-						if err = jsonutils.RespondWith401(w, "token expired"); err != nil {
-							log.Error(err.Error())
-						}
-						return
-					}
-
-					log.Error(err.Error())
-					if err = jsonutils.RespondWith401(w, "Failed to validate token"); err != nil {
-						log.Error(err.Error())
-					}
-					return
-				}
-
-				// Извлекаем ID из токена
-				userID, err := validator.ExtractUserID(claims)
-				if err != nil {
-					log.Info(err.Error())
-					if err = jsonutils.RespondWith401(w, "Invalid token: missing filed: user_id"); err != nil {
-						log.Error(err.Error())
-					}
-				}
-
-				ctx := context.WithValue(r.Context(), validator.GetUserKey(), userID)
-				r = r.WithContext(ctx)
+				return
 			}
 
-			next.ServeHTTP(w, r)
+			// Проверяем формат заголовка (Bearer Token)
+			parts := strings.Split(authHeader, " ")
+			if len(parts) != 2 || parts[0] != "Bearer" {
+				if err := jsonutils.RespondWith401(w, "Invalid token format"); err != nil {
+					log.Error("failed to write response", zap.Error(err))
+				}
+				return
+			}
+
+			// Извлекаем токен
+			tokenString := parts[1]
+
+			// Валидируем токен с помощью переданного валидатора
+			claims, err := validator.ValidateJWTToken(tokenString)
+			if err != nil {
+				if errors.Is(err, validator.GetExpiredError()) {
+					log.Error("token expired", zap.Error(err))
+					if err = jsonutils.RespondWith401(w, "token expired"); err != nil {
+						log.Error("failed to write response", zap.Error(err))
+					}
+					return
+				}
+
+				log.Error("failed to validate token", zap.Error(err))
+				if err = jsonutils.RespondWith401(w, "Failed to validate token"); err != nil {
+					log.Error("failed to write response", zap.Error(err))
+				}
+				return
+			}
+
+			// Извлекаем ID из токена
+			userID, err := validator.ExtractUserID(claims)
+			if err != nil {
+				log.Error("failed to extract user ID", zap.Error(err))
+				if err = jsonutils.RespondWith401(w, "Invalid token: missing field: user_id"); err != nil {
+					log.Error("failed to write response", zap.Error(err))
+				}
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), validator.GetUserKey(), userID)
+			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }

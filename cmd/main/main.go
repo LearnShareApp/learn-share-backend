@@ -12,6 +12,20 @@ import (
 	"time"
 )
 
+// @title        Learn-Share API
+// @version      1.0
+// @description  back-end part for mobile application.
+
+// @contact.name   Ruslan's Support
+// @contact.url    https://t.me/Ruslan20007
+// @contact.email  ruslanrbb8@gmail.com
+
+// @host         localhost:8080
+// @BasePath     /api
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 func main() {
 	ctx, ctxClose := context.WithCancel(context.Background())
 	defer ctxClose()

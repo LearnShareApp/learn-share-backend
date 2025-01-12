@@ -1,4 +1,4 @@
-package login
+package registration
 
 import (
 	"encoding/json"
@@ -8,22 +8,23 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"go.uber.org/zap"
 	"net/http"
+	"time"
 )
 
-const Route = "/login"
+const Route = "/signup"
 
 // MakeHandler returns http.HandlerFunc
-// @Summary Login user
-// @Description Login with email and password
+// @Summary Register new user
+// @Description Register a new user (student) in the system
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param request body request true "Login Credentials"
-// @Success 200 {object} response
+// @Param request body request true "Registration Info"
+// @Success 201 {object} response
 // @Failure 400 {object} errorResponse
-// @Failure 401 {object} errorResponse
+// @Failure 409 {object} errorResponse
 // @Failure 500 {object} errorResponse
-// @Router /api/login [post]
+// @Router /auth/signup [post]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req request
@@ -35,28 +36,38 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		if req.Email == "" || req.Password == "" {
-			if err := jsonutils.RespondWith400(w, "email or password is empty"); err != nil {
+		if req.Email == "" || req.Password == "" || req.Name == "" || req.Surname == "" { //  || req.Avatar == ""
+			if err := jsonutils.RespondWith400(w, "email, name, surname or password is empty"); err != nil {
+				log.Error("failed to send response", zap.Error(err))
+			}
+			return
+		}
+
+		if req.Birthdate.Before(time.Date(1900, 01, 01, 0, 0, 0, 0, time.UTC)) {
+			if err := jsonutils.RespondWith400(w, "birthdate is missed or too old"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
 		}
 
 		user := &entities.User{
-			Email:    req.Email,
-			Password: req.Password,
+			Email:     req.Email,
+			Password:  req.Password,
+			Name:      req.Name,
+			Surname:   req.Surname,
+			Birthdate: req.Birthdate,
 		}
 
 		token, err := s.Do(r.Context(), user)
 		if err != nil {
-			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
-				if err = jsonutils.RespondWith401(w, err.Error()); err != nil {
+			if errors.Is(err, serviceErrors.ErrorUserExists) {
+				if err = jsonutils.RespondWithError(w, http.StatusConflict, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
 
-			} else if errors.Is(err, serviceErrors.ErrorPasswordIncorrect) {
-				if err = jsonutils.RespondWith401(w, err.Error()); err != nil {
+			} else if errors.Is(err, serviceErrors.ErrorPasswordTooShort) {
+				if err = jsonutils.RespondWith400(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
@@ -73,7 +84,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		var resp response
 		resp.Token = token
 
-		respondErr := jsonutils.SuccessRespondWith200(w, resp)
+		respondErr := jsonutils.SuccessRespondWith201(w, resp)
 		if respondErr != nil {
 			log.Error("failed to send response", zap.Error(respondErr))
 		}

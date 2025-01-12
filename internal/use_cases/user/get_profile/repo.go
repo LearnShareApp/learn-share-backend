@@ -1,4 +1,4 @@
-package get
+package get_profile
 
 import (
 	"context"
@@ -6,5 +6,5 @@ import (
 )
 
 type repo interface {
-	GetCategories(ctx context.Context) ([]*entities.Category, error)
+	GetUserById(ctx context.Context, id int64) (*entities.User, error)
 }

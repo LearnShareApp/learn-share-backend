@@ -9,39 +9,17 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "Ruslan's Support",
+            "url": "https://t.me/Ruslan20007",
+            "email": "ruslanrbb8@gmail.com"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/categories": {
-            "get": {
-                "description": "Get list of all categories",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Get categories",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/get.response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/get.errorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/login": {
+        "/auth/login": {
             "post": {
                 "description": "Login with email and password",
                 "consumes": [
@@ -93,7 +71,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/signup": {
+        "/auth/signup": {
             "post": {
                 "description": "Register a new user (student) in the system",
                 "consumes": [
@@ -144,10 +122,73 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/categories": {
+            "get": {
+                "description": "Get list of all categories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_categories.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/get_categories.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/profile": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get info about user by jwt token (in Authorization enter: Bearer \u003cyour_jwt_token\u003e)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get user profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_profile.response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/get_profile.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/get_profile.errorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "get.category": {
+        "get_categories.category": {
             "type": "object",
             "properties": {
                 "id": {
@@ -164,7 +205,7 @@ const docTemplate = `{
                 }
             }
         },
-        "get.errorResponse": {
+        "get_categories.errorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -172,14 +213,47 @@ const docTemplate = `{
                 }
             }
         },
-        "get.response": {
+        "get_categories.response": {
             "type": "object",
             "properties": {
                 "categories": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/get.category"
+                        "$ref": "#/definitions/get_categories.category"
                     }
+                }
+            }
+        },
+        "get_profile.errorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "get_profile.response": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string",
+                    "example": "2002-09-09T10:10:10+09:00"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "qwerty@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "registration_date": {
+                    "type": "string",
+                    "example": "2022-09-09T10:10:10+09:00"
+                },
+                "surname": {
+                    "type": "string",
+                    "example": "Smith"
                 }
             }
         },
@@ -268,17 +342,24 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Learn-Share API",
+	Description:      "back-end part for mobile application.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
