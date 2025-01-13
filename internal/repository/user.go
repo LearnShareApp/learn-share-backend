@@ -24,7 +24,7 @@ func (r *Repository) CreateUser(ctx context.Context, user *entities.User) (int64
 	const req = `
 	INSERT INTO users (email, password, name, surname, birthdate) 
 	VALUES ($1, $2, $3, $4, $5)
-	RETURNING id
+	RETURNING user_id
 	`
 
 	var userID int64
@@ -35,7 +35,7 @@ func (r *Repository) CreateUser(ctx context.Context, user *entities.User) (int64
 }
 
 func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*entities.User, error) {
-	query := `SELECT id, email, password, name, surname, birthdate FROM public.users WHERE email = $1`
+	query := `SELECT user_id, email, password, name, surname, birthdate FROM public.users WHERE email = $1`
 
 	var user entities.User
 	err := r.db.GetContext(ctx, &user, query, email)
@@ -52,7 +52,7 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*entitie
 }
 
 func (r *Repository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
-	query := `SELECT id, email, password, name, surname, birthdate FROM public.users WHERE id = $1`
+	query := `SELECT user_id, email, password, name, surname, birthdate FROM public.users WHERE user_id = $1`
 
 	var user entities.User
 	err := r.db.GetContext(ctx, &user, query, id)

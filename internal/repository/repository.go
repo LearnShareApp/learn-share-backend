@@ -28,6 +28,10 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 		return fmt.Errorf("error creating users table: %w", err)
 	}
 
+	if err = createTeachersTable(ctx, tx); err != nil {
+		return fmt.Errorf("error creating teachers table: %w", err)
+	}
+
 	if err := createCategoriesTable(ctx, tx); err != nil {
 		return fmt.Errorf("error creating categories table: %w", err)
 	}
@@ -53,7 +57,7 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 func createUsersTable(ctx context.Context, tx *sqlx.Tx) error {
 	const query = `
     CREATE TABLE IF NOT EXISTS public.users(
-        id SERIAL PRIMARY KEY NOT NULL,
+        user_id SERIAL PRIMARY KEY NOT NULL,
         email TEXT UNIQUE NOT NULL,
         name TEXT NOT NULL,
         surname TEXT NOT NULL,
@@ -71,10 +75,25 @@ func createUsersTable(ctx context.Context, tx *sqlx.Tx) error {
 	return nil
 }
 
+func createTeachersTable(ctx context.Context, tx *sqlx.Tx) error {
+	const query = `
+    CREATE TABLE IF NOT EXISTS public.teachers(
+        teacher_id SERIAL PRIMARY KEY NOT NULL,
+        user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
+    );
+    `
+
+	_, err := tx.ExecContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to execute users table creation: %w", err)
+	}
+	return nil
+}
+
 func createCategoriesTable(ctx context.Context, tx *sqlx.Tx) error {
 	const query = `
     CREATE TABLE IF NOT EXISTS public.categories(
-        id SERIAL PRIMARY KEY NOT NULL,
+        category_id SERIAL PRIMARY KEY NOT NULL,
         name TEXT UNIQUE NOT NULL,
         min_age INTEGER NOT NULL
     );

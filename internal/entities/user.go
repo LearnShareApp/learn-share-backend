@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type User struct {
-	Id               int64     `db:"id"`
+	Id               int64     `db:"user_id"`
 	Email            string    `db:"email"`
 	Name             string    `db:"name"`
 	Surname          string    `db:"surname"`

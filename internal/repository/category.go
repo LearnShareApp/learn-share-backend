@@ -7,7 +7,7 @@ import (
 )
 
 func (r *Repository) GetCategories(ctx context.Context) ([]*entities.Category, error) {
-	query := `SELECT id, name, min_age FROM public.categories`
+	query := `SELECT category_id, name, min_age FROM public.categories`
 
 	var categories []*entities.Category
 	err := r.db.SelectContext(ctx, &categories, query)

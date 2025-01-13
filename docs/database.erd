@@ -4,8 +4,8 @@
   "settings": {
     "width": 3000,
     "height": 3000,
-    "scrollTop": -198.8262,
-    "scrollLeft": -145.9221,
+    "scrollTop": -501,
+    "scrollLeft": -276.3205,
     "zoomLevel": 1,
     "show": 431,
     "database": 4,
@@ -126,7 +126,7 @@
       },
       "hEO3VDSplXHmQYqBYb2aV": {
         "id": "hEO3VDSplXHmQYqBYb2aV",
-        "name": "Category",
+        "name": "Categories",
         "comment": "",
         "columnIds": [
           "Pf9jU4Pk9hjkjlghisr6v",
@@ -148,13 +148,13 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1735304194745,
+          "updateAt": 1736780387790,
           "createAt": 1735302823110
         }
       },
       "fNJyaZuy8QnnNJj1lwTA8": {
         "id": "fNJyaZuy8QnnNJj1lwTA8",
-        "name": "teachers_skills",
+        "name": "teachers_categories",
         "comment": "",
         "columnIds": [
           "jtrdLQtkRIucO9-0XdN7E",
@@ -181,12 +181,12 @@
           "x": 973.5062,
           "y": 110.365,
           "zIndex": 40,
-          "widthName": 76,
+          "widthName": 106,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1735305904693,
+          "updateAt": 1736780377887,
           "createAt": 1735302895223
         }
       },
@@ -291,7 +291,7 @@
       "yFmzu0XG0qWRE9Lp2PLNP": {
         "id": "yFmzu0XG0qWRE9Lp2PLNP",
         "tableId": "0IVvCT2lhUuhFjlRH9q9W",
-        "name": "id",
+        "name": "user_id",
         "comment": "",
         "dataType": "INTEGER",
         "default": "",
@@ -304,7 +304,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1735303436721,
+          "updateAt": 1736780308544,
           "createAt": 1735302368303
         }
       },
@@ -511,20 +511,20 @@
       "Pf9jU4Pk9hjkjlghisr6v": {
         "id": "Pf9jU4Pk9hjkjlghisr6v",
         "tableId": "hEO3VDSplXHmQYqBYb2aV",
-        "name": "id",
+        "name": "category_id",
         "comment": "",
         "dataType": "INTEGER",
         "default": "",
         "options": 10,
         "ui": {
           "keys": 1,
-          "widthName": 60,
+          "widthName": 63,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1735303078637,
+          "updateAt": 1736780332689,
           "createAt": 1735302854524
         }
       },
@@ -871,7 +871,7 @@
       "z5_oFtxhLcsskiHU9217s": {
         "id": "z5_oFtxhLcsskiHU9217s",
         "tableId": "riEEVn7ZQOvYhkDGFBT50",
-        "name": "id",
+        "name": "teacher_id",
         "comment": "",
         "dataType": "INTEGER",
         "default": "",
@@ -884,7 +884,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1735303458322,
+          "updateAt": 1736780316118,
           "createAt": 1735303447889
         }
       },
@@ -931,7 +931,7 @@
       "Sjtq64zEh6G2jQiUWBFHU": {
         "id": "Sjtq64zEh6G2jQiUWBFHU",
         "tableId": "HSWyOQiz_4cgksLWYOZYL",
-        "name": "id",
+        "name": "lesson_ id",
         "comment": "",
         "dataType": "INTEGER",
         "default": "",
@@ -944,7 +944,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1735304404928,
+          "updateAt": 1736780340809,
           "createAt": 1735303934156
         }
       },
@@ -1151,7 +1151,7 @@
       "Kl5mqMIPczE3RQ-6KNqSq": {
         "id": "Kl5mqMIPczE3RQ-6KNqSq",
         "tableId": "WkBgG6MMpMlGLTghMzVpk",
-        "name": "id",
+        "name": "review_id",
         "comment": "",
         "dataType": "INTEGER",
         "default": "",
@@ -1164,7 +1164,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1735304428303,
+          "updateAt": 1736780350430,
           "createAt": 1735304320934
         }
       },
@@ -1573,7 +1573,7 @@
       1735302368303,
       -1,
       {
-        "name": 1735302370137,
+        "name": 1736780308544,
         "dataType": 1735302378840,
         "options(notNull)": 1735302381229,
         "options(primaryKey)": 1735303436720
@@ -1685,7 +1685,7 @@
       1735302823109,
       -1,
       {
-        "name": 1735302928124
+        "name": 1736780387789
       }
     ],
     "Pf9jU4Pk9hjkjlghisr6v": [
@@ -1693,7 +1693,7 @@
       1735302854524,
       -1,
       {
-        "name": 1735302855713,
+        "name": 1736780332688,
         "dataType": 1735302858216,
         "options(notNull)": 1735302889301,
         "options(primaryKey)": 1735303078636
@@ -1724,7 +1724,7 @@
       1735302895223,
       -1,
       {
-        "name": 1735302905806
+        "name": 1736780377887
       }
     ],
     "B6mA5qbmyAHBlRQlNbBWs": [
@@ -1891,7 +1891,7 @@
       -1,
       {
         "options(notNull)": 1735303447888,
-        "name": 1735303447888,
+        "name": 1736780316117,
         "dataType": 1735303447888,
         "default": 1735303447888,
         "comment": 1735303447888,
@@ -1947,7 +1947,7 @@
       1735303934155,
       -1,
       {
-        "name": 1735303938939,
+        "name": 1736780340807,
         "dataType": 1735303941374,
         "options(notNull)": 1735303945101,
         "options(primaryKey)": 1735304404928
@@ -2086,7 +2086,7 @@
       1735304320934,
       -1,
       {
-        "name": 1735304322108,
+        "name": 1736780350429,
         "dataType": 1735304326879,
         "options(notNull)": 1735304329741,
         "options(primaryKey)": 1735304428302
