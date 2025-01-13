@@ -149,7 +149,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/profile": {
+        "/users/profile": {
             "get": {
                 "security": [
                     {
@@ -242,6 +242,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string",
                     "example": "qwerty@example.com"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "name": {
                     "type": "string",

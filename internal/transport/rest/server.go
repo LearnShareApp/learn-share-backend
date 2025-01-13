@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
-	get_categories2 "github.com/LearnShareApp/learn-share-backend/internal/use_cases/get_categories"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/user/get_profile"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"time"
@@ -25,9 +25,9 @@ const (
 	defaultHTTPServerWriteTimeout = time.Second * 15
 	defaultHTTPServerReadTimeout  = time.Second * 15
 
-	authRoute = "/auth"
-	userRoute = "/user"
-	apiRoute  = "/api"
+	authRoute  = "/auth"
+	usersRoute = "/users"
+	apiRoute   = "/api"
 )
 
 type ServerConfig struct {
@@ -38,7 +38,7 @@ type Services struct {
 	JwtSrv           *jwt.Service
 	RegSrv           *registration.Service
 	LoginSrv         *login.Service
-	GetCategoriesSrv *get_categories2.Service
+	GetCategoriesSrv *get_categories.Service
 	GetProfileSrv    *get_profile.Service
 }
 
@@ -50,7 +50,7 @@ type Server struct {
 func NewServices(jwtSrv *jwt.Service,
 	reg *registration.Service,
 	login *login.Service,
-	getCategories *get_categories2.Service,
+	getCategories *get_categories.Service,
 	getProfile *get_profile.Service) *Services {
 	return &Services{
 		JwtSrv:           jwtSrv,
@@ -69,7 +69,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 
 	regHandler := registration.MakeHandler(services.RegSrv, log)
 	loginHandler := login.MakeHandler(services.LoginSrv, log)
-	getCategoriesHandler := get_categories2.MakeHandler(services.GetCategoriesSrv, log)
+	getCategoriesHandler := get_categories.MakeHandler(services.GetCategoriesSrv, log)
 	getProfileHandler := get_profile.MakeHandler(services.GetProfileSrv, log)
 
 	apiRouter := chi.NewRouter()
@@ -81,15 +81,15 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	apiRouter.Mount(authRoute, authRouter)
 
 	// Categories
-	apiRouter.Get(get_categories2.Route, getCategoriesHandler)
+	apiRouter.Get(get_categories.Route, getCategoriesHandler)
 
 	apiRouter.Group(func(apiRouter chi.Router) {
 		apiRouter.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
 
-		// user routes
-		userRouter := chi.NewRouter()
-		userRouter.Get(get_profile.Route, getProfileHandler)
-		apiRouter.Mount(userRoute, userRouter)
+		// users routes
+		usersRouter := chi.NewRouter()
+		usersRouter.Get(get_profile.Route, getProfileHandler)
+		apiRouter.Mount(usersRoute, usersRouter)
 
 	})
 

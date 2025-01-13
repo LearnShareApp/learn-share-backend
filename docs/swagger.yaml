@@ -37,6 +37,9 @@ definitions:
       email:
         example: qwerty@example.com
         type: string
+      id:
+        example: 1
+        type: integer
       name:
         example: John
         type: string
@@ -202,7 +205,7 @@ paths:
       summary: Get categories
       tags:
       - categories
-  /user/profile:
+  /users/profile:
     get:
       description: 'Get info about user by jwt token (in Authorization enter: Bearer
         <your_jwt_token>)'

@@ -17,7 +17,7 @@ const Route = "/profile"
 // @Success 200 {object} response
 // @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
-// @Router /user/profile [get]
+// @Router /users/profile [get]
 // @Security     BearerAuth
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +45,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		}
 
 		resp := response{
+			Id:               user.Id,
 			Email:            user.Email,
 			Name:             user.Name,
 			Surname:          user.Surname,

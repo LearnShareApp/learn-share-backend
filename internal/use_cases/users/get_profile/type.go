@@ -6,6 +6,7 @@ import (
 )
 
 type response struct {
+	Id               int64     `json:"id" example:"1"`
 	Email            string    `json:"email" example:"qwerty@example.com"`
 	Name             string    `json:"name" example:"John"`
 	Surname          string    `json:"surname" example:"Smith"`
