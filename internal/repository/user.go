@@ -7,7 +7,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 )
 
-func (r *Repository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
+func (r *Repository) IsUserExistsByEmail(ctx context.Context, email string) (bool, error) {
 	const req = `SELECT EXISTS(SELECT 1 FROM public.users WHERE email = $1)`
 
 	var exists bool
@@ -20,7 +20,7 @@ func (r *Repository) ExistsByEmail(ctx context.Context, email string) (bool, err
 	return exists, nil
 }
 
-func (r *Repository) ExistsById(ctx context.Context, id int64) (bool, error) {
+func (r *Repository) IsUserExistsById(ctx context.Context, id int64) (bool, error) {
 	const req = `SELECT EXISTS(SELECT 1 FROM public.users WHERE user_id = $1)`
 
 	var exists bool
@@ -65,7 +65,7 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*entitie
 }
 
 func (r *Repository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
-	query := `SELECT user_id, email, password, name, surname, birthdate FROM public.users WHERE user_id = $1`
+	query := `SELECT user_id, email, password, name, surname, birthdate, registration_date FROM public.users WHERE user_id = $1`
 
 	var user entities.User
 	err := r.db.GetContext(ctx, &user, query, id)

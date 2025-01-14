@@ -21,9 +21,9 @@ const Route = "/signup"
 // @Produce json
 // @Param request body request true "Registration Info"
 // @Success 201 {object} response
-// @Failure 400 {object} errorResponse
-// @Failure 409 {object} errorResponse
-// @Failure 500 {object} errorResponse
+// @Failure 400 {object} jsonutils.ErrorStruct
+// @Failure 409 {object} jsonutils.ErrorStruct
+// @Failure 500 {object} jsonutils.ErrorStruct
 // @Router /auth/signup [post]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

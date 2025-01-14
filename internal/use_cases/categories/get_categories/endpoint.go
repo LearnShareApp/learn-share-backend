@@ -14,7 +14,7 @@ const Route = "/categories"
 // @Tags categories
 // @Produce json
 // @Success 200 {object} response
-// @Failure 500 {object} errorResponse
+// @Failure 500 {object} jsonutils.ErrorStruct
 // @Router /categories [get]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

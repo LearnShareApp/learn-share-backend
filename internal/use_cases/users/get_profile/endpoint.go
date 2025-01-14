@@ -21,8 +21,8 @@ const (
 // @Tags user
 // @Produce json
 // @Success 200 {object} response
-// @Failure 401 {object} errorResponse
-// @Failure 500 {object} errorResponse
+// @Failure 401 {object} jsonutils.ErrorStruct
+// @Failure 500 {object} jsonutils.ErrorStruct
 // @Router /user/profile [get]
 // @Security     BearerAuth
 func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
@@ -73,8 +73,8 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 // @Produce json
 // @Param id path int true "User ID"
 // @Success 200 {object} response
-// @Failure 404 {object} errorResponse
-// @Failure 500 {object} errorResponse
+// @Failure 404 {object} jsonutils.ErrorStruct
+// @Failure 500 {object} jsonutils.ErrorStruct
 // @Router /users/{id}/profile [get]
 func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +101,6 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		user, err := s.Do(r.Context(), id)
 		if err != nil {
 			if errors.Is(err, errors2.ErrorUserNotFound) {
-				log.Error("failed to find user", zap.Int64("id", id), zap.Error(err))
 				if err := jsonutils.RespondWith404(w, errors2.ErrorUserNotFound.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}

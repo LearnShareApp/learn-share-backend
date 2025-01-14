@@ -1,15 +1,13 @@
 package get_categories
 
-import "github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
-
+// @Description get categories response
 type response struct {
 	Categories []category `json:"categories"`
 }
 
+// @Description data of category
 type category struct {
 	Id     int    `json:"id" example:"1"`
 	Name   string `json:"name" example:"Programing"`
 	MinAge int    `json:"min_age" example:"12"`
 }
-
-type errorResponse jsonutils.ErrorStruct

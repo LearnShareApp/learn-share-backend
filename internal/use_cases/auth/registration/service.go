@@ -25,7 +25,7 @@ func NewService(repo repo, service JwtService) *Service {
 }
 
 func (s *Service) Do(ctx context.Context, user *entities.User) (string, error) {
-	exists, err := s.repo.ExistsByEmail(ctx, user.Email)
+	exists, err := s.repo.IsUserExistsByEmail(ctx, user.Email)
 	if err != nil {
 		return "", fmt.Errorf("failed to find user: %w", err)
 	}

@@ -1,7 +1,6 @@
 package registration
 
 import (
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"time"
 )
 
@@ -18,5 +17,3 @@ type request struct {
 type response struct {
 	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
 }
-
-type errorResponse jsonutils.ErrorStruct

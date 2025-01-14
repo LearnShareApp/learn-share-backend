@@ -53,19 +53,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/login.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/login.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/login.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     }
                 }
@@ -105,19 +105,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/registration.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/registration.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/registration.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     }
                 }
@@ -143,7 +143,47 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/get_categories.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/teacher": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get user id by jwt token, and he became teach (if he was not be registrate himself as teacher)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teacher"
+                ],
+                "summary": "User registrate also as teacher",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     }
                 }
@@ -174,13 +214,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/get_profile.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/get_profile.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     }
                 }
@@ -215,13 +255,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/get_profile.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/get_profile.errorResponse"
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     }
                 }
@@ -230,6 +270,7 @@ const docTemplate = `{
     },
     "definitions": {
         "get_categories.category": {
+            "description": "data of category",
             "type": "object",
             "properties": {
                 "id": {
@@ -246,15 +287,8 @@ const docTemplate = `{
                 }
             }
         },
-        "get_categories.errorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
         "get_categories.response": {
+            "description": "get categories response",
             "type": "object",
             "properties": {
                 "categories": {
@@ -262,14 +296,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/get_categories.category"
                     }
-                }
-            }
-        },
-        "get_profile.errorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
                 }
             }
         },
@@ -302,7 +328,7 @@ const docTemplate = `{
                 }
             }
         },
-        "login.errorResponse": {
+        "jsonutils.ErrorStruct": {
             "type": "object",
             "properties": {
                 "error": {
@@ -333,14 +359,6 @@ const docTemplate = `{
                 "token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                }
-            }
-        },
-        "registration.errorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
                 }
             }
         },

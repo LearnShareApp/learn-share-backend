@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"golang.org/x/sync/errgroup"
@@ -41,6 +42,7 @@ type Services struct {
 	LoginSrv         *login.Service
 	GetCategoriesSrv *get_categories.Service
 	GetProfileSrv    *get_profile.Service
+	BecomeTeacherSrv *become_teacher.Service
 }
 
 type Server struct {
@@ -52,13 +54,15 @@ func NewServices(jwtSrv *jwt.Service,
 	reg *registration.Service,
 	login *login.Service,
 	getCategories *get_categories.Service,
-	getProfile *get_profile.Service) *Services {
+	getProfile *get_profile.Service,
+	becomeTeacherSrv *become_teacher.Service) *Services {
 	return &Services{
 		JwtSrv:           jwtSrv,
 		RegSrv:           reg,
 		LoginSrv:         login,
 		GetCategoriesSrv: getCategories,
 		GetProfileSrv:    getProfile,
+		BecomeTeacherSrv: becomeTeacherSrv,
 	}
 }
 
@@ -91,6 +95,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
 
 		// protected routes
+		r.Post(become_teacher.Route, become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Get(path.Join(userRoute, get_profile.ProtectedRoute), get_profile.MakeProtectedHandler(services.GetProfileSrv, log))
 
 	})

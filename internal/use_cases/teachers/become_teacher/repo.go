@@ -1,4 +1,4 @@
-package get_profile
+package become_teacher
 
 import (
 	"context"
@@ -7,5 +7,6 @@ import (
 
 type repo interface {
 	IsUserExistsById(ctx context.Context, id int64) (bool, error)
-	GetUserById(ctx context.Context, id int64) (*entities.User, error)
+	IsTeacherExistsByUserId(ctx context.Context, id int64) (bool, error)
+	CreateTeacher(ctx context.Context, teacher *entities.Teacher) error
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
 	"github.com/jmoiron/sqlx"
@@ -52,8 +53,14 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 
 	getCategoriesSrv := get_categories.NewService(repo)
 	getProfileSrv := get_profile.NewService(repo)
+	becomeTeacherSrv := become_teacher.NewService(repo)
 
-	services := rest.NewServices(jwtService, registrationSrv, loginSrv, getCategoriesSrv, getProfileSrv)
+	services := rest.NewServices(jwtService,
+		registrationSrv,
+		loginSrv,
+		getCategoriesSrv,
+		getProfileSrv,
+		becomeTeacherSrv)
 
 	restServer := rest.NewServer(services, config.Server, log)
 

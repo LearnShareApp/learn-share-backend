@@ -19,7 +19,7 @@ func NewService(repo repo) *Service {
 
 func (s *Service) Do(ctx context.Context, id int64) (*entities.User, error) {
 
-	exists, err := s.repo.ExistsById(ctx, id)
+	exists, err := s.repo.IsUserExistsById(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user by id: %w", err)
 	}

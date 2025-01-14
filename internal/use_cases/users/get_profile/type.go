@@ -1,7 +1,6 @@
 package get_profile
 
 import (
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"time"
 )
 
@@ -13,5 +12,3 @@ type response struct {
 	RegistrationDate time.Time `json:"registration_date" example:"2022-09-09T10:10:10+09:00"`
 	Birthdate        time.Time `json:"birthdate" example:"2002-09-09T10:10:10+09:00"`
 }
-
-type errorResponse jsonutils.ErrorStruct

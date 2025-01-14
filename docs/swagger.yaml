@@ -1,6 +1,7 @@
 basePath: /api
 definitions:
   get_categories.category:
+    description: data of category
     properties:
       id:
         example: 1
@@ -12,22 +13,13 @@ definitions:
         example: Programing
         type: string
     type: object
-  get_categories.errorResponse:
-    properties:
-      error:
-        type: string
-    type: object
   get_categories.response:
+    description: get categories response
     properties:
       categories:
         items:
           $ref: '#/definitions/get_categories.category'
         type: array
-    type: object
-  get_profile.errorResponse:
-    properties:
-      error:
-        type: string
     type: object
   get_profile.response:
     properties:
@@ -50,7 +42,7 @@ definitions:
         example: Smith
         type: string
     type: object
-  login.errorResponse:
+  jsonutils.ErrorStruct:
     properties:
       error:
         type: string
@@ -71,11 +63,6 @@ definitions:
     properties:
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type: string
-    type: object
-  registration.errorResponse:
-    properties:
-      error:
         type: string
     type: object
   registration.request:
@@ -142,15 +129,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/login.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/login.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/login.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
       summary: Login user
       tags:
       - auth
@@ -176,15 +163,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/registration.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/registration.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/registration.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
       summary: Register new user
       tags:
       - auth
@@ -201,10 +188,36 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/get_categories.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
       summary: Get categories
       tags:
       - categories
+  /teacher:
+    post:
+      description: Get user id by jwt token, and he became teach (if he was not be
+        registrate himself as teacher)
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: User registrate also as teacher
+      tags:
+      - teacher
   /user/profile:
     get:
       description: 'Get info about user by jwt token (in Authorization enter: Bearer
@@ -219,11 +232,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/get_profile.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/get_profile.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Get user profile
@@ -248,11 +261,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/get_profile.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/get_profile.errorResponse'
+            $ref: '#/definitions/jsonutils.ErrorStruct'
       summary: Get user profile
       tags:
       - users
