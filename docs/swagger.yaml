@@ -205,6 +205,30 @@ paths:
       summary: Get categories
       tags:
       - categories
+  /user/profile:
+    get:
+      description: 'Get info about user by jwt token (in Authorization enter: Bearer
+        <your_jwt_token>)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_profile.response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/get_profile.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/get_profile.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - user
   /users/{id}/profile:
     get:
       description: Get info about user by id in route (/api/users/{id}/profile)
@@ -229,30 +253,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/get_profile.errorResponse'
-      summary: Get user profile
-      tags:
-      - users
-  /users/profile:
-    get:
-      description: 'Get info about user by jwt token (in Authorization enter: Bearer
-        <your_jwt_token>)'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/get_profile.response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/get_profile.errorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/get_profile.errorResponse'
-      security:
-      - BearerAuth: []
       summary: Get user profile
       tags:
       - users

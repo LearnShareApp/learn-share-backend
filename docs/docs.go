@@ -149,7 +149,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/profile": {
+        "/user/profile": {
             "get": {
                 "security": [
                     {
@@ -161,7 +161,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "user"
                 ],
                 "summary": "Get user profile",
                 "responses": {

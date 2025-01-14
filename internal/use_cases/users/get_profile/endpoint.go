@@ -18,12 +18,12 @@ const (
 // MakeProtectedHandler returns http.HandlerFunc
 // @Summary Get user profile
 // @Description Get info about user by jwt token (in Authorization enter: Bearer <your_jwt_token>)
-// @Tags users
+// @Tags user
 // @Produce json
 // @Success 200 {object} response
 // @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
-// @Router /users/profile [get]
+// @Router /user/profile [get]
 // @Security     BearerAuth
 func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

@@ -26,6 +26,7 @@ const (
 	defaultHTTPServerReadTimeout  = time.Second * 15
 
 	authRoute  = "/auth"
+	userRoute  = "/user"
 	usersRoute = "/users"
 	apiRoute   = "/api"
 )
@@ -90,7 +91,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
 
 		// protected routes
-		r.Get(path.Join(usersRoute, get_profile.ProtectedRoute), get_profile.MakeProtectedHandler(services.GetProfileSrv, log))
+		r.Get(path.Join(userRoute, get_profile.ProtectedRoute), get_profile.MakeProtectedHandler(services.GetProfileSrv, log))
 
 	})
 
