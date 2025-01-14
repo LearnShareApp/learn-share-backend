@@ -205,6 +205,33 @@ paths:
       summary: Get categories
       tags:
       - categories
+  /users/{id}/profile:
+    get:
+      description: Get info about user by id in route (/api/users/{id}/profile)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_profile.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/get_profile.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/get_profile.errorResponse'
+      summary: Get user profile
+      tags:
+      - users
   /users/profile:
     get:
       description: 'Get info about user by jwt token (in Authorization enter: Bearer
@@ -228,7 +255,7 @@ paths:
       - BearerAuth: []
       summary: Get user profile
       tags:
-      - user
+      - users
 securityDefinitions:
   BearerAuth:
     in: header

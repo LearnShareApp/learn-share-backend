@@ -20,6 +20,19 @@ func (r *Repository) ExistsByEmail(ctx context.Context, email string) (bool, err
 	return exists, nil
 }
 
+func (r *Repository) ExistsById(ctx context.Context, id int64) (bool, error) {
+	const req = `SELECT EXISTS(SELECT 1 FROM public.users WHERE user_id = $1)`
+
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, req, id)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check user existence: %w", err)
+	}
+
+	return exists, nil
+}
+
 func (r *Repository) CreateUser(ctx context.Context, user *entities.User) (int64, error) {
 	const req = `
 	INSERT INTO users (email, password, name, surname, birthdate) 

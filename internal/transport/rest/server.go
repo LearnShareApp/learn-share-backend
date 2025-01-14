@@ -7,16 +7,16 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"golang.org/x/sync/errgroup"
 	"net/http"
+	"path"
 	"time"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/middlewares"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
-	"go.uber.org/zap"
-	"golang.org/x/sync/errgroup"
-
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
 
 	_ "github.com/LearnShareApp/learn-share-backend/docs"
 )
@@ -67,31 +67,34 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	router.Use(middlewares.LoggerMiddleware(log.Named("log_middleware")))
 	router.Use(middlewares.CorsMiddleware)
 
-	regHandler := registration.MakeHandler(services.RegSrv, log)
-	loginHandler := login.MakeHandler(services.LoginSrv, log)
-	getCategoriesHandler := get_categories.MakeHandler(services.GetCategoriesSrv, log)
-	getProfileHandler := get_profile.MakeHandler(services.GetProfileSrv, log)
-
+	// root router
 	apiRouter := chi.NewRouter()
+
+	// public rotes
 
 	// auth routes
 	authRouter := chi.NewRouter()
-	authRouter.Post(registration.Route, regHandler)
-	authRouter.Post(login.Route, loginHandler)
+	authRouter.Post(registration.Route, registration.MakeHandler(services.RegSrv, log))
+	authRouter.Post(login.Route, login.MakeHandler(services.LoginSrv, log))
 	apiRouter.Mount(authRoute, authRouter)
 
-	// Categories
-	apiRouter.Get(get_categories.Route, getCategoriesHandler)
+	// categories route
+	apiRouter.Get(get_categories.Route, get_categories.MakeHandler(services.GetCategoriesSrv, log))
 
-	apiRouter.Group(func(apiRouter chi.Router) {
-		apiRouter.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
+	// users route
+	usersRouter := chi.NewRouter()
+	usersRouter.Get(get_profile.PublicRoute, get_profile.MakePublicHandler(services.GetProfileSrv, log))
 
-		// users routes
-		usersRouter := chi.NewRouter()
-		usersRouter.Get(get_profile.Route, getProfileHandler)
-		apiRouter.Mount(usersRoute, usersRouter)
+	// protected routes
+	apiRouter.Group(func(r chi.Router) {
+		r.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
+
+		// protected routes
+		r.Get(path.Join(usersRoute, get_profile.ProtectedRoute), get_profile.MakeProtectedHandler(services.GetProfileSrv, log))
 
 	})
+
+	apiRouter.Mount(usersRoute, usersRouter)
 
 	router.Mount(apiRoute, apiRouter)
 
@@ -118,8 +121,8 @@ func (s *Server) Start() error {
 		s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
 		return s.server.ListenAndServe()
 	})
-
-	return eg.Wait()
+	s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
+	return s.server.ListenAndServe()
 }
 
 // GracefulStop корректная остановка сервера

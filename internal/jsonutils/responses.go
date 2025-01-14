@@ -50,6 +50,12 @@ func RespondWith401(w http.ResponseWriter, message string) error {
 		message)
 }
 
+func RespondWith404(w http.ResponseWriter, message string) error {
+	return RespondWithError(w,
+		http.StatusNotFound,
+		message)
+}
+
 func RespondWith500(w http.ResponseWriter) error {
 	return RespondWithError(w,
 		http.StatusInternalServerError,

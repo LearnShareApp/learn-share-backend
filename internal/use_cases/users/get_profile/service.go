@@ -2,7 +2,9 @@ package get_profile
 
 import (
 	"context"
+	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
+	"github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
 type Service struct {
@@ -17,8 +19,19 @@ func NewService(repo repo) *Service {
 
 func (s *Service) Do(ctx context.Context, id int64) (*entities.User, error) {
 
-	// Вроде как нет смысла обрабатывать кейс когда пользователь не найден по id и заворачивать в ошибку
-	// т. к. по хорошему в токене, который выпустили мы не может быть несуществующий пользователь
+	exists, err := s.repo.ExistsById(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find user by id: %w", err)
+	}
 
-	return s.repo.GetUserById(ctx, id)
+	if !exists {
+		return nil, errors.ErrorUserNotFound
+	}
+
+	user, err := s.repo.GetUserById(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	return user, nil
 }
