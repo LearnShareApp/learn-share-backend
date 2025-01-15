@@ -6,7 +6,7 @@ import (
 )
 
 type repo interface {
-	IsUserExistsById(ctx context.Context, id int64) (bool, error)
-	IsTeacherExistsByUserId(ctx context.Context, id int64) (bool, error)
+	IsUserExistsById(ctx context.Context, id int) (bool, error)
+	IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error)
 	CreateTeacher(ctx context.Context, teacher *entities.Teacher) error
 }

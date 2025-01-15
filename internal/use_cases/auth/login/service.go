@@ -9,7 +9,7 @@ import (
 )
 
 type JwtService interface {
-	GenerateJWTToken(int64) (string, error)
+	GenerateJWTToken(int) (string, error)
 }
 
 type Service struct {

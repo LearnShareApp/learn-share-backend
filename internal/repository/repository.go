@@ -24,7 +24,7 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 	}
 	defer tx.Rollback()
 
-	if err := createUsersTable(ctx, tx); err != nil {
+	if err = createUsersTable(ctx, tx); err != nil {
 		return fmt.Errorf("error creating users table: %w", err)
 	}
 
@@ -32,7 +32,7 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 		return fmt.Errorf("error creating teachers table: %w", err)
 	}
 
-	if err := createCategoriesTable(ctx, tx); err != nil {
+	if err = createCategoriesTable(ctx, tx); err != nil {
 		return fmt.Errorf("error creating categories table: %w", err)
 	}
 
@@ -43,8 +43,12 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 		{Name: "Dancing", MinAge: 0},
 	}
 
-	if err := seedCategories(ctx, tx, categories); err != nil {
+	if err = seedCategories(ctx, tx, categories); err != nil {
 		return fmt.Errorf("error seeding categories: %w", err)
+	}
+
+	if err = createSkillsTable(ctx, tx); err != nil {
+		return fmt.Errorf("error creating skills table: %w", err)
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -79,7 +83,7 @@ func createTeachersTable(ctx context.Context, tx *sqlx.Tx) error {
 	const query = `
     CREATE TABLE IF NOT EXISTS public.teachers(
         teacher_id SERIAL PRIMARY KEY NOT NULL,
-        user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
+        user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
     );
     `
 
@@ -103,6 +107,29 @@ func createCategoriesTable(ctx context.Context, tx *sqlx.Tx) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute categories table creation: %w", err)
 	}
+	return nil
+}
+
+func createSkillsTable(ctx context.Context, tx *sqlx.Tx) error {
+	const query = `
+	CREATE TABLE IF NOT EXISTS public.skills (
+		skill_id SERIAL PRIMARY KEY,
+		teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+		category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE, 
+		video_card_link TEXT,
+		about TEXT,
+		rate SMALLINT,
+		is_active BOOLEAN NOT NULL DEFAULT TRUE, -- по хорошему FALSE но это если делать механизм подтверждения
+		CONSTRAINT unique_teacher_category UNIQUE (teacher_id, category_id) -- Уникальность teacher_id и category_id
+	);
+
+	`
+
+	_, err := tx.ExecContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to execute skills table creation: %w", err)
+	}
+
 	return nil
 }
 

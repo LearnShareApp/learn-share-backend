@@ -28,7 +28,7 @@ const (
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		id := r.Context().Value(jwt.UserIDKey).(int64)
+		id := r.Context().Value(jwt.UserIDKey).(int)
 		if id == 0 {
 			log.Error("id was missed in context")
 			if err := jsonutils.RespondWith500(w); err != nil {

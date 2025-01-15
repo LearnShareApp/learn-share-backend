@@ -48,7 +48,7 @@ func NewJwtService(secretKey string, opts ...Option) *Service {
 }
 
 // GenerateJWTToken создает JWT-токен для пользователя
-func (s *Service) GenerateJWTToken(userId int64) (string, error) {
+func (s *Service) GenerateJWTToken(userId int) (string, error) {
 	// Устанавливаем время жизни токена
 	expirationTime := time.Now().Add(s.duration)
 
@@ -101,12 +101,12 @@ func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 }
 
 // ExtractUserID извлекает ID пользователя из claims
-func (s *Service) ExtractUserID(claims jwt.MapClaims) (int64, error) {
+func (s *Service) ExtractUserID(claims jwt.MapClaims) (int, error) {
 	userID, ok := claims[UserIDKey].(float64)
 	if !ok {
 		return 0, fmt.Errorf("invalid or missing user ID in claims")
 	}
-	return int64(userID), nil
+	return int(userID), nil
 }
 
 func (s *Service) GetUserKey() string {

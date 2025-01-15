@@ -6,7 +6,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 )
 
-func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int64) (bool, error) {
+func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
 	const req = `SELECT EXISTS(SELECT 1 FROM public.teachers WHERE teacher_id = $1)`
 
 	var exists bool

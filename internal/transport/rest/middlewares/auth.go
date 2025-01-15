@@ -12,7 +12,7 @@ import (
 
 type TokenValidator interface {
 	ValidateJWTToken(tokenString string) (jwt.MapClaims, error)
-	ExtractUserID(claims jwt.MapClaims) (int64, error)
+	ExtractUserID(claims jwt.MapClaims) (int, error)
 	GetUserKey() string
 	GetExpiredError() error
 }

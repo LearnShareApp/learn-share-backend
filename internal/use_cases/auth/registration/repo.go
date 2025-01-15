@@ -7,5 +7,5 @@ import (
 
 type repo interface {
 	IsUserExistsByEmail(ctx context.Context, email string) (bool, error)
-	CreateUser(ctx context.Context, user *entities.User) (int64, error)
+	CreateUser(ctx context.Context, user *entities.User) (int, error)
 }

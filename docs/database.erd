@@ -4,8 +4,8 @@
   "settings": {
     "width": 3000,
     "height": 3000,
-    "scrollTop": -96,
-    "scrollLeft": -319.3205,
+    "scrollTop": 0,
+    "scrollLeft": -672.4732,
     "zoomLevel": 1,
     "show": 431,
     "database": 4,
@@ -154,9 +154,10 @@
       },
       "fNJyaZuy8QnnNJj1lwTA8": {
         "id": "fNJyaZuy8QnnNJj1lwTA8",
-        "name": "teachers_categories",
+        "name": "skills",
         "comment": "",
         "columnIds": [
+          "gcslm__UolUCZJgfB8RJ-",
           "jtrdLQtkRIucO9-0XdN7E",
           "6YaCzDTSco54O4nH4K573",
           "pC-ctmJ0dqP-YvaLSgdXj",
@@ -170,6 +171,7 @@
           "uGP_wgqTW2dqVd582rmUV",
           "X2A2s-lBJ43YsuPHXY5VZ",
           "v4PoM3ECnIZST3ufkbZQv",
+          "gcslm__UolUCZJgfB8RJ-",
           "jtrdLQtkRIucO9-0XdN7E",
           "6YaCzDTSco54O4nH4K573",
           "pC-ctmJ0dqP-YvaLSgdXj",
@@ -181,12 +183,12 @@
           "x": 973.5062,
           "y": 110.365,
           "zIndex": 40,
-          "widthName": 106,
+          "widthName": 60,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1736780377887,
+          "updateAt": 1736931168732,
           "createAt": 1735302895223
         }
       },
@@ -354,7 +356,7 @@
         "name": "registration_date",
         "comment": "",
         "dataType": "DATETIME",
-        "default": "",
+        "default": "now()",
         "options": 8,
         "ui": {
           "keys": 0,
@@ -364,7 +366,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1735302520117,
+          "updateAt": 1736931193934,
           "createAt": 1735302499334
         }
       },
@@ -1311,7 +1313,7 @@
       "mZETEMxe_LSvFqO_7V4mu": {
         "id": "mZETEMxe_LSvFqO_7V4mu",
         "tableId": "fNJyaZuy8QnnNJj1lwTA8",
-        "name": "is_approve",
+        "name": "is_active",
         "comment": "",
         "dataType": "BOOLEAN",
         "default": "",
@@ -1324,8 +1326,28 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1735305891060,
+          "updateAt": 1736888908950,
           "createAt": 1735305881875
+        }
+      },
+      "gcslm__UolUCZJgfB8RJ-": {
+        "id": "gcslm__UolUCZJgfB8RJ-",
+        "tableId": "fNJyaZuy8QnnNJj1lwTA8",
+        "name": "skill_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 10,
+        "ui": {
+          "keys": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1736931203121,
+          "createAt": 1736931166890
         }
       }
     },
@@ -1350,7 +1372,7 @@
             "6YaCzDTSco54O4nH4K573"
           ],
           "x": 1360.5062,
-          "y": 210.365,
+          "y": 222.365,
           "direction": 2
         },
         "meta": {
@@ -1406,7 +1428,7 @@
             "jtrdLQtkRIucO9-0XdN7E"
           ],
           "x": 1167.0062,
-          "y": 310.365,
+          "y": 334.365,
           "direction": 8
         },
         "meta": {
@@ -1606,7 +1628,8 @@
       {
         "name": 1735302508420,
         "dataType": 1735302518447,
-        "options(notNull)": 1735302520117
+        "options(notNull)": 1735302520117,
+        "default": 1736931193932
       }
     ],
     "qnnDtzroCTNcDuSnn7Jr3": [
@@ -1724,7 +1747,7 @@
       1735302895223,
       -1,
       {
-        "name": 1736780377887
+        "name": 1736931164194
       }
     ],
     "B6mA5qbmyAHBlRQlNbBWs": [
@@ -2188,9 +2211,20 @@
       1735305881874,
       -1,
       {
-        "name": 1735305886380,
+        "name": 1736888908949,
         "dataType": 1735305889586,
         "options(notNull)": 1735305891060
+      }
+    ],
+    "gcslm__UolUCZJgfB8RJ-": [
+      "tableColumnEntities",
+      1736931166885,
+      -1,
+      {
+        "name": 1736931178752,
+        "dataType": 1736931181947,
+        "options(notNull)": 1736931183495,
+        "options(primaryKey)": 1736931203118
       }
     ]
   }

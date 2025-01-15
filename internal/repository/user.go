@@ -20,7 +20,7 @@ func (r *Repository) IsUserExistsByEmail(ctx context.Context, email string) (boo
 	return exists, nil
 }
 
-func (r *Repository) IsUserExistsById(ctx context.Context, id int64) (bool, error) {
+func (r *Repository) IsUserExistsById(ctx context.Context, id int) (bool, error) {
 	const req = `SELECT EXISTS(SELECT 1 FROM public.users WHERE user_id = $1)`
 
 	var exists bool
@@ -33,14 +33,14 @@ func (r *Repository) IsUserExistsById(ctx context.Context, id int64) (bool, erro
 	return exists, nil
 }
 
-func (r *Repository) CreateUser(ctx context.Context, user *entities.User) (int64, error) {
+func (r *Repository) CreateUser(ctx context.Context, user *entities.User) (int, error) {
 	const req = `
 	INSERT INTO users (email, password, name, surname, birthdate) 
 	VALUES ($1, $2, $3, $4, $5)
 	RETURNING user_id
 	`
 
-	var userID int64
+	var userID int
 	if err := r.db.QueryRowContext(ctx, req, user.Email, user.Password, user.Name, user.Surname, user.Birthdate).Scan(&userID); err != nil {
 		return 0, err
 	}
@@ -64,7 +64,7 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*entitie
 	return &user, nil
 }
 
-func (r *Repository) GetUserById(ctx context.Context, id int64) (*entities.User, error) {
+func (r *Repository) GetUserById(ctx context.Context, id int) (*entities.User, error) {
 	query := `SELECT user_id, email, password, name, surname, birthdate, registration_date FROM public.users WHERE user_id = $1`
 
 	var user entities.User

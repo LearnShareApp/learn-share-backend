@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type User struct {
-	Id               int64     `db:"user_id"`
+	Id               int       `db:"user_id"`
 	Email            string    `db:"email"`
 	Name             string    `db:"name"`
 	Surname          string    `db:"surname"`
@@ -11,4 +11,5 @@ type User struct {
 	RegistrationDate time.Time `db:"registration_date"`
 	Birthdate        time.Time `db:"birthdate"`
 	Avatar           string    `db:"avatar"`
+	IsTeacher        bool
 }

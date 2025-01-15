@@ -17,7 +17,7 @@ func NewService(repo repo) *Service {
 	}
 }
 
-func (s *Service) Do(ctx context.Context, id int64) (*entities.User, error) {
+func (s *Service) Do(ctx context.Context, id int) (*entities.User, error) {
 
 	exists, err := s.repo.IsUserExistsById(ctx, id)
 	if err != nil {
@@ -31,6 +31,11 @@ func (s *Service) Do(ctx context.Context, id int64) (*entities.User, error) {
 	user, err := s.repo.GetUserById(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	user.IsTeacher, err = s.repo.IsTeacherExistsByUserId(ctx, user.Id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check whether the user is a teacher: %w", err)
 	}
 
 	return user, nil
