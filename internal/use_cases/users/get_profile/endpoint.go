@@ -2,7 +2,7 @@ package get_profile
 
 import (
 	"errors"
-	errors2 "github.com/LearnShareApp/learn-share-backend/internal/errors"
+	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
@@ -39,15 +39,19 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		user, err := s.Do(r.Context(), id)
 		if err != nil {
-			// Вроде как нет смысла обрабатывать кейс когда пользователь не найден по id т. к. по хорошему в токене,
-			// который выпустили мы не может быть несуществующий пользователь
-			// что и есть 500-я
+			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
+				if err = jsonutils.RespondWith401(w, err.Error()); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+				return
 
-			log.Error(err.Error())
-			if err = jsonutils.RespondWith500(w); err != nil {
-				log.Error("failed to send response", zap.Error(err))
+			} else {
+				log.Error(err.Error())
+				if err = jsonutils.RespondWith500(w); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+				return
 			}
-			return
 		}
 
 		resp := response{
@@ -101,8 +105,8 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		user, err := s.Do(r.Context(), id)
 		if err != nil {
-			if errors.Is(err, errors2.ErrorUserNotFound) {
-				if err := jsonutils.RespondWith404(w, errors2.ErrorUserNotFound.Error()); err != nil {
+			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
+				if err := jsonutils.RespondWith404(w, serviceErrors.ErrorUserNotFound.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return

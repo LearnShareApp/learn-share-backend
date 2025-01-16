@@ -2,7 +2,6 @@ package become_teacher
 
 import (
 	"errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
@@ -37,9 +36,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		teacher := entities.Teacher{UserId: id}
-
-		err := s.Do(r.Context(), &teacher)
+		err := s.Do(r.Context(), id)
 		if err != nil {
 			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
 				if err = jsonutils.RespondWith401(w, err.Error()); err != nil {

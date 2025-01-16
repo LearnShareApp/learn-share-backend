@@ -1,5 +1,19 @@
 basePath: /api
 definitions:
+  add_skill.request:
+    properties:
+      about:
+        example: I am Groot
+        type: string
+      category_id:
+        example: 1
+        type: integer
+      video_card_link:
+        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
+        type: string
+    required:
+    - category_id
+    type: object
   get_categories.category:
     description: data of category
     properties:
@@ -32,6 +46,9 @@ definitions:
       id:
         example: 1
         type: integer
+      is_teacher:
+        example: false
+        type: boolean
       name:
         example: John
         type: string
@@ -216,6 +233,45 @@ paths:
       security:
       - BearerAuth: []
       summary: User registrate also as teacher
+      tags:
+      - teacher
+  /teacher/skill:
+    post:
+      consumes:
+      - application/json
+      description: Registrate new skill for teacher (if he not exists create and registrate
+        skill)
+      parameters:
+      - description: Skill data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/add_skill.request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Registrate new skill
       tags:
       - teacher
   /user/profile:

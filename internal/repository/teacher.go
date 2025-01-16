@@ -2,8 +2,9 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 )
 
 func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
@@ -19,18 +20,43 @@ func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool,
 	return exists, nil
 }
 
-func (r *Repository) CreateTeacher(ctx context.Context, teacher *entities.Teacher) error {
+func (r *Repository) CreateTeacher(ctx context.Context, userId int) error {
 	const req = `
 	INSERT INTO teachers (user_id) 
 	VALUES ($1)
 	`
 
-	if teacher == nil {
-		return fmt.Errorf("teacher is nil")
-	}
-
-	if _, err := r.db.ExecContext(ctx, req, teacher.UserId); err != nil {
+	if _, err := r.db.ExecContext(ctx, req, userId); err != nil {
 		return fmt.Errorf("failed to insert teacher: %w", err)
 	}
 	return nil
+}
+
+func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (int, error) {
+	const (
+		selectQuery = `
+		SELECT teacher_id FROM teachers WHERE user_id = $1
+		`
+
+		insertQuery = `
+		INSERT INTO teachers (user_id) 
+		VALUES ($1)
+		RETURNING teacher_id
+		`
+	)
+
+	var teacherId int
+
+	err := r.db.GetContext(ctx, &teacherId, selectQuery, userId)
+	if err == nil {
+		return teacherId, nil
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		// Если ошибка не sql.ErrNoRows, возвращаем её
+		return 0, fmt.Errorf("failed to select teacher: %w", err)
+	}
+
+	if err := r.db.QueryRowContext(ctx, insertQuery, userId).Scan(&teacherId); err != nil {
+		return 0, fmt.Errorf("failed to insert teacher: %w", err)
+	}
+	return teacherId, nil
 }

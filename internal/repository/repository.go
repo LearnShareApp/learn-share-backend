@@ -83,7 +83,7 @@ func createTeachersTable(ctx context.Context, tx *sqlx.Tx) error {
 	const query = `
     CREATE TABLE IF NOT EXISTS public.teachers(
         teacher_id SERIAL PRIMARY KEY NOT NULL,
-        user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+        user_id INTEGER UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
     );
     `
 

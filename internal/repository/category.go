@@ -17,3 +17,16 @@ func (r *Repository) GetCategories(ctx context.Context) ([]*entities.Category, e
 
 	return categories, nil
 }
+
+func (r *Repository) IsCategoryExistsById(ctx context.Context, id int) (bool, error) {
+	const req = `SELECT EXISTS(SELECT 1 FROM public.categories WHERE category_id = $1)`
+
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, req, id)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check category existence: %w", err)
+	}
+
+	return exists, nil
+}

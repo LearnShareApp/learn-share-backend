@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -26,10 +27,11 @@ const (
 	defaultHTTPServerWriteTimeout = time.Second * 15
 	defaultHTTPServerReadTimeout  = time.Second * 15
 
-	authRoute  = "/auth"
-	userRoute  = "/user"
-	usersRoute = "/users"
-	apiRoute   = "/api"
+	authRoute    = "/auth"
+	userRoute    = "/user"
+	usersRoute   = "/users"
+	teacherRoute = "/teacher"
+	apiRoute     = "/api"
 )
 
 type ServerConfig struct {
@@ -43,6 +45,7 @@ type Services struct {
 	GetCategoriesSrv *get_categories.Service
 	GetProfileSrv    *get_profile.Service
 	BecomeTeacherSrv *become_teacher.Service
+	AddSkillSrv      *add_skill.Service
 }
 
 type Server struct {
@@ -55,7 +58,8 @@ func NewServices(jwtSrv *jwt.Service,
 	login *login.Service,
 	getCategories *get_categories.Service,
 	getProfile *get_profile.Service,
-	becomeTeacherSrv *become_teacher.Service) *Services {
+	becomeTeacherSrv *become_teacher.Service,
+	addSkillSrv *add_skill.Service) *Services {
 	return &Services{
 		JwtSrv:           jwtSrv,
 		RegSrv:           reg,
@@ -63,6 +67,7 @@ func NewServices(jwtSrv *jwt.Service,
 		GetCategoriesSrv: getCategories,
 		GetProfileSrv:    getProfile,
 		BecomeTeacherSrv: becomeTeacherSrv,
+		AddSkillSrv:      addSkillSrv,
 	}
 }
 
@@ -95,9 +100,9 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
 
 		// protected routes
-		r.Post(become_teacher.Route, become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Get(path.Join(userRoute, get_profile.ProtectedRoute), get_profile.MakeProtectedHandler(services.GetProfileSrv, log))
-
+		r.Post(become_teacher.Route, become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
+		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))
 	})
 
 	apiRouter.Mount(usersRoute, usersRouter)

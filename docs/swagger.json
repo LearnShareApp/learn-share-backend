@@ -183,6 +183,66 @@
                 }
             }
         },
+        "/teacher/skill": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registrate new skill for teacher (if he not exists create and registrate skill)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teacher"
+                ],
+                "summary": "Registrate new skill",
+                "parameters": [
+                    {
+                        "description": "Skill data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/add_skill.request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/user/profile": {
             "get": {
                 "security": [
@@ -263,6 +323,26 @@
         }
     },
     "definitions": {
+        "add_skill.request": {
+            "type": "object",
+            "required": [
+                "category_id"
+            ],
+            "properties": {
+                "about": {
+                    "type": "string",
+                    "example": "I am Groot"
+                },
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "video_card_link": {
+                    "type": "string",
+                    "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
+                }
+            }
+        },
         "get_categories.category": {
             "description": "data of category",
             "type": "object",
@@ -307,6 +387,10 @@
                 "id": {
                     "type": "integer",
                     "example": 1
+                },
+                "is_teacher": {
+                    "type": "boolean",
+                    "example": false
                 },
                 "name": {
                     "type": "string",
