@@ -7,7 +7,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"path"
@@ -42,7 +42,7 @@ type Services struct {
 	RegSrv           *registration.Service
 	LoginSrv         *login.Service
 	GetCategoriesSrv *get_categories.Service
-	GetProfileSrv    *get_profile.Service
+	GetProfileSrv    *get_user.Service
 	BecomeTeacherSrv *become_teacher.Service
 	AddSkillSrv      *add_skill.Service
 }
@@ -56,7 +56,7 @@ func NewServices(jwtSrv *jwt.Service,
 	reg *registration.Service,
 	login *login.Service,
 	getCategories *get_categories.Service,
-	getProfile *get_profile.Service,
+	getProfile *get_user.Service,
 	becomeTeacherSrv *become_teacher.Service,
 	addSkillSrv *add_skill.Service) *Services {
 	return &Services{
@@ -92,14 +92,14 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 
 	// users route
 	usersRouter := chi.NewRouter()
-	usersRouter.Get(get_profile.PublicRoute, get_profile.MakePublicHandler(services.GetProfileSrv, log))
+	usersRouter.Get(get_user.PublicRoute, get_user.MakePublicHandler(services.GetProfileSrv, log))
 
 	// protected routes
 	apiRouter.Group(func(r chi.Router) {
 		r.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
 
 		// protected routes
-		r.Get(path.Join(userRoute, get_profile.ProtectedRoute), get_profile.MakeProtectedHandler(services.GetProfileSrv, log))
+		r.Get(path.Join(userRoute, get_user.ProtectedRoute), get_user.MakeProtectedHandler(services.GetProfileSrv, log))
 		r.Post(become_teacher.Route, become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))
 	})

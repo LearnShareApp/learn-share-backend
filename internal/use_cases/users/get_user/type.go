@@ -1,4 +1,4 @@
-package get_profile
+package get_user
 
 import (
 	"time"

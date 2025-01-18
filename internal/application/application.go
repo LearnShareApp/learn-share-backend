@@ -12,7 +12,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -53,7 +53,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	loginSrv := login.NewService(repo, jwtService)
 
 	getCategoriesSrv := get_categories.NewService(repo)
-	getProfileSrv := get_profile.NewService(repo)
+	getProfileSrv := get_user.NewService(repo)
 	becomeTeacherSrv := become_teacher.NewService(repo)
 	addSkillSrv := add_skill.NewService(repo)
 

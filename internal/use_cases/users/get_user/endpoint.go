@@ -1,4 +1,4 @@
-package get_profile
+package get_user
 
 import (
 	"errors"
@@ -64,16 +64,15 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			IsTeacher:        user.IsTeacher,
 		}
 
-		respondErr := jsonutils.SuccessRespondWith200(w, resp)
-		if respondErr != nil {
-			log.Error("failed to send response", zap.Error(respondErr))
+		if err = jsonutils.SuccessRespondWith200(w, resp); err != nil {
+			log.Error("failed to send response", zap.Error(err))
 		}
 	}
 }
 
 // MakePublicHandler returns http.HandlerFunc
 // @Summary Get user profile
-// @Description Get info about user by id in route (/api/users/{id}/profile)
+// @Description Get info about user by user id in route (/api/users/{id}/profile)
 // @Tags users
 // @Produce json
 // @Param id path int true "User ID"
@@ -129,9 +128,8 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			IsTeacher:        user.IsTeacher,
 		}
 
-		respondErr := jsonutils.SuccessRespondWith200(w, resp)
-		if respondErr != nil {
-			log.Error("failed to send response", zap.Error(respondErr))
+		if err = jsonutils.SuccessRespondWith200(w, resp); err != nil {
+			log.Error("failed to send response", zap.Error(err))
 		}
 	}
 }

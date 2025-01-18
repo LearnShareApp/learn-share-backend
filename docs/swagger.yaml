@@ -35,7 +35,7 @@ definitions:
           $ref: '#/definitions/get_categories.category'
         type: array
     type: object
-  get_profile.response:
+  get_user.response:
     properties:
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
@@ -284,7 +284,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_profile.response'
+            $ref: '#/definitions/get_user.response'
         "401":
           description: Unauthorized
           schema:
@@ -300,7 +300,7 @@ paths:
       - user
   /users/{id}/profile:
     get:
-      description: Get info about user by id in route (/api/users/{id}/profile)
+      description: Get info about user by user id in route (/api/users/{id}/profile)
       parameters:
       - description: User ID
         in: path
@@ -313,7 +313,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_profile.response'
+            $ref: '#/definitions/get_user.response'
         "404":
           description: Not Found
           schema:

@@ -268,7 +268,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/get_profile.response"
+                            "$ref": "#/definitions/get_user.response"
                         }
                     },
                     "401": {
@@ -288,7 +288,7 @@ const docTemplate = `{
         },
         "/users/{id}/profile": {
             "get": {
-                "description": "Get info about user by id in route (/api/users/{id}/profile)",
+                "description": "Get info about user by user id in route (/api/users/{id}/profile)",
                 "produces": [
                     "application/json"
                 ],
@@ -309,7 +309,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/get_profile.response"
+                            "$ref": "#/definitions/get_user.response"
                         }
                     },
                     "404": {
@@ -379,7 +379,7 @@ const docTemplate = `{
                 }
             }
         },
-        "get_profile.response": {
+        "get_user.response": {
             "type": "object",
             "properties": {
                 "birthdate": {
