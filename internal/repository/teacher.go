@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/internal/entities"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
 func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
@@ -59,4 +61,21 @@ func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (
 		return 0, fmt.Errorf("failed to insert teacher: %w", err)
 	}
 	return teacherId, nil
+}
+
+func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error) {
+	query := `SELECT teacher_id, user_id FROM public.teachers WHERE user_id = $1`
+
+	var teacher entities.Teacher
+	err := r.db.GetContext(ctx, &teacher, query, id)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, internalErrs.ErrorSelectEmpty
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to find teacher by user id: %w", err)
+	}
+
+	return &teacher, nil
 }

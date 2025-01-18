@@ -35,6 +35,52 @@ definitions:
           $ref: '#/definitions/get_categories.category'
         type: array
     type: object
+  get_teacher.response:
+    properties:
+      birthdate:
+        example: "2002-09-09T10:10:10+09:00"
+        type: string
+      email:
+        example: qwerty@example.com
+        type: string
+      name:
+        example: John
+        type: string
+      registration_date:
+        example: "2022-09-09T10:10:10+09:00"
+        type: string
+      skills:
+        items:
+          $ref: '#/definitions/get_teacher.skill'
+        type: array
+      surname:
+        example: Smith
+        type: string
+      teacher_id:
+        example: 1
+        type: integer
+      user_id:
+        example: 1
+        type: integer
+    type: object
+  get_teacher.skill:
+    properties:
+      about:
+        example: about me...
+        type: string
+      category_id:
+        example: 1
+        type: integer
+      rate:
+        example: 5
+        type: integer
+      skill_id:
+        example: 1
+        type: integer
+      video_card_link:
+        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
+        type: string
+    type: object
   get_user.response:
     properties:
       birthdate:
@@ -210,6 +256,33 @@ paths:
       tags:
       - categories
   /teacher:
+    get:
+      description: Get all info about teacher (user info + teacher + his skills) by
+        user id in token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_teacher.response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Get teacher data
+      tags:
+      - teachers
     post:
       description: Get user id by jwt token, and he became teach (if he was not be
         registrate himself as teacher)
@@ -274,6 +347,34 @@ paths:
       summary: Registrate new skill
       tags:
       - teacher
+  /teachers/{id}:
+    get:
+      description: Get all info about teacher (user info + teacher + his skills) by
+        user id in route (/api/teachers/{id})
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_teacher.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      summary: Get teacher data
+      tags:
+      - teachers
   /user/profile:
     get:
       description: 'Get info about user by jwt token (in Authorization enter: Bearer
@@ -297,7 +398,7 @@ paths:
       - BearerAuth: []
       summary: Get user profile
       tags:
-      - user
+      - users
   /users/{id}/profile:
     get:
       description: Get info about user by user id in route (/api/users/{id}/profile)

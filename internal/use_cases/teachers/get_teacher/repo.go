@@ -6,6 +6,7 @@ import (
 )
 
 type repo interface {
-	IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error)
 	GetUserById(ctx context.Context, id int) (*entities.User, error)
+	GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error)
+	GetSkillsByTeacherId(ctx context.Context, id int) ([]*entities.Skill, error)
 }

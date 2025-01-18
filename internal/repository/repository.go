@@ -118,7 +118,7 @@ func createSkillsTable(ctx context.Context, tx *sqlx.Tx) error {
 		category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE, 
 		video_card_link TEXT,
 		about TEXT,
-		rate SMALLINT,
+		rate SMALLINT NOT NULL DEFAULT 0,
 		is_active BOOLEAN NOT NULL DEFAULT TRUE, -- по хорошему FALSE но это если делать механизм подтверждения
 		CONSTRAINT unique_teacher_category UNIQUE (teacher_id, category_id) -- Уникальность teacher_id и category_id
 	);

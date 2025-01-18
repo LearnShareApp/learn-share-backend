@@ -18,7 +18,7 @@ const (
 // MakeProtectedHandler returns http.HandlerFunc
 // @Summary Get user profile
 // @Description Get info about user by jwt token (in Authorization enter: Bearer <your_jwt_token>)
-// @Tags user
+// @Tags users
 // @Produce json
 // @Success 200 {object} response
 // @Failure 401 {object} jsonutils.ErrorStruct

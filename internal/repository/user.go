@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
+	"github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
 func (r *Repository) IsUserExistsByEmail(ctx context.Context, email string) (bool, error) {
@@ -71,7 +72,7 @@ func (r *Repository) GetUserById(ctx context.Context, id int) (*entities.User, e
 	err := r.db.GetContext(ctx, &user, query, id)
 
 	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("user not found: %w", err)
+		return nil, errors.ErrorSelectEmpty
 	}
 
 	if err != nil {

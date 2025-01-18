@@ -20,5 +20,5 @@ type skill struct {
 	CategoryId    int    `json:"category_id" example:"1"`
 	VideoCardLink string `json:"video_card_link" example:"https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"`
 	About         string `json:"about" example:"about me..."`
-	Rate          int    `json:"rate" example:"5"`
+	Rate          int8   `json:"rate" example:"5"`
 }

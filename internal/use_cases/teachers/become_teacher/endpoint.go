@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	Route = "/teacher"
+	Route = ""
 )
 
 // MakeHandler returns http.HandlerFunc

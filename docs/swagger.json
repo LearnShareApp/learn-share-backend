@@ -144,6 +144,47 @@
             }
         },
         "/teacher": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all info about teacher (user info + teacher + his skills) by user id in token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Get teacher data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_teacher.response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -243,6 +284,47 @@
                 }
             }
         },
+        "/teachers/{id}": {
+            "get": {
+                "description": "Get all info about teacher (user info + teacher + his skills) by user id in route (/api/teachers/{id})",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Get teacher data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_teacher.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/user/profile": {
             "get": {
                 "security": [
@@ -255,7 +337,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "users"
                 ],
                 "summary": "Get user profile",
                 "responses": {
@@ -370,6 +452,70 @@
                     "items": {
                         "$ref": "#/definitions/get_categories.category"
                     }
+                }
+            }
+        },
+        "get_teacher.response": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string",
+                    "example": "2002-09-09T10:10:10+09:00"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "qwerty@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "registration_date": {
+                    "type": "string",
+                    "example": "2022-09-09T10:10:10+09:00"
+                },
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/get_teacher.skill"
+                    }
+                },
+                "surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "get_teacher.skill": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "type": "string",
+                    "example": "about me..."
+                },
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "rate": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "skill_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "video_card_link": {
+                    "type": "string",
+                    "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
                 }
             }
         },

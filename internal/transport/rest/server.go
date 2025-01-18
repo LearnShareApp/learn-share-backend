@@ -7,6 +7,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
@@ -26,11 +27,12 @@ const (
 	defaultHTTPServerWriteTimeout = time.Second * 15
 	defaultHTTPServerReadTimeout  = time.Second * 15
 
-	authRoute    = "/auth"
-	userRoute    = "/user"
-	usersRoute   = "/users"
-	teacherRoute = "/teacher"
-	apiRoute     = "/api"
+	authRoute     = "/auth"
+	userRoute     = "/user"
+	usersRoute    = "/users"
+	teacherRoute  = "/teacher"
+	teachersRoute = "/teachers"
+	apiRoute      = "/api"
 )
 
 type ServerConfig struct {
@@ -45,6 +47,7 @@ type Services struct {
 	GetProfileSrv    *get_user.Service
 	BecomeTeacherSrv *become_teacher.Service
 	AddSkillSrv      *add_skill.Service
+	GetTeacherSrv    *get_teacher.Service
 }
 
 type Server struct {
@@ -58,7 +61,8 @@ func NewServices(jwtSrv *jwt.Service,
 	getCategories *get_categories.Service,
 	getProfile *get_user.Service,
 	becomeTeacherSrv *become_teacher.Service,
-	addSkillSrv *add_skill.Service) *Services {
+	addSkillSrv *add_skill.Service,
+	getTeacher *get_teacher.Service) *Services {
 	return &Services{
 		JwtSrv:           jwtSrv,
 		RegSrv:           reg,
@@ -67,6 +71,7 @@ func NewServices(jwtSrv *jwt.Service,
 		GetProfileSrv:    getProfile,
 		BecomeTeacherSrv: becomeTeacherSrv,
 		AddSkillSrv:      addSkillSrv,
+		GetTeacherSrv:    getTeacher,
 	}
 }
 
@@ -94,13 +99,19 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	usersRouter := chi.NewRouter()
 	usersRouter.Get(get_user.PublicRoute, get_user.MakePublicHandler(services.GetProfileSrv, log))
 
+	// teachers route
+	teachersRouter := chi.NewRouter()
+	teachersRouter.Get(get_teacher.PublicRoute, get_teacher.MakePublicHandler(services.GetTeacherSrv, log))
+	apiRouter.Mount(teachersRoute, teachersRouter)
+
 	// protected routes
 	apiRouter.Group(func(r chi.Router) {
 		r.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
 
 		// protected routes
 		r.Get(path.Join(userRoute, get_user.ProtectedRoute), get_user.MakeProtectedHandler(services.GetProfileSrv, log))
-		r.Post(become_teacher.Route, become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
+		r.Get(path.Join(teacherRoute, get_teacher.ProtectedRoute), get_teacher.MakeProtectedHandler(services.GetTeacherSrv, log))
+		r.Post(path.Join(teacherRoute, become_teacher.Route), become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))
 	})
 
