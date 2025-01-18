@@ -9,7 +9,6 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_profile"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"path"
 	"time"
@@ -129,12 +128,12 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 }
 
 func (s *Server) Start() error {
-	eg := errgroup.Group{}
-
-	eg.Go(func() error {
-		s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
-		return s.server.ListenAndServe()
-	})
+	//eg := errgroup.Group{}
+	//
+	//eg.Go(func() error {
+	//	s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
+	//	return s.server.ListenAndServe()
+	//})
 	s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
 	return s.server.ListenAndServe()
 }
