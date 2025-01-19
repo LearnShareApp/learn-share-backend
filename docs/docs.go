@@ -548,6 +548,10 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
+                "category_name": {
+                    "type": "string",
+                    "example": "Category"
+                },
                 "rate": {
                     "type": "integer",
                     "example": 5

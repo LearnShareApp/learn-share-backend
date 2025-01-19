@@ -30,9 +30,19 @@ func (r *Repository) CreateSkill(ctx context.Context, skill *entities.Skill) err
 }
 
 func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entities.Skill, error) {
-	query := `SELECT skill_id, teacher_id, category_id, video_card_link, about, rate, is_active 
-		FROM public.skills 
-		WHERE teacher_id = $1`
+	query := `
+	SELECT 
+		s.skill_id, 
+		s.teacher_id, 
+		s.category_id, 
+		s.video_card_link, 
+		s.about, 
+		s.rate, 
+		s.is_active,
+		c.name as category_name
+	FROM public.skills s
+	INNER JOIN public.categories c ON s.category_id = c.category_id
+	WHERE teacher_id = $1`
 
 	var skills []*entities.Skill
 	err := r.db.SelectContext(ctx, &skills, query, id)

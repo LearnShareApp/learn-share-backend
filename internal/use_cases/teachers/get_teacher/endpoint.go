@@ -137,6 +137,7 @@ func mappingResponse(user *entities.User) *response {
 		resp.Skills = append(resp.Skills, skill{
 			SkillId:       sk.Id,
 			CategoryId:    sk.CategoryId,
+			CategoryName:  sk.CategoryName,
 			VideoCardLink: sk.VideoCardLink,
 			About:         sk.About,
 			Rate:          sk.Rate,

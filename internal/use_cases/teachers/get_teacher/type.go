@@ -18,6 +18,7 @@ type response struct {
 type skill struct {
 	SkillId       int    `json:"skill_id" example:"1"`
 	CategoryId    int    `json:"category_id" example:"1"`
+	CategoryName  string `json:"category_name" example:"Category"`
 	VideoCardLink string `json:"video_card_link" example:"https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"`
 	About         string `json:"about" example:"about me..."`
 	Rate          int8   `json:"rate" example:"5"`

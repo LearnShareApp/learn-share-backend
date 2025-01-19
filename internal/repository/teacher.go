@@ -107,7 +107,6 @@ func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, e
 	type result struct {
 		entities.User
 		entities.Teacher
-		CategoryName string `db:"category_name"` // Добавляем поле для маппинга
 		entities.Skill
 	}
 
@@ -160,7 +159,7 @@ func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, e
 				Id:            row.Skill.Id,
 				TeacherId:     row.Skill.TeacherId,
 				CategoryId:    row.Skill.CategoryId,
-				CategoryName:  row.CategoryName,
+				CategoryName:  row.Skill.CategoryName,
 				VideoCardLink: row.Skill.VideoCardLink,
 				About:         row.Skill.About,
 				Rate:          row.Skill.Rate,

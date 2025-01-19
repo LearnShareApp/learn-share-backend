@@ -71,6 +71,9 @@ definitions:
       category_id:
         example: 1
         type: integer
+      category_name:
+        example: Category
+        type: string
       rate:
         example: 5
         type: integer
