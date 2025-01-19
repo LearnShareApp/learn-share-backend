@@ -8,6 +8,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teachers"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
@@ -48,6 +49,7 @@ type Services struct {
 	BecomeTeacherSrv *become_teacher.Service
 	AddSkillSrv      *add_skill.Service
 	GetTeacherSrv    *get_teacher.Service
+	GetTeachersSrv   *get_teachers.Service
 }
 
 type Server struct {
@@ -62,7 +64,8 @@ func NewServices(jwtSrv *jwt.Service,
 	getProfile *get_user.Service,
 	becomeTeacherSrv *become_teacher.Service,
 	addSkillSrv *add_skill.Service,
-	getTeacher *get_teacher.Service) *Services {
+	getTeacher *get_teacher.Service,
+	getTeachers *get_teachers.Service) *Services {
 	return &Services{
 		JwtSrv:           jwtSrv,
 		RegSrv:           reg,
@@ -72,6 +75,7 @@ func NewServices(jwtSrv *jwt.Service,
 		BecomeTeacherSrv: becomeTeacherSrv,
 		AddSkillSrv:      addSkillSrv,
 		GetTeacherSrv:    getTeacher,
+		GetTeachersSrv:   getTeachers,
 	}
 }
 
@@ -111,6 +115,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		// protected routes
 		r.Get(path.Join(userRoute, get_user.ProtectedRoute), get_user.MakeProtectedHandler(services.GetProfileSrv, log))
 		r.Get(path.Join(teacherRoute, get_teacher.ProtectedRoute), get_teacher.MakeProtectedHandler(services.GetTeacherSrv, log))
+		r.Get(path.Join(teachersRoute, get_teachers.Route), get_teachers.MakeHandler(services.GetTeachersSrv, log))
 		r.Post(path.Join(teacherRoute, become_teacher.Route), become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))
 	})

@@ -79,3 +79,100 @@ func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.
 
 	return &teacher, nil
 }
+
+func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, error) {
+	query := `
+    SELECT
+		u.user_id,
+		u.email,
+		u.name,
+		u.surname,
+		u.registration_date,
+		u.birthdate,
+		u.avatar,
+		t.teacher_id,
+		s.skill_id,
+		s.category_id,
+		s.video_card_link,
+		s.about,
+		s.rate,
+		s.is_active,
+		c.name as category_name
+	FROM public.users u
+    INNER JOIN public.teachers t ON u.user_id = t.user_id
+    INNER JOIN public.skills s ON t.teacher_id = s.teacher_id AND s.is_active
+    INNER JOIN public.categories c ON s.category_id = c.category_id`
+
+	// Временная структура для хранения результатов запроса
+	type result struct {
+		entities.User
+		entities.Teacher
+		CategoryName string `db:"category_name"` // Добавляем поле для маппинга
+		entities.Skill
+	}
+
+	var rows []result
+	err := r.db.SelectContext(ctx, &rows, query)
+	if err != nil {
+		return nil, err
+	}
+
+	// Мапа для группировки результатов
+	usersMap := make(map[int]*entities.User)
+
+	// Обработка результатов
+	for _, row := range rows {
+		user, exists := usersMap[row.User.Id]
+		if !exists {
+			user = &entities.User{
+				Id:               row.User.Id,
+				Email:            row.User.Email,
+				Name:             row.User.Name,
+				Surname:          row.User.Surname,
+				Password:         row.User.Password,
+				RegistrationDate: row.User.RegistrationDate,
+				Birthdate:        row.User.Birthdate,
+				IsTeacher:        false,
+				TeacherData:      nil,
+			}
+			usersMap[row.User.Id] = user
+		}
+
+		if user.TeacherData == nil {
+			user.IsTeacher = true
+			user.TeacherData = &entities.Teacher{
+				Id:     row.Teacher.Id,
+				UserId: row.Teacher.UserId,
+				Skills: make([]*entities.Skill, 0),
+			}
+		}
+
+		skillExists := false
+		for _, skill := range user.TeacherData.Skills {
+			if skill.Id == row.Skill.Id {
+				skillExists = true
+				break
+			}
+		}
+
+		if !skillExists {
+			user.TeacherData.Skills = append(user.TeacherData.Skills, &entities.Skill{
+				Id:            row.Skill.Id,
+				TeacherId:     row.Skill.TeacherId,
+				CategoryId:    row.Skill.CategoryId,
+				CategoryName:  row.CategoryName,
+				VideoCardLink: row.Skill.VideoCardLink,
+				About:         row.Skill.About,
+				Rate:          row.Skill.Rate,
+				IsActive:      row.Skill.IsActive,
+			})
+		}
+	}
+
+	users := make([]entities.User, 0, len(usersMap))
+	for _, user := range usersMap {
+		users = append(users, *user)
+	}
+
+	return users, nil
+}

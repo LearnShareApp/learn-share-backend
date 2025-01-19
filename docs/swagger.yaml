@@ -81,6 +81,62 @@ definitions:
         example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
         type: string
     type: object
+  get_teachers.response:
+    properties:
+      teachers:
+        items:
+          $ref: '#/definitions/get_teachers.teacher'
+        type: array
+    type: object
+  get_teachers.skill:
+    properties:
+      about:
+        example: about me...
+        type: string
+      category_id:
+        example: 1
+        type: integer
+      category_name:
+        example: Category
+        type: string
+      rate:
+        example: 5
+        type: integer
+      skill_id:
+        example: 1
+        type: integer
+      video_card_link:
+        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
+        type: string
+    type: object
+  get_teachers.teacher:
+    properties:
+      birthdate:
+        example: "2002-09-09T10:10:10+09:00"
+        type: string
+      email:
+        example: qwerty@example.com
+        type: string
+      name:
+        example: John
+        type: string
+      registration_date:
+        example: "2022-09-09T10:10:10+09:00"
+        type: string
+      skills:
+        items:
+          $ref: '#/definitions/get_teachers.skill'
+        type: array
+      surname:
+        example: Smith
+        type: string
+      teacher_id:
+        example: 1
+        type: integer
+      user_id:
+        example: 1
+        type: integer
+    type: object
   get_user.response:
     properties:
       birthdate:
@@ -307,7 +363,7 @@ paths:
       - BearerAuth: []
       summary: User registrate also as teacher
       tags:
-      - teacher
+      - teachers
   /teacher/skill:
     post:
       consumes:
@@ -346,7 +402,30 @@ paths:
       - BearerAuth: []
       summary: Registrate new skill
       tags:
-      - teacher
+      - teachers
+  /teachers:
+    get:
+      description: Get full teachers data (their user data, teacher data and skills)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_teachers.response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Get full teachers data
+      tags:
+      - teachers
   /teachers/{id}:
     get:
       description: Get all info about teacher (user info + teacher + his skills) by

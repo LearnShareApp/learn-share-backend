@@ -19,7 +19,7 @@ const (
 // MakeHandler returns http.HandlerFunc
 // @Summary Registrate new skill
 // @Description Registrate new skill for teacher (if he not exists create and registrate skill)
-// @Tags teacher
+// @Tags teachers
 // @Accept json
 // @Produce json
 // @Param request body request true "Skill data"

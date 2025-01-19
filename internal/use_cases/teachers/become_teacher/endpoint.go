@@ -16,7 +16,7 @@ const (
 // MakeHandler returns http.HandlerFunc
 // @Summary User registrate also as teacher
 // @Description Get user id by jwt token, and he became teach (if he was not be registrate himself as teacher)
-// @Tags teacher
+// @Tags teachers
 // @Produce json
 // @Success 201
 // @Failure 401 {object} jsonutils.ErrorStruct

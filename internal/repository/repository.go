@@ -68,7 +68,7 @@ func createUsersTable(ctx context.Context, tx *sqlx.Tx) error {
         password TEXT NOT NULL,
         registration_date TIMESTAMPTZ DEFAULT NOW(),
         birthdate DATE NOT NULL,
-        avatar TEXT
+        avatar TEXT NOT NULL DEFAULT ''
     );
     `
 

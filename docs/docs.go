@@ -202,7 +202,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "teacher"
+                    "teachers"
                 ],
                 "summary": "User registrate also as teacher",
                 "responses": {
@@ -245,7 +245,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "teacher"
+                    "teachers"
                 ],
                 "summary": "Registrate new skill",
                 "parameters": [
@@ -277,6 +277,43 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get full teachers data (their user data, teacher data and skills)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Get full teachers data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_teachers.response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
@@ -522,6 +559,85 @@ const docTemplate = `{
                 "video_card_link": {
                     "type": "string",
                     "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
+                }
+            }
+        },
+        "get_teachers.response": {
+            "type": "object",
+            "properties": {
+                "teachers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/get_teachers.teacher"
+                    }
+                }
+            }
+        },
+        "get_teachers.skill": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "type": "string",
+                    "example": "about me..."
+                },
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "category_name": {
+                    "type": "string",
+                    "example": "Category"
+                },
+                "rate": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "skill_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "video_card_link": {
+                    "type": "string",
+                    "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
+                }
+            }
+        },
+        "get_teachers.teacher": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string",
+                    "example": "2002-09-09T10:10:10+09:00"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "qwerty@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "registration_date": {
+                    "type": "string",
+                    "example": "2022-09-09T10:10:10+09:00"
+                },
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/get_teachers.skill"
+                    }
+                },
+                "surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
