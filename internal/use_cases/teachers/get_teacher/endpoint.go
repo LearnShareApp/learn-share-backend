@@ -39,13 +39,14 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		user, teacher, err := s.Do(r.Context(), id)
+		user, err := s.Do(r.Context(), id)
 
 		if err != nil {
 			coveringErrors(err, log, w)
+			return
 		}
 
-		resp := mappingResponse(user, teacher)
+		resp := mappingResponse(user)
 
 		respondErr := jsonutils.SuccessRespondWith200(w, resp)
 		if respondErr != nil {
@@ -86,13 +87,14 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		user, teacher, err := s.Do(r.Context(), id)
+		user, err := s.Do(r.Context(), id)
 
 		if err != nil {
 			coveringErrors(err, log, w)
+			return
 		}
 
-		resp := mappingResponse(user, teacher)
+		resp := mappingResponse(user)
 
 		respondErr := jsonutils.SuccessRespondWith200(w, resp)
 		if respondErr != nil {
@@ -118,20 +120,20 @@ func coveringErrors(err error, log *zap.Logger, w http.ResponseWriter) {
 	}
 }
 
-func mappingResponse(user *entities.User, teacher *entities.Teacher) *response {
+func mappingResponse(user *entities.User) *response {
 	resp := response{
-		TeacherId:        teacher.Id,
+		TeacherId:        user.TeacherData.Id,
 		UserId:           user.Id,
 		Email:            user.Email,
 		Name:             user.Name,
 		Surname:          user.Surname,
 		RegistrationDate: user.RegistrationDate,
 		Birthdate:        user.Birthdate,
-		Skills:           make([]skill, 0, len(teacher.Skills)),
+		Skills:           make([]skill, 0, len(user.TeacherData.Skills)),
 	}
 
 	// remap entity skill to response skill-type
-	for _, sk := range teacher.Skills {
+	for _, sk := range user.TeacherData.Skills {
 		resp.Skills = append(resp.Skills, skill{
 			SkillId:       sk.Id,
 			CategoryId:    sk.CategoryId,

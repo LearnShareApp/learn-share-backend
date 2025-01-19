@@ -18,31 +18,33 @@ func NewService(repo repo) *Service {
 	}
 }
 
-func (s *Service) Do(ctx context.Context, id int) (*entities.User, *entities.Teacher, error) {
+func (s *Service) Do(ctx context.Context, id int) (*entities.User, error) {
 
 	user, err := s.repo.GetUserById(ctx, id)
 	if err != nil {
 		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
-			return nil, nil, internalErrs.ErrorUserNotFound
+			return nil, internalErrs.ErrorUserNotFound
 		}
-		return nil, nil, fmt.Errorf("failed to get user: %w", err)
+		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
 	teacher, err := s.repo.GetTeacherByUserId(ctx, id)
 	if err != nil {
 		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
-			return nil, nil, internalErrs.ErrorTeacherNotFound
+			return nil, internalErrs.ErrorTeacherNotFound
 		}
-		return nil, nil, fmt.Errorf("failed to get teacher: %w", err)
+		return nil, fmt.Errorf("failed to get teacher: %w", err)
 	}
+
+	user.TeacherData = teacher
 
 	teacher.Skills, err = s.repo.GetSkillsByTeacherId(ctx, id)
 	if err != nil {
 		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
-			return user, teacher, nil
+			return user, nil
 		}
-		return nil, nil, fmt.Errorf("failed to get skills: %w", err)
+		return nil, fmt.Errorf("failed to get skills: %w", err)
 	}
 
-	return user, teacher, nil
+	return user, nil
 }
