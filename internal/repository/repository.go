@@ -41,6 +41,7 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 		{Name: "Programming", MinAge: 7},
 		{Name: "Drawing", MinAge: 0},
 		{Name: "Dancing", MinAge: 0},
+		//...
 	}
 
 	if err = seedCategories(ctx, tx, categories); err != nil {
@@ -49,6 +50,30 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 
 	if err = createSkillsTable(ctx, tx); err != nil {
 		return fmt.Errorf("error creating skills table: %w", err)
+	}
+
+	if err = createSchedulesTable(ctx, tx); err != nil {
+		return fmt.Errorf("error creating schedules table: %w", err)
+	}
+
+	if err = createStatusesTable(ctx, tx); err != nil {
+		return fmt.Errorf("error creating statuses table: %w", err)
+	}
+
+	statuses := []entities.Statuses{
+		{Name: "ongoing"},
+		{Name: "cancelled"},
+		{Name: "verification"},
+		{Name: "waiting"},
+		//...
+	}
+
+	if err = seedStatuses(ctx, tx, statuses); err != nil {
+		return fmt.Errorf("error seeding statuses: %w", err)
+	}
+
+	if err = createLessonsTable(ctx, tx); err != nil {
+		return fmt.Errorf("error creating lessons table: %w", err)
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -133,6 +158,62 @@ func createSkillsTable(ctx context.Context, tx *sqlx.Tx) error {
 	return nil
 }
 
+func createSchedulesTable(ctx context.Context, tx *sqlx.Tx) error {
+	const query = `
+	CREATE TABLE IF NOT EXISTS public.schedules (
+		schedule_id SERIAL PRIMARY KEY,
+		teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+	    datetime TIMESTAMPTZ NOT NULL,
+		is_available BOOLEAN NOT NULL DEFAULT TRUE
+	);
+	`
+
+	_, err := tx.ExecContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to execute schedules table creation: %w", err)
+	}
+
+	return nil
+}
+
+func createStatusesTable(ctx context.Context, tx *sqlx.Tx) error {
+	const query = `
+	CREATE TABLE IF NOT EXISTS public.statuses (
+		status_id SERIAL PRIMARY KEY,
+		name TEXT UNIQUE NOT NULL
+	);
+	`
+
+	_, err := tx.ExecContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to execute statuses table creation: %w", err)
+	}
+
+	return nil
+}
+
+func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
+	const query = `
+	CREATE TABLE IF NOT EXISTS public.lessons (
+		lessons_id SERIAL PRIMARY KEY,
+		student_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+	    teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+	    category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
+	    price INTEGER NOT NULL DEFAULT 0,
+	    datetime TIMESTAMPTZ NOT NULL,
+	    status_id INTEGER NOT NULL REFERENCES statuses(status_id) ON DELETE CASCADE,
+	    token TEXT
+	);
+	`
+
+	_, err := tx.ExecContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to execute lessons table creation: %w", err)
+	}
+
+	return nil
+}
+
 func seedCategories(ctx context.Context, tx *sqlx.Tx, categories []entities.Category) error {
 	const query = `
         INSERT INTO public.categories (name, min_age)
@@ -144,6 +225,23 @@ func seedCategories(ctx context.Context, tx *sqlx.Tx, categories []entities.Cate
 		_, err := tx.ExecContext(ctx, query, category.Name, category.MinAge)
 		if err != nil {
 			return fmt.Errorf("failed to insert category %s: %w", category.Name, err)
+		}
+	}
+
+	return nil
+}
+
+func seedStatuses(ctx context.Context, tx *sqlx.Tx, statuses []entities.Statuses) error {
+	const query = `
+        INSERT INTO public.statuses (name)
+        VALUES ($1)
+        ON CONFLICT (name) DO NOTHING
+    `
+
+	for _, status := range statuses {
+		_, err := tx.ExecContext(ctx, query, status.Name)
+		if err != nil {
+			return fmt.Errorf("failed to insert status %s: %w", status.Name, err)
 		}
 	}
 
