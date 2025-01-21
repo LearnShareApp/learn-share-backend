@@ -148,6 +148,13 @@ definitions:
         example: 1
         type: integer
     type: object
+  get_times.response:
+    properties:
+      datetimes:
+        items:
+          type: string
+        type: array
+    type: object
   get_user.response:
     properties:
       birthdate:
@@ -376,6 +383,32 @@ paths:
       tags:
       - teachers
   /teacher/schedule:
+    get:
+      description: Get lessons times from teacher schedule
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_times.response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Get times from schedule
+      tags:
+      - teachers
     post:
       consumes:
       - application/json
@@ -416,7 +449,7 @@ paths:
       - BearerAuth: []
       summary: Add time to schedule
       tags:
-      - teacher/schedule
+      - teachers
   /teacher/skill:
     post:
       consumes:
@@ -482,9 +515,9 @@ paths:
   /teachers/{id}:
     get:
       description: Get all info about teacher (user info + teacher + his skills) by
-        user id in route (/api/teachers/{id})
+        his UserID in route (/api/teachers/{id})
       parameters:
-      - description: User ID
+      - description: Teacher's UserID
         in: path
         name: id
         required: true
@@ -505,6 +538,33 @@ paths:
           schema:
             $ref: '#/definitions/jsonutils.ErrorStruct'
       summary: Get teacher data
+      tags:
+      - teachers
+  /teachers/{id}/schedule:
+    get:
+      description: Get lessons times from teacher schedule (by his UserID)
+      parameters:
+      - description: Teacher's UserID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_times.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      summary: Get times from schedule
       tags:
       - teachers
   /user/profile:

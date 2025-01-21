@@ -231,6 +231,47 @@ const docTemplate = `{
             }
         },
         "/teacher/schedule": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get lessons times from teacher schedule",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Get times from schedule",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_times.response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -245,7 +286,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "teacher/schedule"
+                    "teachers"
                 ],
                 "summary": "Add time to schedule",
                 "parameters": [
@@ -395,7 +436,7 @@ const docTemplate = `{
         },
         "/teachers/{id}": {
             "get": {
-                "description": "Get all info about teacher (user info + teacher + his skills) by user id in route (/api/teachers/{id})",
+                "description": "Get all info about teacher (user info + teacher + his skills) by his UserID in route (/api/teachers/{id})",
                 "produces": [
                     "application/json"
                 ],
@@ -406,7 +447,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "User ID",
+                        "description": "Teacher's UserID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -417,6 +458,47 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/get_teacher.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/{id}/schedule": {
+            "get": {
+                "description": "Get lessons times from teacher schedule (by his UserID)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Get times from schedule",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Teacher's UserID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_times.response"
                         }
                     },
                     "404": {
@@ -720,6 +802,17 @@ const docTemplate = `{
                 "user_id": {
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "get_times.response": {
+            "type": "object",
+            "properties": {
+                "datetimes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

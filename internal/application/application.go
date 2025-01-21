@@ -12,6 +12,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
@@ -54,15 +55,18 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 
 	jwtService := jwt.NewJwtService(config.SecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
 
-	registrationSrv := registration.NewService(repo, jwtService)
-	loginSrv := login.NewService(repo, jwtService)
-	getCategoriesSrv := get_categories.NewService(repo)
-	getProfileSrv := get_user.NewService(repo)
-	becomeTeacherSrv := become_teacher.NewService(repo)
-	addSkillSrv := add_skill.NewService(repo)
-	getTeacherSrv := get_teacher.NewService(repo)
-	getTeachersSrv := get_teachers.NewService(repo)
-	addScheduleTimeSrv := add_time.NewService(repo)
+	var (
+		registrationSrv     = registration.NewService(repo, jwtService)
+		loginSrv            = login.NewService(repo, jwtService)
+		getCategoriesSrv    = get_categories.NewService(repo)
+		getProfileSrv       = get_user.NewService(repo)
+		becomeTeacherSrv    = become_teacher.NewService(repo)
+		addSkillSrv         = add_skill.NewService(repo)
+		getTeacherSrv       = get_teacher.NewService(repo)
+		getTeachersSrv      = get_teachers.NewService(repo)
+		addScheduleTimeSrv  = add_time.NewService(repo)
+		getScheduleTimesSrv = get_times.NewService(repo)
+	)
 
 	services := rest.NewServices(jwtService,
 		registrationSrv,
@@ -73,7 +77,8 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		addSkillSrv,
 		getTeacherSrv,
 		getTeachersSrv,
-		addScheduleTimeSrv)
+		addScheduleTimeSrv,
+		getScheduleTimesSrv)
 
 	restServer := rest.NewServer(services, config.Server, log)
 

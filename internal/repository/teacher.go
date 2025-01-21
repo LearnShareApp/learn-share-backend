@@ -10,10 +10,10 @@ import (
 )
 
 func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
-	const req = `SELECT EXISTS(SELECT 1 FROM public.teachers WHERE teacher_id = $1)`
+	const query = `SELECT EXISTS(SELECT 1 FROM public.teachers WHERE teacher_id = $1)`
 
 	var exists bool
-	err := r.db.GetContext(ctx, &exists, req, id)
+	err := r.db.GetContext(ctx, &exists, query, id)
 
 	if err != nil {
 		return false, fmt.Errorf("failed to check teacher existence: %w", err)
@@ -23,12 +23,12 @@ func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool,
 }
 
 func (r *Repository) CreateTeacher(ctx context.Context, userId int) error {
-	const req = `
+	const query = `
 	INSERT INTO teachers (user_id) 
 	VALUES ($1)
 	`
 
-	if _, err := r.db.ExecContext(ctx, req, userId); err != nil {
+	if _, err := r.db.ExecContext(ctx, query, userId); err != nil {
 		return fmt.Errorf("failed to insert teacher: %w", err)
 	}
 	return nil
@@ -64,7 +64,7 @@ func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (
 }
 
 func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error) {
-	query := `SELECT teacher_id, user_id FROM public.teachers WHERE user_id = $1`
+	const query = `SELECT teacher_id, user_id FROM public.teachers WHERE user_id = $1`
 
 	var teacher entities.Teacher
 	err := r.db.GetContext(ctx, &teacher, query, id)
@@ -81,7 +81,7 @@ func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.
 }
 
 func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, error) {
-	query := `
+	const query = `
     SELECT
 		u.user_id,
 		u.email,

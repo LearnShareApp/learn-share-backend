@@ -1,4 +1,4 @@
-package get_teacher
+package get_times
 
 import (
 	"errors"
@@ -9,29 +9,30 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 const (
-	ProtectedRoute = ""
-	PublicRoute    = "/{id}"
+	PublicRoute    = "/{id}/schedule"
+	ProtectedRoute = "/schedule"
 )
 
-// MakeProtectedHandler returns http.HandlerFunc which handle get teacher, get user id from token
-// @Summary Get teacher data
-// @Description Get all info about teacher (user info + teacher + his skills) by user id in token
+// MakeProtectedHandler returns http.HandlerFunc
+// @Summary Get times from schedule
+// @Description Get lessons times from teacher schedule
 // @Tags teachers
 // @Produce json
 // @Success 200 {object} response
 // @Failure 401 {object} jsonutils.ErrorStruct
 // @Failure 404 {object} jsonutils.ErrorStruct
 // @Failure 500 {object} jsonutils.ErrorStruct
-// @Router /teacher [get]
+// @Router /teacher/schedule [get]
 // @Security     BearerAuth
 func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		id := r.Context().Value(jwt.UserIDKey).(int)
-		if id == 0 {
+		userId := r.Context().Value(jwt.UserIDKey).(int)
+		if userId == 0 {
 			log.Error("id was missed in context")
 			if err := jsonutils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
@@ -39,14 +40,14 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		user, err := s.Do(r.Context(), id)
+		times, err := s.Do(r.Context(), userId)
 
 		if err != nil {
 			coveringErrors(w, log, err)
 			return
 		}
 
-		resp := mappingToResponse(user)
+		resp := mappingToResponse(times)
 
 		respondErr := jsonutils.SuccessRespondWith200(w, resp)
 		if respondErr != nil {
@@ -55,16 +56,16 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	}
 }
 
-// MakePublicHandler returns http.HandlerFunc which handle get teacher, get user id from http param
-// @Summary Get teacher data
-// @Description Get all info about teacher (user info + teacher + his skills) by his UserID in route (/api/teachers/{id})
+// MakePublicHandler returns http.HandlerFunc which handle get schedule, get user id from http param
+// @Summary Get times from schedule
+// @Description Get lessons times from teacher schedule (by his UserID)
 // @Tags teachers
 // @Produce json
 // @Param id path int true "Teacher's UserID"
 // @Success 200 {object} response
 // @Failure 404 {object} jsonutils.ErrorStruct
 // @Failure 500 {object} jsonutils.ErrorStruct
-// @Router /teachers/{id} [get]
+// @Router /teachers/{id}/schedule [get]
 func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var id int
@@ -104,11 +105,7 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 }
 
 func coveringErrors(w http.ResponseWriter, log *zap.Logger, err error) {
-	if errors.Is(err, serviceErrors.ErrorUserNotFound) {
-		if err := jsonutils.RespondWith404(w, serviceErrors.ErrorUserNotFound.Error()); err != nil {
-			log.Error("failed to send response", zap.Error(err))
-		}
-	} else if errors.Is(err, serviceErrors.ErrorTeacherNotFound) {
+	if errors.Is(err, serviceErrors.ErrorTeacherNotFound) {
 		if err := jsonutils.RespondWith404(w, serviceErrors.ErrorUserIsNotTeacher.Error()); err != nil {
 			log.Error("failed to send response", zap.Error(err))
 		}
@@ -120,29 +117,14 @@ func coveringErrors(w http.ResponseWriter, log *zap.Logger, err error) {
 	}
 }
 
-func mappingToResponse(user *entities.User) *response {
+func mappingToResponse(scheduleTimes []*entities.ScheduleTime) response {
 	resp := response{
-		TeacherId:        user.TeacherData.Id,
-		UserId:           user.Id,
-		Email:            user.Email,
-		Name:             user.Name,
-		Surname:          user.Surname,
-		RegistrationDate: user.RegistrationDate,
-		Birthdate:        user.Birthdate,
-		Skills:           make([]skill, 0, len(user.TeacherData.Skills)),
+		Datetimes: make([]time.Time, len(scheduleTimes)),
 	}
 
-	// remap entity skill to response skill-type
-	for _, sk := range user.TeacherData.Skills {
-		resp.Skills = append(resp.Skills, skill{
-			SkillId:       sk.Id,
-			CategoryId:    sk.CategoryId,
-			CategoryName:  sk.CategoryName,
-			VideoCardLink: sk.VideoCardLink,
-			About:         sk.About,
-			Rate:          sk.Rate,
-		})
+	for i := range scheduleTimes {
+		resp.Datetimes[i] = scheduleTimes[i].Datetime
 	}
 
-	return &resp
+	return resp
 }

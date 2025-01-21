@@ -18,7 +18,7 @@ const (
 // MakeHandler returns http.HandlerFunc
 // @Summary Add time to schedule
 // @Description Add time to teacher schedule
-// @Tags teacher/schedule
+// @Tags teachers
 // @Accept json
 // @Produce json
 // @Param request body request true "datetime"

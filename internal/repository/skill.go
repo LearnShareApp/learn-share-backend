@@ -11,12 +11,12 @@ import (
 )
 
 func (r *Repository) CreateSkill(ctx context.Context, skill *entities.Skill) error {
-	const req = `
+	const query = `
 	INSERT INTO skills (teacher_id, category_id, video_card_link, about) 
 	VALUES ($1, $2, $3, $4)
 	`
 
-	if _, err := r.db.ExecContext(ctx, req, skill.TeacherId, skill.CategoryId, skill.VideoCardLink, skill.About); err != nil {
+	if _, err := r.db.ExecContext(ctx, query, skill.TeacherId, skill.CategoryId, skill.VideoCardLink, skill.About); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			// Код ошибки 23505 означает unique_violation
 			if pqErr.Code == "23505" {
@@ -30,7 +30,7 @@ func (r *Repository) CreateSkill(ctx context.Context, skill *entities.Skill) err
 }
 
 func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entities.Skill, error) {
-	query := `
+	const query = `
 	SELECT 
 		s.skill_id, 
 		s.teacher_id, 
