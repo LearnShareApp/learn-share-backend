@@ -4,9 +4,9 @@
   "settings": {
     "width": 3000,
     "height": 3000,
-    "scrollTop": -187.439,
-    "scrollLeft": -493.0858,
-    "zoomLevel": 1,
+    "scrollTop": -153.95,
+    "scrollLeft": -15.4293,
+    "zoomLevel": 0.97,
     "show": 431,
     "database": 4,
     "databaseName": "",
@@ -270,7 +270,7 @@
       },
       "CwxI9BKp8C2y2w2g9CnSy": {
         "id": "CwxI9BKp8C2y2w2g9CnSy",
-        "name": "schedules",
+        "name": "schedule_times",
         "comment": "",
         "columnIds": [
           "w8UvF0-Gf8n1Y1LTqw00-",
@@ -289,12 +289,12 @@
           "x": 306.9713,
           "y": 47.5241,
           "zIndex": 308,
-          "widthName": 60,
+          "widthName": 82,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1737393228865,
+          "updateAt": 1737452537954,
           "createAt": 1735305285350
         }
       },
@@ -2480,7 +2480,7 @@
       1735305285348,
       -1,
       {
-        "name": 1737393228865
+        "name": 1737452537953
       }
     ],
     "NhC6_a0uEaZmFbYvscfm3": [

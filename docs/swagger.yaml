@@ -14,6 +14,14 @@ definitions:
     required:
     - category_id
     type: object
+  add_time.request:
+    properties:
+      datetime:
+        example: "2025-02-01T00:00:00Z"
+        type: string
+    required:
+    - datetime
+    type: object
   get_categories.category:
     description: data of category
     properties:
@@ -367,6 +375,48 @@ paths:
       summary: User registrate also as teacher
       tags:
       - teachers
+  /teacher/schedule:
+    post:
+      consumes:
+      - application/json
+      description: Add time to teacher schedule
+      parameters:
+      - description: datetime
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/add_time.request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Add time to schedule
+      tags:
+      - teacher/schedule
   /teacher/skill:
     post:
       consumes:

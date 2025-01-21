@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
@@ -10,6 +11,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
@@ -19,6 +21,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"os"
+	"time"
 )
 
 type Application struct {
@@ -49,7 +52,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		log.Info("successfully created tables (if they not existed)")
 	}
 
-	jwtService := jwt.NewJwtService(config.SecretKey, jwt.WithIssuer("learn-share-backend"))
+	jwtService := jwt.NewJwtService(config.SecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
 
 	registrationSrv := registration.NewService(repo, jwtService)
 	loginSrv := login.NewService(repo, jwtService)
@@ -59,6 +62,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	addSkillSrv := add_skill.NewService(repo)
 	getTeacherSrv := get_teacher.NewService(repo)
 	getTeachersSrv := get_teachers.NewService(repo)
+	addScheduleTimeSrv := add_time.NewService(repo)
 
 	services := rest.NewServices(jwtService,
 		registrationSrv,
@@ -68,7 +72,8 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		becomeTeacherSrv,
 		addSkillSrv,
 		getTeacherSrv,
-		getTeachersSrv)
+		getTeachersSrv,
+		addScheduleTimeSrv)
 
 	restServer := rest.NewServer(services, config.Server, log)
 
@@ -92,7 +97,7 @@ func (app *Application) Shutdown(ctx context.Context) error {
 
 	go func() {
 		<-ctx.Done()
-		if ctx.Err() == context.DeadlineExceeded {
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			app.log.Error("graceful shutdown timed out... forcing exit")
 			os.Exit(1)
 		}

@@ -52,7 +52,7 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 		return fmt.Errorf("error creating skills table: %w", err)
 	}
 
-	if err = createSchedulesTable(ctx, tx); err != nil {
+	if err = createScheduleTimesTable(ctx, tx); err != nil {
 		return fmt.Errorf("error creating schedules table: %w", err)
 	}
 
@@ -158,10 +158,10 @@ func createSkillsTable(ctx context.Context, tx *sqlx.Tx) error {
 	return nil
 }
 
-func createSchedulesTable(ctx context.Context, tx *sqlx.Tx) error {
+func createScheduleTimesTable(ctx context.Context, tx *sqlx.Tx) error {
 	const query = `
-	CREATE TABLE IF NOT EXISTS public.schedules (
-		schedule_id SERIAL PRIMARY KEY,
+	CREATE TABLE IF NOT EXISTS public.schedule_times (
+		schedule_time_id SERIAL PRIMARY KEY,
 		teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
 	    datetime TIMESTAMPTZ NOT NULL,
 		is_available BOOLEAN NOT NULL DEFAULT TRUE

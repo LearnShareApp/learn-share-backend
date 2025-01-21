@@ -13,7 +13,8 @@ var (
 	ErrorPasswordTooShort  = errors.New("password too short")
 	ErrorPasswordIncorrect = errors.New("password incorrect")
 
-	ErrorCategoryNotFound = errors.New("category not found")
+	ErrorCategoryNotFound   = errors.New("category not found")
+	ErrorScheduleTimeExists = errors.New("schedule time already exists")
 
 	// repository
 	ErrorSelectEmpty = errors.New("select empty")

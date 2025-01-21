@@ -224,6 +224,72 @@
                 }
             }
         },
+        "/teacher/schedule": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Add time to teacher schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teacher/schedule"
+                ],
+                "summary": "Add time to schedule",
+                "parameters": [
+                    {
+                        "description": "datetime",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/add_time.request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/teacher/skill": {
             "post": {
                 "security": [
@@ -459,6 +525,18 @@
                 "video_card_link": {
                     "type": "string",
                     "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
+                }
+            }
+        },
+        "add_time.request": {
+            "type": "object",
+            "required": [
+                "datetime"
+            ],
+            "properties": {
+                "datetime": {
+                    "type": "string",
+                    "example": "2025-02-01T00:00:00Z"
                 }
             }
         },
