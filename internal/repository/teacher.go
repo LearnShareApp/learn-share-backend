@@ -10,13 +10,26 @@ import (
 )
 
 func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
+	const query = `SELECT EXISTS(SELECT 1 FROM public.teachers WHERE user_id = $1)`
+
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, query, id)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check teacher existence by user id: %w", err)
+	}
+
+	return exists, nil
+}
+
+func (r *Repository) IsTeacherExistsById(ctx context.Context, id int) (bool, error) {
 	const query = `SELECT EXISTS(SELECT 1 FROM public.teachers WHERE teacher_id = $1)`
 
 	var exists bool
 	err := r.db.GetContext(ctx, &exists, query, id)
 
 	if err != nil {
-		return false, fmt.Errorf("failed to check teacher existence: %w", err)
+		return false, fmt.Errorf("failed to check teacher existence by teacher id: %w", err)
 	}
 
 	return exists, nil
