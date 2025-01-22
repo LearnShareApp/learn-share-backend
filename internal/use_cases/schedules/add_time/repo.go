@@ -7,6 +7,7 @@ import (
 )
 
 type repo interface {
+	IsUserExistsById(ctx context.Context, id int) (bool, error)
 	IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error)
 	GetTeacherByUserId(ctx context.Context, userId int) (*entities.Teacher, error)
 	IsTimeExistsByTeacherIdAndDatetime(ctx context.Context, id int, datetime time.Time) (bool, error)

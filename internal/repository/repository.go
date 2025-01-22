@@ -199,8 +199,8 @@ func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
 		student_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 	    teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
 	    category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
+	    schedule_time_id INTEGER NOT NULL REFERENCES schedule_times(schedule_time_id) ON DELETE CASCADE,
 	    price INTEGER NOT NULL DEFAULT 0,
-	    datetime TIMESTAMPTZ NOT NULL,
 	    status_id INTEGER NOT NULL REFERENCES statuses(status_id) ON DELETE CASCADE,
 	    token TEXT
 	);

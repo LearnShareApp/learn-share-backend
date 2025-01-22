@@ -163,6 +163,9 @@ definitions:
       is_available:
         example: true
         type: boolean
+      schedule_time_id:
+        example: 1
+        type: integer
     type: object
   get_user.response:
     properties:

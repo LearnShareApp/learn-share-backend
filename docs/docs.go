@@ -826,6 +826,10 @@ const docTemplate = `{
                 "is_available": {
                     "type": "boolean",
                     "example": true
+                },
+                "schedule_time_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

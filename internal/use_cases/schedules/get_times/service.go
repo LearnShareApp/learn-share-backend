@@ -18,14 +18,23 @@ func NewService(repo repo) *Service {
 }
 
 func (s *Service) Do(ctx context.Context, userId int) ([]*entities.ScheduleTime, error) {
+	// is user exists
+	exists, err := s.repo.IsUserExistsById(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check user existence: %w", err)
+	}
+	if !exists {
+		return nil, errors.ErrorUserNotFound
+	}
+
 	// is teacher exists
-	exists, err := s.repo.IsTeacherExistsByUserId(ctx, userId)
+	exists, err = s.repo.IsTeacherExistsByUserId(ctx, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check teacher existstance by user id: %w", err)
 	}
 
 	if !exists {
-		return nil, errors.ErrorTeacherNotFound
+		return nil, errors.ErrorUserIsNotTeacher
 	}
 
 	// get teacher

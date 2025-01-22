@@ -104,7 +104,11 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 }
 
 func coveringErrors(w http.ResponseWriter, log *zap.Logger, err error) {
-	if errors.Is(err, serviceErrors.ErrorTeacherNotFound) {
+	if errors.Is(err, serviceErrors.ErrorUserNotFound) {
+		if err := jsonutils.RespondWith404(w, serviceErrors.ErrorUserNotFound.Error()); err != nil {
+			log.Error("failed to send response", zap.Error(err))
+		}
+	} else if errors.Is(err, serviceErrors.ErrorUserIsNotTeacher) {
 		if err := jsonutils.RespondWith404(w, serviceErrors.ErrorUserIsNotTeacher.Error()); err != nil {
 			log.Error("failed to send response", zap.Error(err))
 		}
@@ -122,8 +126,11 @@ func mappingToResponse(scheduleTimes []*entities.ScheduleTime) response {
 	}
 
 	for i := range scheduleTimes {
-		resp.Datetimes[i].Datetime = scheduleTimes[i].Datetime
-		resp.Datetimes[i].IsAvailable = scheduleTimes[i].IsAvailable
+		resp.Datetimes[i] = times{
+			ScheduleTimeId: scheduleTimes[i].Id,
+			Datetime:       scheduleTimes[i].Datetime,
+			IsAvailable:    scheduleTimes[i].IsAvailable,
+		}
 	}
 
 	return resp

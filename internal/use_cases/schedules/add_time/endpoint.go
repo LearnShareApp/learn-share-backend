@@ -66,8 +66,8 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 				}
 				return
 
-			} else if errors.Is(err, serviceErrors.ErrorTeacherNotFound) {
-				if err = jsonutils.RespondWithError(w, http.StatusForbidden, "you are not the teacher"); err != nil {
+			} else if errors.Is(err, serviceErrors.ErrorUserIsNotTeacher) {
+				if err = jsonutils.RespondWithError(w, http.StatusForbidden, serviceErrors.ErrorUserIsNotTeacher.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
