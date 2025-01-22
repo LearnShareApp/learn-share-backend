@@ -34,7 +34,7 @@ func (s *Service) Do(ctx context.Context, userId int) ([]*entities.ScheduleTime,
 		return nil, fmt.Errorf("failed to get teacher by user id: %w", err)
 	}
 
-	times, err := s.repo.GetAvailableScheduleTimesByTeacherId(ctx, teacher.Id)
+	times, err := s.repo.GetScheduleTimesByTeacherId(ctx, teacher.Id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get available schedule times by teacher id: %w", err)
 	}

@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 const (
@@ -119,11 +118,12 @@ func coveringErrors(w http.ResponseWriter, log *zap.Logger, err error) {
 
 func mappingToResponse(scheduleTimes []*entities.ScheduleTime) response {
 	resp := response{
-		Datetimes: make([]time.Time, len(scheduleTimes)),
+		Datetimes: make([]times, len(scheduleTimes)),
 	}
 
 	for i := range scheduleTimes {
-		resp.Datetimes[i] = scheduleTimes[i].Datetime
+		resp.Datetimes[i].Datetime = scheduleTimes[i].Datetime
+		resp.Datetimes[i].IsAvailable = scheduleTimes[i].IsAvailable
 	}
 
 	return resp

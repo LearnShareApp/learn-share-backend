@@ -8,5 +8,5 @@ import (
 type repo interface {
 	IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error)
 	GetTeacherByUserId(ctx context.Context, userId int) (*entities.Teacher, error)
-	GetAvailableScheduleTimesByTeacherId(ctx context.Context, Id int) ([]*entities.ScheduleTime, error)
+	GetScheduleTimesByTeacherId(ctx context.Context, Id int) ([]*entities.ScheduleTime, error)
 }

@@ -34,9 +34,11 @@ func (r *Repository) CreateTime(ctx context.Context, teacherId int, datetime tim
 	return nil
 }
 
-func (r *Repository) GetAvailableScheduleTimesByTeacherId(ctx context.Context, id int) ([]*entities.ScheduleTime, error) {
+func (r *Repository) GetScheduleTimesByTeacherId(ctx context.Context, id int) ([]*entities.ScheduleTime, error) {
 	const query = `
-		SELECT schedule_time_id, teacher_id, datetime FROM schedule_times WHERE teacher_id = $1 AND is_available
+		SELECT schedule_time_id, teacher_id, datetime, is_available FROM schedule_times 
+		WHERE teacher_id = $1 AND 
+		      datetime >= NOW() - INTERVAL '1 day'
 		`
 
 	var times []*entities.ScheduleTime

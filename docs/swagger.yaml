@@ -152,8 +152,17 @@ definitions:
     properties:
       datetimes:
         items:
-          type: string
+          $ref: '#/definitions/get_times.times'
         type: array
+    type: object
+  get_times.times:
+    properties:
+      datetime:
+        example: "0001-01-01T00:00:00Z"
+        type: string
+      is_available:
+        example: true
+        type: boolean
     type: object
   get_user.response:
     properties:

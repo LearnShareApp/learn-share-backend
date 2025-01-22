@@ -811,8 +811,21 @@ const docTemplate = `{
                 "datetimes": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/get_times.times"
                     }
+                }
+            }
+        },
+        "get_times.times": {
+            "type": "object",
+            "properties": {
+                "datetime": {
+                    "type": "string",
+                    "example": "0001-01-01T00:00:00Z"
+                },
+                "is_available": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
