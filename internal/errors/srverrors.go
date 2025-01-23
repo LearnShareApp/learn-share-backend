@@ -8,7 +8,7 @@ var (
 
 	ErrorUserExists       = errors.New("user already exists")
 	ErrorUserNotFound     = errors.New("user not found")
-	ErrorUserIsNotTeacher = errors.New("user is not teacher")
+	ErrorUserIsNotTeacher = errors.New("user is not a teacher")
 
 	ErrorTeacherExists     = errors.New("teacher already exists")
 	ErrorTeacherNotFound   = errors.New("teacher not found")

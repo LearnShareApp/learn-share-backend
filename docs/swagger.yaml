@@ -451,6 +451,29 @@ paths:
       summary: User registrate also as teacher
       tags:
       - teachers
+  /teacher/lessons:
+    get:
+      description: Return all lessons which have teacher
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Get lessons for teachers
+      tags:
+      - teachers
   /teacher/schedule:
     get:
       description: Get lessons times from teacher schedule

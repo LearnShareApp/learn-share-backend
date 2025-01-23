@@ -195,14 +195,14 @@ func createStatusesTable(ctx context.Context, tx *sqlx.Tx) error {
 func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
 	const createTable = `
     CREATE TABLE IF NOT EXISTS public.lessons (
-        lessons_id SERIAL PRIMARY KEY,
+        lesson_id SERIAL PRIMARY KEY,
         student_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
         teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
         category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
         schedule_time_id INTEGER UNIQUE NOT NULL REFERENCES schedule_times(schedule_time_id) ON DELETE CASCADE,
         price INTEGER NOT NULL DEFAULT 0,
         status_id INTEGER DEFAULT NULL REFERENCES statuses(status_id) ON DELETE CASCADE,
-        token TEXT
+        token TEXT NOT NULL DEFAULT ''
     );`
 
 	const createTriggerFunc = `

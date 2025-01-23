@@ -1,5 +1,7 @@
 package entities
 
+import "time"
+
 type Lesson struct {
 	Id             int    `db:"lesson_id"`
 	StudentId      int    `db:"student_id"`
@@ -9,4 +11,10 @@ type Lesson struct {
 	StatusId       int    `db:"status_id"`
 	Price          int    `db:"price"`
 	Token          string `db:"token"`
+
+	StatusName           string    `db:"-"`
+	CategoryName         string    `db:"-"`
+	ScheduleTimeDatetime time.Time `db:"-"`
+	StudentData          *User     `db:"-"`
+	TeacherData          *Teacher  `db:"-"`
 }

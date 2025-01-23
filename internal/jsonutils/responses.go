@@ -50,6 +50,18 @@ func RespondWith401(w http.ResponseWriter, message string) error {
 		message)
 }
 
+func RespondWith403(w http.ResponseWriter, message string) error {
+	return RespondWithError(w,
+		http.StatusForbidden,
+		message)
+}
+
+func RespondWith409(w http.ResponseWriter, message string) error {
+	return RespondWithError(w,
+		http.StatusConflict,
+		message)
+}
+
 func RespondWith404(w http.ResponseWriter, message string) error {
 	return RespondWithError(w,
 		http.StatusNotFound,
