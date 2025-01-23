@@ -44,7 +44,7 @@ func (s *Service) Do(ctx context.Context, userId int, datetime time.Time) error 
 		return fmt.Errorf("failed to get teacher by user id: %w", err)
 	}
 
-	exists, err = s.repo.IsTimeExistsByTeacherIdAndDatetime(ctx, teacher.Id, datetime)
+	exists, err = s.repo.IsScheduleTimeExistsByTeacherIdAndDatetime(ctx, teacher.Id, datetime)
 	if err != nil {
 		return fmt.Errorf("failed to check time existstance by user id: %w", err)
 	}
@@ -52,7 +52,7 @@ func (s *Service) Do(ctx context.Context, userId int, datetime time.Time) error 
 		return errors.ErrorScheduleTimeExists
 	}
 
-	if err = s.repo.CreateTime(ctx, teacher.Id, datetime); err != nil {
+	if err = s.repo.CreateScheduleTime(ctx, teacher.Id, datetime); err != nil {
 		return fmt.Errorf("failed to create teacher time: %w", err)
 	}
 

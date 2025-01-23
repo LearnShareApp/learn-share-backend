@@ -20,13 +20,26 @@ func (r *Repository) CreateSkill(ctx context.Context, skill *entities.Skill) err
 		if pqErr, ok := err.(*pq.Error); ok {
 			// Код ошибки 23505 означает unique_violation
 			if pqErr.Code == "23505" {
-				return internalErrs.ErrorSkillRegistered
+				return internalErrs.ErrorNonUniqueData
 			}
 		}
 
 		return fmt.Errorf("failed to insert skill: %w", err)
 	}
 	return nil
+}
+
+func (r *Repository) IsSkillExistsByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (bool, error) {
+	const query = `SELECT EXISTS(SELECT 1 FROM skills WHERE teacher_id = $1 AND category_id = $2)`
+
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, query, teacherId, categoryId)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check skill existence by teacher id and category id: %w", err)
+	}
+
+	return exists, nil
 }
 
 func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entities.Skill, error) {
@@ -40,8 +53,8 @@ func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entit
 		s.rate, 
 		s.is_active,
 		c.name as category_name
-	FROM public.skills s
-	INNER JOIN public.categories c ON s.category_id = c.category_id
+	FROM skills s
+	INNER JOIN categories c ON s.category_id = c.category_id
 	WHERE teacher_id = $1`
 
 	var skills []*entities.Skill

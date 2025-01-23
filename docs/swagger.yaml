@@ -22,6 +22,24 @@ definitions:
     required:
     - datetime
     type: object
+  book_lesson.request:
+    description: book lesson body request
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      schedule_time_id:
+        example: 1
+        type: integer
+      teacher_id:
+        description: '@Description exactly teacherID, not his userID'
+        example: 1
+        type: integer
+    required:
+    - category_id
+    - schedule_time_id
+    - teacher_id
+    type: object
   get_categories.category:
     description: data of category
     properties:
@@ -341,6 +359,45 @@ paths:
       summary: Get categories
       tags:
       - categories
+  /lesson:
+    post:
+      consumes:
+      - application/json
+      description: Check is all data confirmed and if so create lesson with status
+        "verification" (Unconfirmed)
+      parameters:
+      - description: LessonData
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/book_lesson.request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Add Unconfirmed lesson (lesson request)
+      tags:
+      - lessons
   /teacher:
     get:
       description: Get all info about teacher (user info + teacher + his skills) by

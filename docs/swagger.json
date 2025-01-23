@@ -143,6 +143,66 @@
                 }
             }
         },
+        "/lesson": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Check is all data confirmed and if so create lesson with status \"verification\" (Unconfirmed)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lessons"
+                ],
+                "summary": "Add Unconfirmed lesson (lesson request)",
+                "parameters": [
+                    {
+                        "description": "LessonData",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/book_lesson.request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/teacher": {
             "get": {
                 "security": [
@@ -619,6 +679,30 @@
                 "datetime": {
                     "type": "string",
                     "example": "2025-02-01T00:00:00Z"
+                }
+            }
+        },
+        "book_lesson.request": {
+            "description": "book lesson body request",
+            "type": "object",
+            "required": [
+                "category_id",
+                "schedule_time_id",
+                "teacher_id"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "schedule_time_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "teacher_id": {
+                    "description": "@Description exactly teacherID, not his userID",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -35,6 +36,7 @@ const (
 	usersRoute    = "/users"
 	teacherRoute  = "/teacher"
 	teachersRoute = "/teachers"
+	lessonRoute   = "/lesson"
 	apiRoute      = "/api"
 )
 
@@ -54,6 +56,7 @@ type Services struct {
 	GetTeachersSrv      *get_teachers.Service
 	AddScheduleTimeSrv  *add_time.Service
 	GetScheduleTimesSrv *get_times.Service
+	BookLessonSrv       *book_lesson.Service
 }
 
 type Server struct {
@@ -71,7 +74,8 @@ func NewServices(jwtSrv *jwt.Service,
 	getTeacher *get_teacher.Service,
 	getTeachers *get_teachers.Service,
 	addScheduleTimeSrv *add_time.Service,
-	getScheduleTimeSrv *get_times.Service) *Services {
+	getScheduleTimeSrv *get_times.Service,
+	bookLessonSrv *book_lesson.Service) *Services {
 	return &Services{
 		JwtSrv:              jwtSrv,
 		RegSrv:              reg,
@@ -84,6 +88,7 @@ func NewServices(jwtSrv *jwt.Service,
 		GetTeachersSrv:      getTeachers,
 		AddScheduleTimeSrv:  addScheduleTimeSrv,
 		GetScheduleTimesSrv: getScheduleTimeSrv,
+		BookLessonSrv:       bookLessonSrv,
 	}
 }
 
@@ -126,10 +131,11 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Get(path.Join(teacherRoute, get_teacher.ProtectedRoute), get_teacher.MakeProtectedHandler(services.GetTeacherSrv, log))
 		r.Get(path.Join(teacherRoute, get_times.ProtectedRoute), get_times.MakeProtectedHandler(services.GetScheduleTimesSrv, log))
 		r.Get(path.Join(teachersRoute, get_teachers.Route), get_teachers.MakeHandler(services.GetTeachersSrv, log))
-		
+
 		r.Post(path.Join(teacherRoute, become_teacher.Route), become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))
 		r.Post(path.Join(teacherRoute, add_time.Route), add_time.MakeHandler(services.AddScheduleTimeSrv, log))
+		r.Post(path.Join(lessonRoute, book_lesson.Route), book_lesson.MakeHandler(services.BookLessonSrv, log))
 	})
 
 	apiRouter.Mount(usersRoute, usersRouter)

@@ -10,7 +10,7 @@ import (
 )
 
 func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
-	const query = `SELECT EXISTS(SELECT 1 FROM public.teachers WHERE user_id = $1)`
+	const query = `SELECT EXISTS(SELECT 1 FROM teachers WHERE user_id = $1)`
 
 	var exists bool
 	err := r.db.GetContext(ctx, &exists, query, id)
@@ -23,7 +23,7 @@ func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool,
 }
 
 func (r *Repository) IsTeacherExistsById(ctx context.Context, id int) (bool, error) {
-	const query = `SELECT EXISTS(SELECT 1 FROM public.teachers WHERE teacher_id = $1)`
+	const query = `SELECT EXISTS(SELECT 1 FROM teachers WHERE teacher_id = $1)`
 
 	var exists bool
 	err := r.db.GetContext(ctx, &exists, query, id)
@@ -77,7 +77,7 @@ func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (
 }
 
 func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error) {
-	const query = `SELECT teacher_id, user_id FROM public.teachers WHERE user_id = $1`
+	const query = `SELECT teacher_id, user_id FROM teachers WHERE user_id = $1`
 
 	var teacher entities.Teacher
 	err := r.db.GetContext(ctx, &teacher, query, id)
@@ -88,6 +88,23 @@ func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find teacher by user id: %w", err)
+	}
+
+	return &teacher, nil
+}
+
+func (r *Repository) GetTeacherById(ctx context.Context, id int) (*entities.Teacher, error) {
+	const query = `SELECT teacher_id, user_id FROM teachers WHERE teacher_id = $1`
+
+	var teacher entities.Teacher
+	err := r.db.GetContext(ctx, &teacher, query, id)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, internalErrs.ErrorSelectEmpty
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to find teacher by id: %w", err)
 	}
 
 	return &teacher, nil
@@ -111,10 +128,10 @@ func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, e
 		s.rate,
 		s.is_active,
 		c.name as category_name
-	FROM public.users u
-    INNER JOIN public.teachers t ON u.user_id = t.user_id
-    INNER JOIN public.skills s ON t.teacher_id = s.teacher_id AND s.is_active
-    INNER JOIN public.categories c ON s.category_id = c.category_id`
+	FROM users u
+    INNER JOIN teachers t ON u.user_id = t.user_id
+    INNER JOIN skills s ON t.teacher_id = s.teacher_id AND s.is_active
+    INNER JOIN categories c ON s.category_id = c.category_id`
 
 	// Временная структура для хранения результатов запроса
 	type result struct {

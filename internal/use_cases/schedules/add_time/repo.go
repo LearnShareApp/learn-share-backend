@@ -10,6 +10,6 @@ type repo interface {
 	IsUserExistsById(ctx context.Context, id int) (bool, error)
 	IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error)
 	GetTeacherByUserId(ctx context.Context, userId int) (*entities.Teacher, error)
-	IsTimeExistsByTeacherIdAndDatetime(ctx context.Context, id int, datetime time.Time) (bool, error)
-	CreateTime(ctx context.Context, teacherId int, datetime time.Time) error
+	IsScheduleTimeExistsByTeacherIdAndDatetime(ctx context.Context, id int, datetime time.Time) (bool, error)
+	CreateScheduleTime(ctx context.Context, teacherId int, datetime time.Time) error
 }

@@ -53,8 +53,8 @@ func (s *Service) Do(ctx context.Context, userId int, categoryId int, videoCardL
 	}
 
 	if err = s.repo.CreateSkill(ctx, skill); err != nil {
-		if err == errors.ErrorSkillRegistered {
-			return err
+		if err == errors.ErrorNonUniqueData {
+			return errors.ErrorSkillRegistered
 		}
 		return fmt.Errorf("failed to create skill: %w", err)
 	}

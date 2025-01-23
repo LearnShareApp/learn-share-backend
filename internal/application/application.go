@@ -11,6 +11,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -66,6 +67,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		getTeachersSrv      = get_teachers.NewService(repo)
 		addScheduleTimeSrv  = add_time.NewService(repo)
 		getScheduleTimesSrv = get_times.NewService(repo)
+		bookLessonSrv       = book_lesson.NewService(repo)
 	)
 
 	services := rest.NewServices(jwtService,
@@ -78,7 +80,8 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		getTeacherSrv,
 		getTeachersSrv,
 		addScheduleTimeSrv,
-		getScheduleTimesSrv)
+		getScheduleTimesSrv,
+		bookLessonSrv)
 
 	restServer := rest.NewServer(services, config.Server, log)
 
