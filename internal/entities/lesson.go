@@ -15,6 +15,6 @@ type Lesson struct {
 	StatusName           string    `db:"-"`
 	CategoryName         string    `db:"-"`
 	ScheduleTimeDatetime time.Time `db:"-"`
-	StudentData          *User     `db:"-"`
-	TeacherData          *Teacher  `db:"-"`
+	StudentUserData      *User     `db:"-"` // info about student
+	TeacherUserData      *User     `db:"-"` // info about teacher (as user)
 }

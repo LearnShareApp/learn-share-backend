@@ -61,6 +61,43 @@ definitions:
           $ref: '#/definitions/get_categories.category'
         type: array
     type: object
+  get_student_lessons.respLessons:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      category_name:
+        example: Programming
+        type: string
+      datetime:
+        example: "2025-02-01T09:00:00Z"
+        type: string
+      lesson_id:
+        example: 1
+        type: integer
+      status:
+        example: verification
+        type: string
+      teacher_id:
+        example: 1
+        type: integer
+      teacher_name:
+        example: John
+        type: string
+      teacher_surname:
+        example: Smith
+        type: string
+      teacher_user_id:
+        example: 1
+        type: integer
+    type: object
+  get_student_lessons.response:
+    properties:
+      lessons:
+        items:
+          $ref: '#/definitions/get_student_lessons.respLessons'
+        type: array
+    type: object
   get_teacher.response:
     properties:
       birthdate:
@@ -109,6 +146,40 @@ definitions:
       video_card_link:
         example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
         type: string
+    type: object
+  get_teacher_lessons.respLessons:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      category_name:
+        example: Programming
+        type: string
+      datetime:
+        example: "2025-02-01T09:00:00Z"
+        type: string
+      lesson_id:
+        example: 1
+        type: integer
+      status:
+        example: verification
+        type: string
+      student_id:
+        example: 1
+        type: integer
+      student_name:
+        example: John
+        type: string
+      student_surname:
+        example: Smith
+        type: string
+    type: object
+  get_teacher_lessons.response:
+    properties:
+      lessons:
+        items:
+          $ref: '#/definitions/get_teacher_lessons.respLessons'
+        type: array
     type: object
   get_teachers.response:
     properties:
@@ -398,6 +469,33 @@ paths:
       summary: Add Unconfirmed lesson (lesson request)
       tags:
       - lessons
+  /lessons:
+    get:
+      description: Return all lessons which have student
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_student_lessons.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Get lessons for students
+      tags:
+      - lessons
   /teacher:
     get:
       description: Get all info about teacher (user info + teacher + his skills) by
@@ -457,12 +555,20 @@ paths:
       produces:
       - application/json
       responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get_teacher_lessons.response'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/jsonutils.ErrorStruct'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/jsonutils.ErrorStruct'
         "500":

@@ -6,11 +6,12 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teachers"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
@@ -38,6 +39,7 @@ const (
 	teacherRoute  = "/teacher"
 	teachersRoute = "/teachers"
 	lessonRoute   = "/lesson"
+	lessonsRoute  = "/lessons"
 	apiRoute      = "/api"
 )
 
@@ -58,7 +60,8 @@ type Services struct {
 	AddScheduleTimeSrv      *add_time.Service
 	GetScheduleTimesSrv     *get_times.Service
 	BookLessonSrv           *book_lesson.Service
-	GetLessonsForTeacherSrv *get_lessons.Service
+	GetLessonsForTeacherSrv *get_teacher_lessons.Service
+	GetLessonsForStudentSrv *get_student_lessons.Service
 }
 
 type Server struct {
@@ -78,7 +81,8 @@ func NewServices(jwtSrv *jwt.Service,
 	addScheduleTimeSrv *add_time.Service,
 	getScheduleTimeSrv *get_times.Service,
 	bookLessonSrv *book_lesson.Service,
-	getLessonsForTeacherSrv *get_lessons.Service) *Services {
+	getLessonsForTeacherSrv *get_teacher_lessons.Service,
+	getLessonsForStudentSrv *get_student_lessons.Service) *Services {
 	return &Services{
 		JwtSrv:                  jwtSrv,
 		RegSrv:                  reg,
@@ -93,6 +97,7 @@ func NewServices(jwtSrv *jwt.Service,
 		GetScheduleTimesSrv:     getScheduleTimeSrv,
 		BookLessonSrv:           bookLessonSrv,
 		GetLessonsForTeacherSrv: getLessonsForTeacherSrv,
+		GetLessonsForStudentSrv: getLessonsForStudentSrv,
 	}
 }
 
@@ -135,7 +140,8 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Get(path.Join(teacherRoute, get_teacher.ProtectedRoute), get_teacher.MakeProtectedHandler(services.GetTeacherSrv, log))
 		r.Get(path.Join(teacherRoute, get_times.ProtectedRoute), get_times.MakeProtectedHandler(services.GetScheduleTimesSrv, log))
 		r.Get(path.Join(teachersRoute, get_teachers.Route), get_teachers.MakeHandler(services.GetTeachersSrv, log))
-		r.Get(path.Join(teacherRoute, get_lessons.Route), get_lessons.MakeHandler(services.GetLessonsForTeacherSrv, log))
+		r.Get(path.Join(teacherRoute, get_teacher_lessons.Route), get_teacher_lessons.MakeHandler(services.GetLessonsForTeacherSrv, log))
+		r.Get(path.Join(lessonsRoute, get_student_lessons.Route), get_student_lessons.MakeHandler(services.GetLessonsForStudentSrv, log))
 
 		r.Post(path.Join(teacherRoute, become_teacher.Route), become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))

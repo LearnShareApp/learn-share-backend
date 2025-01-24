@@ -1,4 +1,4 @@
-package get_lessons
+package get_teacher_lessons
 
 import "time"
 

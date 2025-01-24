@@ -112,8 +112,92 @@ func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) (
 			lessonsMap[row.Lesson.Id] = lesson
 		}
 
-		if lesson.StudentData == nil {
-			lesson.StudentData = &entities.User{
+		if lesson.StudentUserData == nil {
+			lesson.StudentUserData = &entities.User{
+				Id:      row.User.Id,
+				Email:   row.User.Email,
+				Name:    row.User.Name,
+				Surname: row.User.Surname,
+				Avatar:  row.User.Avatar,
+			}
+		}
+	}
+
+	lessons := make([]*entities.Lesson, 0, len(lessonsMap))
+	for _, lesson := range lessonsMap {
+		lessons = append(lessons, lesson)
+	}
+
+	return lessons, nil
+}
+
+func (r *Repository) GetStudentLessonsByUserId(ctx context.Context, id int) ([]*entities.Lesson, error) {
+	const query = `
+	   SELECT
+		lessons.lesson_id,
+		lessons.student_id,
+		lessons.teacher_id,
+		lessons.category_id,
+		lessons.schedule_time_id,
+		lessons.status_id,
+		lessons.price,
+		lessons.token,
+		users.user_id,
+		users.email,
+		users.name,
+		users.surname,
+		users.avatar,
+		categories.name as category_name,
+		statuses.name as status_name,
+		schedule_times.datetime as schedule_time_datetime
+		FROM lessons
+		   INNER JOIN teachers ON lessons.teacher_id = teachers.teacher_id
+		   INNER JOIN users ON teachers.user_id = users.user_id
+		   INNER JOIN categories ON lessons.category_id = categories.category_id
+		   INNER JOIN statuses ON lessons.status_id = statuses.status_id
+		   INNER JOIN schedule_times ON lessons.schedule_time_id = schedule_times.schedule_time_id
+	   WHERE lessons.student_id = $1`
+
+	// Временная структура для хранения результатов запроса
+	type result struct {
+		CategoryName         string    `db:"category_name"`
+		StatusName           string    `db:"status_name"`
+		ScheduleTimeDatetime time.Time `db:"schedule_time_datetime"`
+		entities.Lesson
+		entities.User
+	}
+
+	var rows []result
+	err := r.db.SelectContext(ctx, &rows, query, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Мапа для группировки результатов
+	lessonsMap := make(map[int]*entities.Lesson)
+
+	// Обработка результатов
+	for _, row := range rows {
+		lesson, exists := lessonsMap[row.Lesson.Id]
+		if !exists {
+			lesson = &entities.Lesson{
+				Id:                   row.Lesson.Id,
+				StudentId:            row.Lesson.StudentId,
+				TeacherId:            row.Lesson.TeacherId,
+				CategoryId:           row.Lesson.CategoryId,
+				ScheduleTimeId:       row.Lesson.ScheduleTimeId,
+				StatusId:             row.Lesson.StatusId,
+				Price:                row.Lesson.Price,
+				Token:                row.Lesson.Token,
+				StatusName:           row.StatusName,
+				CategoryName:         row.CategoryName,
+				ScheduleTimeDatetime: row.ScheduleTimeDatetime,
+			}
+			lessonsMap[row.Lesson.Id] = lesson
+		}
+
+		if lesson.TeacherUserData == nil {
+			lesson.TeacherUserData = &entities.User{
 				Id:      row.User.Id,
 				Email:   row.User.Email,
 				Name:    row.User.Name,

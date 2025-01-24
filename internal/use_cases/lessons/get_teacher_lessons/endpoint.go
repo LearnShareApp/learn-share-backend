@@ -1,4 +1,4 @@
-package get_lessons
+package get_teacher_lessons
 
 import (
 	"errors"
@@ -18,9 +18,10 @@ const (
 // @Description Return all lessons which have teacher
 // @Tags teachers
 // @Produce json
-// // @Success 200 {object} response
+// @Success 200 {object} response
 // @Failure 400 {object} jsonutils.ErrorStruct
 // @Failure 401 {object} jsonutils.ErrorStruct
+// @Failure 403 {object} jsonutils.ErrorStruct
 // @Failure 500 {object} jsonutils.ErrorStruct
 // @Router /teacher/lessons [get]
 // @Security     BearerAuth
@@ -67,8 +68,8 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			resp.Lessons[i] = respLessons{
 				LessonId:       lessons[i].Id,
 				StudentId:      lessons[i].StudentId,
-				StudentName:    lessons[i].StudentData.Name,
-				StudentSurname: lessons[i].StudentData.Surname,
+				StudentName:    lessons[i].StudentUserData.Name,
+				StudentSurname: lessons[i].StudentUserData.Surname,
 				CategoryId:     lessons[i].CategoryId,
 				CategoryName:   lessons[i].CategoryName,
 				Status:         lessons[i].StatusName,

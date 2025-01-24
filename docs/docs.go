@@ -209,6 +209,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/lessons": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Return all lessons which have student",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lessons"
+                ],
+                "summary": "Get lessons for students",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_student_lessons.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/teacher": {
             "get": {
                 "security": [
@@ -306,6 +349,12 @@ const docTemplate = `{
                 ],
                 "summary": "Get lessons for teachers",
                 "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_teacher_lessons.response"
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -314,6 +363,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
@@ -779,6 +834,58 @@ const docTemplate = `{
                 }
             }
         },
+        "get_student_lessons.respLessons": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "category_name": {
+                    "type": "string",
+                    "example": "Programming"
+                },
+                "datetime": {
+                    "type": "string",
+                    "example": "2025-02-01T09:00:00Z"
+                },
+                "lesson_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "verification"
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "teacher_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "teacher_surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "teacher_user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "get_student_lessons.response": {
+            "type": "object",
+            "properties": {
+                "lessons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/get_student_lessons.respLessons"
+                    }
+                }
+            }
+        },
         "get_teacher.response": {
             "type": "object",
             "properties": {
@@ -844,6 +951,54 @@ const docTemplate = `{
                 "video_card_link": {
                     "type": "string",
                     "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
+                }
+            }
+        },
+        "get_teacher_lessons.respLessons": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "category_name": {
+                    "type": "string",
+                    "example": "Programming"
+                },
+                "datetime": {
+                    "type": "string",
+                    "example": "2025-02-01T09:00:00Z"
+                },
+                "lesson_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "verification"
+                },
+                "student_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "student_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "student_surname": {
+                    "type": "string",
+                    "example": "Smith"
+                }
+            }
+        },
+        "get_teacher_lessons.response": {
+            "type": "object",
+            "properties": {
+                "lessons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/get_teacher_lessons.respLessons"
+                    }
                 }
             }
         },

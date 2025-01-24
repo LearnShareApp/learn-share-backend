@@ -1,4 +1,4 @@
-package get_lessons
+package get_student_lessons
 
 import (
 	"context"
@@ -27,25 +27,10 @@ func (s *Service) Do(ctx context.Context, userId int) ([]*entities.Lesson, error
 		return nil, serviceErrs.ErrorUserNotFound
 	}
 
-	// is the user a teacher
-	exists, err = s.repo.IsTeacherExistsByUserId(ctx, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to check teacher existstance by userId: %w", err)
-	}
-	if !exists {
-		return nil, serviceErrs.ErrorUserIsNotTeacher
-	}
-
-	// get teacher by userId
-	teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get teacher by userId: %w", err)
-	}
-
 	//get lessons
-	lessons, err := s.repo.GetTeacherLessonsByTeacherId(ctx, teacher.Id)
+	lessons, err := s.repo.GetStudentLessonsByUserId(ctx, userId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get teacher lessons: %w", err)
+		return nil, fmt.Errorf("failed to get student lessons: %w", err)
 	}
 
 	return lessons, nil
