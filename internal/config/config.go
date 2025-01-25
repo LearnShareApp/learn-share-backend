@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
 	"github.com/joho/godotenv"
@@ -11,10 +12,11 @@ import (
 )
 
 type Config struct {
-	Db        postgres.DbConfig
-	Server    rest.ServerConfig
-	IsInitDb  bool
-	SecretKey string
+	Db           postgres.DbConfig
+	Server       rest.ServerConfig
+	LiveKit      livekit.ApiConfig
+	IsInitDb     bool
+	JwtSecretKey string
 }
 
 func LoadConfig() (*Config, error) {
@@ -67,7 +69,11 @@ func LoadConfig() (*Config, error) {
 	}
 
 	// JWT secret key
-	config.SecretKey = os.Getenv("SECRET_KEY")
+	config.JwtSecretKey = os.Getenv("SECRET_KEY")
+
+	// LiveKit config
+	config.LiveKit.ApiKey = os.Getenv("LIVEKIT_API_KEY")
+	config.LiveKit.ApiSecret = os.Getenv("LIVEKIT_API_SECRET")
 
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("config validation failed: %w", err)
@@ -105,8 +111,16 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("database user cannot be empty")
 	}
 
-	if c.SecretKey == "" {
+	if c.JwtSecretKey == "" {
 		return fmt.Errorf("jwt secret key cannot be empty")
+	}
+
+	if c.LiveKit.ApiKey == "" {
+		return fmt.Errorf("live kit api key cannot be empty")
+	}
+
+	if c.LiveKit.ApiSecret == "" {
+		return fmt.Errorf("live kit api secret cannot be empty")
 	}
 
 	return nil
@@ -120,6 +134,14 @@ func (c *Config) LogConfig() string {
 	// Маскируем пароль
 	if logConfig.Db.Password != "" {
 		logConfig.Db.Password = "********"
+	}
+
+	if logConfig.JwtSecretKey != "" {
+		logConfig.JwtSecretKey = "********"
+	}
+
+	if logConfig.LiveKit.ApiSecret != "" {
+		logConfig.LiveKit.ApiSecret = "********"
 	}
 
 	// Преобразуем в JSON с отступами для читаемости

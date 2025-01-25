@@ -362,6 +362,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/lessons/{id}/start": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "generate meet token and set status to lesson \"ongoing\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lessons"
+                ],
+                "summary": "Start lesson",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LessonID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/start_lesson.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/teacher": {
             "get": {
                 "security": [
@@ -982,6 +1040,10 @@ const docTemplate = `{
                 "teacher_user_id": {
                     "type": "integer",
                     "example": 1
+                },
+                "token": {
+                    "type": "string",
+                    "example": "headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee"
                 }
             }
         },
@@ -1098,6 +1160,10 @@ const docTemplate = `{
                 "student_surname": {
                     "type": "string",
                     "example": "Smith"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee"
                 }
             }
         },
@@ -1321,6 +1387,15 @@ const docTemplate = `{
         },
         "registration.response": {
             "description": "User registration response",
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "start_lesson.response": {
             "type": "object",
             "properties": {
                 "token": {

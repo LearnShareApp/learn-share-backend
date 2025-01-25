@@ -4,6 +4,7 @@ const (
 	CancelStatusName       = "cancelled"
 	WaitingStatusName      = "waiting"
 	VerificationStatusName = "verification"
+	OngoingStatusName      = "ongoing"
 )
 
 type Status struct {

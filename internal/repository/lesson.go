@@ -65,19 +65,35 @@ func (r *Repository) IsLessonExistsById(ctx context.Context, id int) (bool, erro
 
 func (r *Repository) GetLessonById(ctx context.Context, id int) (*entities.Lesson, error) {
 	const query = `
-	SELECT lesson_id, 
-	       student_id, 
-	       teacher_id, 
-	       category_id, 
-	       schedule_time_id, 
-	       status_id,
-	       price, 
-	       token FROM lessons WHERE lesson_id = $1
+	SELECT
+		lessons.lesson_id,
+		lessons.student_id,
+		lessons.teacher_id,
+		lessons.category_id,
+		lessons.schedule_time_id,
+		lessons.status_id,
+		lessons.price,
+		lessons.token,
+		categories.name as category_name,
+		statuses.name as status_name,
+    	schedule_times.datetime as schedule_time_datetime
+	FROM lessons
+		INNER JOIN categories ON lessons.category_id = categories.category_id
+    	INNER JOIN statuses ON lessons.status_id = statuses.status_id
+		INNER JOIN schedule_times ON lessons.schedule_time_id = schedule_times.schedule_time_id
+	WHERE lesson_id = $1
 	`
 
-	var lesson entities.Lesson
+	type result struct {
+		CategoryName         string    `db:"category_name"`
+		StatusName           string    `db:"status_name"`
+		ScheduleTimeDatetime time.Time `db:"schedule_time_datetime"`
+		entities.Lesson
+	}
 
-	err := r.db.GetContext(ctx, &lesson, query, id)
+	var resp result
+
+	err := r.db.GetContext(ctx, &resp, query, id)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, internalErrs.ErrorSelectEmpty
@@ -86,6 +102,11 @@ func (r *Repository) GetLessonById(ctx context.Context, id int) (*entities.Lesso
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract lesson by id: %w", err)
 	}
+
+	lesson := resp.Lesson
+	lesson.CategoryName = resp.CategoryName
+	lesson.StatusName = resp.StatusName
+	lesson.ScheduleTimeDatetime = resp.ScheduleTimeDatetime
 
 	return &lesson, nil
 }
@@ -97,6 +118,17 @@ func (r *Repository) ChangeLessonStatus(ctx context.Context, lessonId int, statu
 
 	if _, err := r.db.ExecContext(ctx, query, lessonId, statusId); err != nil {
 		return fmt.Errorf("failed to update lesson status: %w", err)
+	}
+	return nil
+}
+
+func (r *Repository) EditStatusAndSaveTokenInLesson(ctx context.Context, lessonId int, statusId int, token string) error {
+	const query = `
+	UPDATE lessons SET status_id = $2, token = $3 WHERE lesson_id = $1
+	`
+
+	if _, err := r.db.ExecContext(ctx, query, lessonId, statusId, token); err != nil {
+		return fmt.Errorf("failed to update lesson status and set token: %w", err)
 	}
 	return nil
 }

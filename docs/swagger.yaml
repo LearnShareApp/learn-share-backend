@@ -90,6 +90,9 @@ definitions:
       teacher_user_id:
         example: 1
         type: integer
+      token:
+        example: headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee
+        type: string
     type: object
   get_student_lessons.response:
     properties:
@@ -172,6 +175,9 @@ definitions:
         type: string
       student_surname:
         example: Smith
+        type: string
+      token:
+        example: headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee
         type: string
     type: object
   get_teacher_lessons.response:
@@ -330,6 +336,12 @@ definitions:
     type: object
   registration.response:
     description: User registration response
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  start_lesson.response:
     properties:
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -564,6 +576,43 @@ paths:
       security:
       - BearerAuth: []
       summary: Cancel lesson
+      tags:
+      - lessons
+  /lessons/{id}/start:
+    put:
+      description: generate meet token and set status to lesson "ongoing"
+      parameters:
+      - description: LessonID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/start_lesson.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Start lesson
       tags:
       - lessons
   /teacher:

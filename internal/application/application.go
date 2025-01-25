@@ -7,6 +7,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
@@ -16,6 +17,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -58,7 +60,8 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		log.Info("successfully created tables (if they not existed)")
 	}
 
-	jwtService := jwt.NewJwtService(config.SecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
+	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
+	leveKitService := livekit.NewService(config.LiveKit)
 
 	var (
 		registrationSrv         = registration.NewService(repo, jwtService)
@@ -76,6 +79,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		getLessonsForStudentSrv = get_student_lessons.NewService(repo)
 		cancelLessonSrv         = cancel_lesson.NewService(repo)
 		approveLessonSrv        = approve_lesson.NewService(repo)
+		startLessonSrv          = start_lesson.NewService(repo, leveKitService)
 	)
 
 	services := rest.NewServices(jwtService,
@@ -93,7 +97,8 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		getLessonsForTeacherSrv,
 		getLessonsForStudentSrv,
 		cancelLessonSrv,
-		approveLessonSrv)
+		approveLessonSrv,
+		startLessonSrv)
 
 	restServer := rest.NewServer(services, config.Server, log)
 

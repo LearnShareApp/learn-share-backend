@@ -33,7 +33,7 @@ func WithIssuer(issuer string) Option {
 	}
 }
 
-func NewJwtService(secretKey string, opts ...Option) *Service {
+func NewService(secretKey string, opts ...Option) *Service {
 	s := &Service{
 		secretKey: []byte(secretKey),
 		duration:  24 * time.Hour,

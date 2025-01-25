@@ -10,6 +10,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -66,6 +67,7 @@ type Services struct {
 	GetLessonsForStudentSrv *get_student_lessons.Service
 	CancelLessonSrv         *cancel_lesson.Service
 	ApproveLessonSrv        *approve_lesson.Service
+	StartLessonSrv          *start_lesson.Service
 }
 
 type Server struct {
@@ -88,7 +90,8 @@ func NewServices(jwtSrv *jwt.Service,
 	getLessonsForTeacherSrv *get_teacher_lessons.Service,
 	getLessonsForStudentSrv *get_student_lessons.Service,
 	cancelLessonSrv *cancel_lesson.Service,
-	approveLessonSrv *approve_lesson.Service) *Services {
+	approveLessonSrv *approve_lesson.Service,
+	startLessonSrv *start_lesson.Service) *Services {
 	return &Services{
 		JwtSrv:                  jwtSrv,
 		RegSrv:                  reg,
@@ -106,6 +109,7 @@ func NewServices(jwtSrv *jwt.Service,
 		GetLessonsForStudentSrv: getLessonsForStudentSrv,
 		CancelLessonSrv:         cancelLessonSrv,
 		ApproveLessonSrv:        approveLessonSrv,
+		StartLessonSrv:          startLessonSrv,
 	}
 }
 
@@ -158,6 +162,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 
 		r.Put(path.Join(lessonsRoute, cancel_lesson.Route), cancel_lesson.MakeHandler(services.CancelLessonSrv, log))
 		r.Put(path.Join(lessonsRoute, approve_lesson.Route), approve_lesson.MakeHandler(services.ApproveLessonSrv, log))
+		r.Put(path.Join(lessonsRoute, start_lesson.Route), start_lesson.MakeHandler(services.StartLessonSrv, log))
 	})
 
 	apiRouter.Mount(usersRoute, usersRouter)

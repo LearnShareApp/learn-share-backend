@@ -73,7 +73,7 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) error {
 		return serviceErrs.ErrorStatusNonVerification
 	}
 
-	// get verification and waiting statusId
+	// get waiting statusId
 	waitingStatusId, err := s.repo.GetStatusIdByStatusName(ctx, entities.WaitingStatusName)
 	if err != nil {
 		return fmt.Errorf("failed to get status by status name: %w", err)

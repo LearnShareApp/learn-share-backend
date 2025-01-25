@@ -61,7 +61,7 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 	}
 
 	statuses := []entities.Status{
-		{Name: "ongoing"},
+		{Name: entities.OngoingStatusName},
 		{Name: entities.CancelStatusName},
 		{Name: entities.VerificationStatusName},
 		{Name: entities.WaitingStatusName},

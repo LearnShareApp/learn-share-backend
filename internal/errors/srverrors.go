@@ -30,4 +30,5 @@ var (
 	ErrorNotRelatedTeacherToLesson = errors.New("teacher no related to this lesson")
 
 	ErrorStatusNonVerification = errors.New("non-verification status")
+	ErrorStatusNonWaiting      = errors.New("non-waiting status")
 )
