@@ -496,6 +496,41 @@ paths:
       summary: Get lessons for students
       tags:
       - lessons
+  /lessons/{id}/cancel:
+    put:
+      description: Return all lessons which have student
+      parameters:
+      - description: LessonID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Get lessons for students
+      tags:
+      - lessons
   /teacher:
     get:
       description: Get all info about teacher (user info + teacher + his skills) by

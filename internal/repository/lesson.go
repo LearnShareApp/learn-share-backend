@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
@@ -45,6 +47,57 @@ func (r *Repository) CreateUnconfirmedLesson(ctx context.Context, lesson *entiti
 		return fmt.Errorf("error committing transaction: %w", err)
 	}
 
+	return nil
+}
+
+func (r *Repository) IsLessonExistsById(ctx context.Context, id int) (bool, error) {
+	const query = `SELECT EXISTS(SELECT 1 FROM lessons WHERE lesson_id = $1)`
+
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, query, id)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check lesson existence by lesson id: %w", err)
+	}
+
+	return exists, nil
+}
+
+func (r *Repository) GetLessonById(ctx context.Context, id int) (*entities.Lesson, error) {
+	const query = `
+	SELECT lesson_id, 
+	       student_id, 
+	       teacher_id, 
+	       category_id, 
+	       schedule_time_id, 
+	       status_id,
+	       price, 
+	       token FROM lessons WHERE lesson_id = $1
+	`
+
+	var lesson entities.Lesson
+
+	err := r.db.GetContext(ctx, &lesson, query, id)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, internalErrs.ErrorSelectEmpty
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract lesson by id: %w", err)
+	}
+
+	return &lesson, nil
+}
+
+func (r *Repository) ChangeLessonStatus(ctx context.Context, lessonId int, statusId int) error {
+	const query = `
+	UPDATE lessons SET status_id = $2 WHERE lesson_id = $1
+	`
+
+	if _, err := r.db.ExecContext(ctx, query, lessonId, statusId); err != nil {
+		return fmt.Errorf("failed to update lesson status: %w", err)
+	}
 	return nil
 }
 

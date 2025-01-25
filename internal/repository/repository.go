@@ -60,9 +60,9 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 		return fmt.Errorf("error creating statuses table: %w", err)
 	}
 
-	statuses := []entities.Statuses{
+	statuses := []entities.Status{
 		{Name: "ongoing"},
-		{Name: "cancelled"},
+		{Name: entities.CancelStatusName},
 		{Name: "verification"},
 		{Name: "waiting"},
 		//...
@@ -265,7 +265,7 @@ func seedCategories(ctx context.Context, tx *sqlx.Tx, categories []entities.Cate
 	return nil
 }
 
-func seedStatuses(ctx context.Context, tx *sqlx.Tx, statuses []entities.Statuses) error {
+func seedStatuses(ctx context.Context, tx *sqlx.Tx, statuses []entities.Status) error {
 	const query = `
         INSERT INTO public.statuses (name)
         VALUES ($1)

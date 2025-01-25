@@ -246,6 +246,61 @@
                 }
             }
         },
+        "/lessons/{id}/cancel": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Return all lessons which have student",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lessons"
+                ],
+                "summary": "Get lessons for students",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LessonID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/teacher": {
             "get": {
                 "security": [
