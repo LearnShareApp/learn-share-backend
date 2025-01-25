@@ -1,4 +1,4 @@
-package cancel_lesson
+package approve_lesson
 
 import (
 	"errors"
@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	Route = "/{id}/cancel"
+	Route = "/{id}/approve"
 )
 
 // MakeHandler returns http.HandlerFunc
-// @Summary Cancel lesson
-// @Description Set lesson status "cancelled" if this user related to lesson
+// @Summary Approve lesson
+// @Description Set lesson status "waiting" if this user is a teacher to lesson
 // @Tags lessons
 // @Produce json
 // @Param id path int true "LessonID"
@@ -25,7 +25,7 @@ const (
 // @Failure 401 {object} jsonutils.ErrorStruct
 // @Failure 403 {object} jsonutils.ErrorStruct
 // @Failure 500 {object} jsonutils.ErrorStruct
-// @Router /lessons/{id}/cancel [put]
+// @Router /lessons/{id}/approve [put]
 // @Security     BearerAuth
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -66,8 +66,16 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 				if err = jsonutils.RespondWith404(w, serviceErrors.ErrorLessonNotFound.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
-			} else if errors.Is(err, serviceErrors.ErrorNotRelatedUserToLesson) {
-				if err = jsonutils.RespondWith403(w, serviceErrors.ErrorNotRelatedUserToLesson.Error()); err != nil {
+			} else if errors.Is(err, serviceErrors.ErrorUserIsNotTeacher) {
+				if err = jsonutils.RespondWith403(w, "unavailable operation for students"); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+			} else if errors.Is(err, serviceErrors.ErrorNotRelatedTeacherToLesson) {
+				if err = jsonutils.RespondWith403(w, serviceErrors.ErrorNotRelatedTeacherToLesson.Error()); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+			} else if errors.Is(err, serviceErrors.ErrorStatusNonVerification) {
+				if err = jsonutils.RespondWith403(w, "can approve a lesson if only the lesson had a verification status"); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			} else {

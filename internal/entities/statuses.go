@@ -1,7 +1,9 @@
 package entities
 
 const (
-	CancelStatusName = "cancelled"
+	CancelStatusName       = "cancelled"
+	WaitingStatusName      = "waiting"
+	VerificationStatusName = "verification"
 )
 
 type Status struct {

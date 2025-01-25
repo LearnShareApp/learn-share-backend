@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
@@ -64,6 +65,7 @@ type Services struct {
 	GetLessonsForTeacherSrv *get_teacher_lessons.Service
 	GetLessonsForStudentSrv *get_student_lessons.Service
 	CancelLessonSrv         *cancel_lesson.Service
+	ApproveLessonSrv        *approve_lesson.Service
 }
 
 type Server struct {
@@ -85,7 +87,8 @@ func NewServices(jwtSrv *jwt.Service,
 	bookLessonSrv *book_lesson.Service,
 	getLessonsForTeacherSrv *get_teacher_lessons.Service,
 	getLessonsForStudentSrv *get_student_lessons.Service,
-	cancelLessonSrv *cancel_lesson.Service) *Services {
+	cancelLessonSrv *cancel_lesson.Service,
+	approveLessonSrv *approve_lesson.Service) *Services {
 	return &Services{
 		JwtSrv:                  jwtSrv,
 		RegSrv:                  reg,
@@ -102,6 +105,7 @@ func NewServices(jwtSrv *jwt.Service,
 		GetLessonsForTeacherSrv: getLessonsForTeacherSrv,
 		GetLessonsForStudentSrv: getLessonsForStudentSrv,
 		CancelLessonSrv:         cancelLessonSrv,
+		ApproveLessonSrv:        approveLessonSrv,
 	}
 }
 
@@ -153,6 +157,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Post(path.Join(lessonRoute, book_lesson.Route), book_lesson.MakeHandler(services.BookLessonSrv, log))
 
 		r.Put(path.Join(lessonsRoute, cancel_lesson.Route), cancel_lesson.MakeHandler(services.CancelLessonSrv, log))
+		r.Put(path.Join(lessonsRoute, approve_lesson.Route), approve_lesson.MakeHandler(services.ApproveLessonSrv, log))
 	})
 
 	apiRouter.Mount(usersRoute, usersRouter)

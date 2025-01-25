@@ -23,8 +23,11 @@ var (
 	ErrorScheduleTimeForAnotherTeacher = errors.New("schedule time for another teacher")
 	ErrorScheduleTimeUnavailable       = errors.New("schedule time unavailable anymore")
 
-	ErrorStudentAndTeacherSame  = errors.New("student and teacher the same person")
-	ErrorLessonTimeBooked       = errors.New("lesson time already booked")
-	ErrorLessonNotFound         = errors.New("lesson not found")
-	ErrorNotRelatedUserToLesson = errors.New("user no related to this lesson")
+	ErrorStudentAndTeacherSame     = errors.New("student and teacher the same person")
+	ErrorLessonTimeBooked          = errors.New("lesson time already booked")
+	ErrorLessonNotFound            = errors.New("lesson not found")
+	ErrorNotRelatedUserToLesson    = errors.New("user no related to this lesson")
+	ErrorNotRelatedTeacherToLesson = errors.New("teacher no related to this lesson")
+
+	ErrorStatusNonVerification = errors.New("non-verification status")
 )

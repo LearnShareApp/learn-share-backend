@@ -63,8 +63,8 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 	statuses := []entities.Status{
 		{Name: "ongoing"},
 		{Name: entities.CancelStatusName},
-		{Name: "verification"},
-		{Name: "waiting"},
+		{Name: entities.VerificationStatusName},
+		{Name: entities.WaitingStatusName},
 		//...
 	}
 
@@ -205,7 +205,7 @@ func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
         token TEXT NOT NULL DEFAULT ''
     );`
 
-	const createTriggerFunc = `
+	var createTriggerFunc = fmt.Sprintf(`
     CREATE OR REPLACE FUNCTION set_default_lesson_status()
     RETURNS TRIGGER AS $$
     BEGIN
@@ -213,13 +213,13 @@ func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
             NEW.status_id := (
                 SELECT status_id 
                 FROM statuses 
-                WHERE name = 'verification' 
+                WHERE name = '%s'
                 LIMIT 1
             );
         END IF;
         RETURN NEW;
     END;
-    $$ LANGUAGE plpgsql;`
+    $$ LANGUAGE plpgsql;`, entities.VerificationStatusName)
 
 	const createTrigger = `
 	DO $$
