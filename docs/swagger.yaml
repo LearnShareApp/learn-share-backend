@@ -90,9 +90,6 @@ definitions:
       teacher_user_id:
         example: 1
         type: integer
-      token:
-        example: headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee
-        type: string
     type: object
   get_student_lessons.response:
     properties:
@@ -175,9 +172,6 @@ definitions:
         type: string
       student_surname:
         example: Smith
-        type: string
-      token:
-        example: headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee
         type: string
     type: object
   get_teacher_lessons.response:
@@ -284,6 +278,12 @@ definitions:
         type: string
       surname:
         example: Smith
+        type: string
+    type: object
+  join_lesson.response:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
     type: object
   jsonutils.ErrorStruct:
@@ -613,6 +613,44 @@ paths:
       security:
       - BearerAuth: []
       summary: Finished lesson
+      tags:
+      - lessons
+  /lessons/{id}/join:
+    get:
+      description: generate meet token to join "ongoing" lesson (if user related to
+        lesson)
+      parameters:
+      - description: LessonID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/join_lesson.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Join to lesson
       tags:
       - lessons
   /lessons/{id}/start:

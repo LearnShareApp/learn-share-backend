@@ -202,8 +202,7 @@ func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
         category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
         schedule_time_id INTEGER UNIQUE NOT NULL REFERENCES schedule_times(schedule_time_id) ON DELETE CASCADE,
         price INTEGER NOT NULL DEFAULT 0,
-        status_id INTEGER DEFAULT NULL REFERENCES statuses(status_id) ON DELETE CASCADE,
-        token TEXT NOT NULL DEFAULT ''
+        status_id INTEGER DEFAULT NULL REFERENCES statuses(status_id) ON DELETE CASCADE
     );`
 
 	var createTriggerFunc = fmt.Sprintf(`

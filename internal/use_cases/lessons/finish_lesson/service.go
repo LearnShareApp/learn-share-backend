@@ -79,8 +79,8 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) error {
 		return fmt.Errorf("failed to get status by status name: %w", err)
 	}
 	// change lesson status and remove lesson token
-	if err = s.repo.EditStatusAndTokenInLesson(ctx, lessonId, finishedStatusId, ""); err != nil {
-		return fmt.Errorf("failed to change lesson status or remove token: %w", err)
+	if err = s.repo.ChangeLessonStatus(ctx, lessonId, finishedStatusId); err != nil {
+		return fmt.Errorf("failed to change lesson status: %w", err)
 	}
 
 	return nil
