@@ -1,4 +1,4 @@
-package approve_lesson
+package finish_lesson
 
 import (
 	"errors"
@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	Route = "/{id}/approve"
+	Route = "/{id}/finish"
 )
 
 // MakeHandler returns http.HandlerFunc
-// @Summary Approve lesson
-// @Description Set lesson status "waiting" if this user is a teacher to lesson and lesson hasn't been cancelled (was verification)
+// @Summary Finished lesson
+// @Description Set lesson status "finished" if this user is a teacher to lesson and lesson's stats has been "ongoing"
 // @Tags lessons
 // @Produce json
 // @Param id path int true "LessonID"
@@ -25,7 +25,7 @@ const (
 // @Failure 401 {object} jsonutils.ErrorStruct
 // @Failure 403 {object} jsonutils.ErrorStruct
 // @Failure 500 {object} jsonutils.ErrorStruct
-// @Router /lessons/{id}/approve [put]
+// @Router /lessons/{id}/finish [put]
 // @Security     BearerAuth
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -74,8 +74,8 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 				if err = jsonutils.RespondWith403(w, serviceErrors.ErrorNotRelatedTeacherToLesson.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
-			} else if errors.Is(err, serviceErrors.ErrorStatusNonVerification) {
-				if err = jsonutils.RespondWith403(w, "can approve a lesson if only the lesson had a verification status"); err != nil {
+			} else if errors.Is(err, serviceErrors.ErrorStatusNonOngoing) {
+				if err = jsonutils.RespondWith403(w, "can finish a lesson if only the lesson had a ongoing status"); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			} else {

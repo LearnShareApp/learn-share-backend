@@ -511,6 +511,7 @@ paths:
   /lessons/{id}/approve:
     put:
       description: Set lesson status "waiting" if this user is a teacher to lesson
+        and lesson hasn't been cancelled (was verification)
       parameters:
       - description: LessonID
         in: path
@@ -576,6 +577,42 @@ paths:
       security:
       - BearerAuth: []
       summary: Cancel lesson
+      tags:
+      - lessons
+  /lessons/{id}/finish:
+    put:
+      description: Set lesson status "finished" if this user is a teacher to lesson
+        and lesson's stats has been "ongoing"
+      parameters:
+      - description: LessonID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Finished lesson
       tags:
       - lessons
   /lessons/{id}/start:

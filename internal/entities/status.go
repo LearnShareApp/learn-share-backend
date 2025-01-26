@@ -5,6 +5,7 @@ const (
 	WaitingStatusName      = "waiting"
 	VerificationStatusName = "verification"
 	OngoingStatusName      = "ongoing"
+	FinishedStatusName     = "finished"
 )
 
 type Status struct {

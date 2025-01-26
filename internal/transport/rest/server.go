@@ -8,6 +8,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/finish_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
@@ -68,6 +69,7 @@ type Services struct {
 	CancelLessonSrv         *cancel_lesson.Service
 	ApproveLessonSrv        *approve_lesson.Service
 	StartLessonSrv          *start_lesson.Service
+	FinishLessonSrv         *finish_lesson.Service
 }
 
 type Server struct {
@@ -91,7 +93,8 @@ func NewServices(jwtSrv *jwt.Service,
 	getLessonsForStudentSrv *get_student_lessons.Service,
 	cancelLessonSrv *cancel_lesson.Service,
 	approveLessonSrv *approve_lesson.Service,
-	startLessonSrv *start_lesson.Service) *Services {
+	startLessonSrv *start_lesson.Service,
+	finishLessonSrv *finish_lesson.Service) *Services {
 	return &Services{
 		JwtSrv:                  jwtSrv,
 		RegSrv:                  reg,
@@ -110,6 +113,7 @@ func NewServices(jwtSrv *jwt.Service,
 		CancelLessonSrv:         cancelLessonSrv,
 		ApproveLessonSrv:        approveLessonSrv,
 		StartLessonSrv:          startLessonSrv,
+		FinishLessonSrv:         finishLessonSrv,
 	}
 }
 
@@ -163,6 +167,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Put(path.Join(lessonsRoute, cancel_lesson.Route), cancel_lesson.MakeHandler(services.CancelLessonSrv, log))
 		r.Put(path.Join(lessonsRoute, approve_lesson.Route), approve_lesson.MakeHandler(services.ApproveLessonSrv, log))
 		r.Put(path.Join(lessonsRoute, start_lesson.Route), start_lesson.MakeHandler(services.StartLessonSrv, log))
+		r.Put(path.Join(lessonsRoute, finish_lesson.Route), finish_lesson.MakeHandler(services.FinishLessonSrv, log))
 	})
 
 	apiRouter.Mount(usersRoute, usersRouter)

@@ -91,7 +91,7 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, err
 	}
 
 	// save token and edit status
-	if err = s.repo.EditStatusAndSaveTokenInLesson(ctx, lessonId, ongoingStatusId, token); err != nil {
+	if err = s.repo.EditStatusAndTokenInLesson(ctx, lessonId, ongoingStatusId, token); err != nil {
 		return "", fmt.Errorf("failed to save lesson token and edit lesson status: %w", err)
 	}
 

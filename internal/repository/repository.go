@@ -65,6 +65,7 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 		{Name: entities.CancelStatusName},
 		{Name: entities.VerificationStatusName},
 		{Name: entities.WaitingStatusName},
+		{Name: entities.FinishedStatusName},
 		//...
 	}
 

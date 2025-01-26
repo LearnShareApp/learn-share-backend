@@ -122,7 +122,7 @@ func (r *Repository) ChangeLessonStatus(ctx context.Context, lessonId int, statu
 	return nil
 }
 
-func (r *Repository) EditStatusAndSaveTokenInLesson(ctx context.Context, lessonId int, statusId int, token string) error {
+func (r *Repository) EditStatusAndTokenInLesson(ctx context.Context, lessonId int, statusId int, token string) error {
 	const query = `
 	UPDATE lessons SET status_id = $2, token = $3 WHERE lesson_id = $1
 	`

@@ -31,4 +31,5 @@ var (
 
 	ErrorStatusNonVerification = errors.New("non-verification status")
 	ErrorStatusNonWaiting      = errors.New("non-waiting status")
+	ErrorStatusNonOngoing      = errors.New("non-ongoing status")
 )

@@ -259,7 +259,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Set lesson status \"waiting\" if this user is a teacher to lesson",
+                "description": "Set lesson status \"waiting\" if this user is a teacher to lesson and lesson hasn't been cancelled (was verification)",
                 "produces": [
                     "application/json"
                 ],
@@ -322,6 +322,61 @@ const docTemplate = `{
                     "lessons"
                 ],
                 "summary": "Cancel lesson",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LessonID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/lessons/{id}/finish": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Set lesson status \"finished\" if this user is a teacher to lesson and lesson's stats has been \"ongoing\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lessons"
+                ],
+                "summary": "Finished lesson",
                 "parameters": [
                     {
                         "type": "integer",

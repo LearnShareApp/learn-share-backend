@@ -1,4 +1,4 @@
-package start_lesson
+package finish_lesson
 
 import (
 	"context"
