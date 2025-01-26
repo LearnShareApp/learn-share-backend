@@ -1,6 +1,8 @@
 package livekit
 
 import (
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/livekit/protocol/auth"
 	"time"
 )
@@ -40,19 +42,20 @@ func NewService(config ApiConfig, opts ...Option) *Service {
 
 func (s *Service) GenerateMeetingToken(roomName string) (string, error) {
 	canPublishMedia := true
-	CanSubscribeMedia := true
+	canSubscribeMedia := true
 	// Общий токен для всех участников комнаты
 	grants := &auth.VideoGrant{
 		RoomJoin:     true,
 		Room:         roomName,
 		CanPublish:   &canPublishMedia,
-		CanSubscribe: &CanSubscribeMedia,
+		CanSubscribe: &canSubscribeMedia,
 	}
 
 	at := auth.NewAccessToken(s.ApiKey, s.ApiSecret)
 	at.SetVideoGrant(grants)
-	//at.AddGrant(grants)
 
+	// ДОБАВЬТЕ это - уникальный идентификатор
+	at.SetIdentity(fmt.Sprintf("participant_%s", uuid.New().String()))
 	// Можно добавить время жизни токена
 	at.SetValidFor(s.duration)
 
