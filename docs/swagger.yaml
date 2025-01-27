@@ -347,7 +347,7 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
     type: object
-host: adoe.ru:81
+host: localhost:81
 info:
   contact:
     email: ruslanrbb8@gmail.com
@@ -650,7 +650,7 @@ paths:
             $ref: '#/definitions/jsonutils.ErrorStruct'
       security:
       - BearerAuth: []
-      summary: Join to lesson
+      summary: Join the lesson
       tags:
       - lessons
   /lessons/{id}/start:

@@ -10,7 +10,7 @@
         },
         "version": "1.0"
     },
-    "host": "adoe.ru:81",
+    "host": "localhost:81",
     "basePath": "/api",
     "paths": {
         "/auth/login": {
@@ -425,7 +425,7 @@
                 "tags": [
                     "lessons"
                 ],
-                "summary": "Join to lesson",
+                "summary": "Join the lesson",
                 "parameters": [
                     {
                         "type": "integer",

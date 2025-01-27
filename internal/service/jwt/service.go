@@ -3,8 +3,9 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 const UserIDKey = "user_id"
@@ -47,12 +48,12 @@ func NewService(secretKey string, opts ...Option) *Service {
 	return s
 }
 
-// GenerateJWTToken создает JWT-токен для пользователя
+// GenerateJWTToken creates a JWT token for a user
 func (s *Service) GenerateJWTToken(userId int) (string, error) {
-	// Устанавливаем время жизни токена
+	// Set token expiration time
 	expirationTime := time.Now().Add(s.duration)
 
-	// Создаем claims
+	// Create claims
 	claims := jwt.MapClaims{
 		UserIDKey: userId,
 		"exp":     expirationTime.Unix(),
@@ -60,10 +61,10 @@ func (s *Service) GenerateJWTToken(userId int) (string, error) {
 		"iss":     s.issuer,
 	}
 
-	// Создаем токен с алгоритмом подписи
+	// Create token with signing algorithm
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Подписываем токен секретным ключом
+	// Sign the token with secret key
 	tokenString, err := token.SignedString(s.secretKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate token: %w", err)
@@ -72,7 +73,7 @@ func (s *Service) GenerateJWTToken(userId int) (string, error) {
 	return tokenString, nil
 }
 
-// ValidateJWTToken проверяет валидность JWT-токена
+// ValidateJWTToken validates the JWT token
 func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -90,7 +91,7 @@ func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 		return nil, fmt.Errorf("invalid token")
 	}
 
-	// Дополнительная проверка времени истечения
+	// Additional expiration time check
 	if exp, ok := claims["exp"].(float64); ok {
 		if time.Now().Unix() > int64(exp) {
 			return nil, ErrorTokenExpired
@@ -100,7 +101,7 @@ func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-// ExtractUserID извлекает ID пользователя из claims
+// ExtractUserID extracts user ID from claims
 func (s *Service) ExtractUserID(claims jwt.MapClaims) (int, error) {
 	userID, ok := claims[UserIDKey].(float64)
 	if !ok {

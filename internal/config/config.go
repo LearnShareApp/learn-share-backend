@@ -3,12 +3,13 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"strconv"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
 	"github.com/joho/godotenv"
-	"os"
-	"strconv"
 )
 
 type Config struct {
@@ -20,7 +21,7 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	// Ищем .env файл в разных директориях
+	// Looking for .env file in different directories
 	envPaths := []string{
 		".env",
 		"./config/.env",
@@ -82,7 +83,6 @@ func LoadConfig() (*Config, error) {
 	return config, nil
 }
 
-// getEnvAsInt теперь возвращает ошибку вместо значения по умолчанию
 func getEnvAsInt(key string) (int, error) {
 	valueStr := os.Getenv(key)
 	value, err := strconv.Atoi(valueStr)
@@ -92,7 +92,7 @@ func getEnvAsInt(key string) (int, error) {
 	return value, nil
 }
 
-// Validate валидация конфига
+// Validate config validation
 func (c *Config) Validate() error {
 
 	if c.Db.Port < 1 || c.Db.Port > 65535 {
@@ -126,12 +126,12 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// LogConfig логирует конфигурацию с маскированием чувствительных данных
+// LogConfig logs configuration with sensitive data masking
 func (c *Config) LogConfig() string {
-	// Создаем копию конфига для логирования
+	// Create a copy of config for logging
 	logConfig := *c
 
-	// Маскируем пароль
+	// Mask password
 	if logConfig.Db.Password != "" {
 		logConfig.Db.Password = "********"
 	}
@@ -144,7 +144,7 @@ func (c *Config) LogConfig() string {
 		logConfig.LiveKit.ApiSecret = "********"
 	}
 
-	// Преобразуем в JSON с отступами для читаемости
+	// Convert to JSON with indents for readability
 	jsonBytes, err := json.MarshalIndent(logConfig, "", "  ")
 	if err != nil {
 		return fmt.Sprintf("Error marshaling config: %v", err)
