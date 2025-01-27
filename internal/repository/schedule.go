@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	"github.com/jmoiron/sqlx"
-	"time"
 )
 
 func (r *Repository) IsScheduleTimeExistsByTeacherIdAndDatetime(ctx context.Context, id int, datetime time.Time) (bool, error) {
@@ -65,7 +66,7 @@ func (r *Repository) GetScheduleTimesByTeacherId(ctx context.Context, id int) ([
 	const query = `
 		SELECT schedule_time_id, teacher_id, datetime, is_available FROM schedule_times 
 		WHERE teacher_id = $1 AND 
-		      datetime >= NOW() - INTERVAL '1 day'
+		      datetime >= NOW()
 		`
 
 	var times []*entities.ScheduleTime

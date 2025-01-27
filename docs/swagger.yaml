@@ -650,7 +650,7 @@ paths:
             $ref: '#/definitions/jsonutils.ErrorStruct'
       security:
       - BearerAuth: []
-      summary: Join to lesson
+      summary: Join the lesson
       tags:
       - lessons
   /lessons/{id}/start:

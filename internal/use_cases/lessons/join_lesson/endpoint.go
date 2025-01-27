@@ -2,12 +2,13 @@ package join_lesson
 
 import (
 	"errors"
+	"net/http"
+	"strconv"
+
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
-	"net/http"
-	"strconv"
 )
 
 const (
@@ -15,7 +16,7 @@ const (
 )
 
 // MakeHandler returns http.HandlerFunc
-// @Summary Join to lesson
+// @Summary Join the lesson
 // @Description generate meet token to join "ongoing" lesson (if user related to lesson)
 // @Tags lessons
 // @Produce json

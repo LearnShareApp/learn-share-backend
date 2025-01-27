@@ -431,7 +431,7 @@ const docTemplate = `{
                 "tags": [
                     "lessons"
                 ],
-                "summary": "Join to lesson",
+                "summary": "Join the lesson",
                 "parameters": [
                     {
                         "type": "integer",
