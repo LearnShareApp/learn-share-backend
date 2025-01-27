@@ -845,6 +845,20 @@ const docTemplate = `{
                     "teachers"
                 ],
                 "summary": "Get full teachers data",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Filter my teachers",
+                        "name": "is_mine",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter category",
+                        "name": "category",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

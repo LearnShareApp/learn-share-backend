@@ -37,10 +37,17 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 	}
 
 	categories := []entities.Category{
-		{Name: "Cooking", MinAge: 7},
-		{Name: "Programming", MinAge: 7},
-		{Name: "Drawing", MinAge: 0},
-		{Name: "Dancing", MinAge: 0},
+		{Name: "Cooking", MinAge: 12},
+		{Name: "Programming", MinAge: 6},
+		{Name: "Drawing", MinAge: 3},
+		{Name: "Dancing", MinAge: 6},
+		{Name: "English", MinAge: 6},
+		{Name: "Russian", MinAge: 6},
+		{Name: "Public Speaking", MinAge: 14},
+		{Name: "Physics", MinAge: 6},
+		{Name: "Biology", MinAge: 6},
+		{Name: "History", MinAge: 6},
+		{Name: "Maths", MinAge: 6},
 		//...
 	}
 

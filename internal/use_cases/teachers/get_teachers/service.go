@@ -15,11 +15,9 @@ func NewService(repo repo) *Service {
 	}
 }
 
-func (s *Service) Do(ctx context.Context) ([]entities.User, error) {
+func (s *Service) Do(ctx context.Context, userId int, isMyTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error) {
 
-	// maybe add filters
-
-	teachers, err := s.repo.GetAllTeachersData(ctx)
+	teachers, err := s.repo.GetAllTeachersDataFiltered(ctx, userId, isMyTeachers, category, isFilteredByCategory)
 
 	if err != nil {
 		return nil, err

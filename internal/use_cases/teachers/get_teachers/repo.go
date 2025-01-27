@@ -6,5 +6,5 @@ import (
 )
 
 type repo interface {
-	GetAllTeachersData(ctx context.Context) ([]entities.User, error)
+	GetAllTeachersDataFiltered(ctx context.Context, userId int, isUsersTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error)
 }

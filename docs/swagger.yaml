@@ -884,6 +884,15 @@ paths:
   /teachers:
     get:
       description: Get full teachers data (their user data, teacher data and skills)
+      parameters:
+      - description: Filter my teachers
+        in: query
+        name: is_mine
+        type: boolean
+      - description: Filter category
+        in: query
+        name: category
+        type: string
       produces:
       - application/json
       responses:
