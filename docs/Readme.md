@@ -17,185 +17,198 @@
 2. start docker on your PC
 3. in terminal go to project root (learn-share-backend/)
     * enter command `docker-compose up -d --build`
+4. for stop backend by command `docker-compose down`
+5. after first run you can use `docker-compose up -d` command
 
-<br>
-<hr>
-<br>
 
-* after starting project you can open swagger: http://adoe.ru:81
+## How to use
+
+* after starting project you can open swagger and try api: http://adoe.ru:81
     * or http://localhost:81 for local start
-* stop backend by command `docker-compose down`
-* after first run you can use `docker-compose up -d` command
 
+## The main technologies which i use in this project
 
-for questions contact with me: [telegram](https://t.me/Ruslan20007) or by email: ruslanrbb8@gmail.com
+* [Go](https://go.dev/) - programming language
+* [postgresql](https://www.postgresql.org/) - database
+* [Docker](https://www.docker.com/) - containerization
+* [chi](https://github.com/go-chi/chi) - http router
+* [zap](https://github.com/uber-go/zap) - logging
+* [swaggo](https://github.com/swaggo/swag) - swagger documentation
+* [JWT](https://jwt.io/) - authentication
+* [bcrypt](https://pkg.go.dev/golang.org/x/crypto/bcrypt) - password hashing
+* [sqlx](https://github.com/jmoiron/sqlx) - database communication
+* [livekit](https://livekit.io/) - video communication (generating tokens for frontend)
 
+## Contact
 
-[//]: # ()
-[//]: # (## Learn-Share Backend Documentation)
+for questions contact with me in [telegram](https://t.me/Ruslan20007) or by email: ruslanrbb8@gmail.com
 
-[//]: # ()
-[//]: # (### Project Structure)
 
-[//]: # (The project follows a clean architecture pattern with clear separation of concerns:)
 
-[//]: # ()
-[//]: # (1. **cmd/main** - Entry point with graceful shutdown)
+<!-- ## Learn-Share Backend Documentation
 
-[//]: # (2. **internal/transport/rest** - REST API implementation using chi router)
 
-[//]: # (3. **internal/use_cases** - Business logic organized by domain areas)
+### Project Structure
 
-[//]: # (4. **pkg/logger** - Centralized logging with zap)
+The project follows a clean architecture pattern with clear separation of concerns:
 
-[//]: # (5. **internal/config** - Configuration management)
 
-[//]: # ()
-[//]: # (### Key Libraries)
+1. **cmd/main** - Entry point with graceful shutdown
 
-[//]: # (- **chi** - Lightweight HTTP router)
+2. **internal/transport/rest** - REST API implementation using chi router
 
-[//]: # (- **zap** - High-performance logging)
+3. **internal/use_cases** - Business logic organized by domain areas
 
-[//]: # (- **swaggo** - Swagger documentation generation)
+4. **pkg/logger** - Centralized logging with zap
 
-[//]: # (- **docker** - Containerization and deployment)
+5. **internal/config** - Configuration management
 
-[//]: # ()
-[//]: # (### Use Case Structure)
 
-[//]: # (The use cases are organized by domain areas:)
+### Key Libraries
 
-[//]: # ()
-[//]: # (```go)
+- **chi** - Lightweight HTTP router
 
-[//]: # (internal/use_cases/)
+- **zap** - High-performance logging
 
-[//]: # (├── auth/            # Authentication)
+- **swaggo** - Swagger documentation generation
 
-[//]: # (│   ├── login/       # User login)
+- **docker** - Containerization and deployment
 
-[//]: # (│   └── registration/ # User registration)
 
-[//]: # (├── categories/      # Category management)
+### Use Case Structure
 
-[//]: # (├── lessons/         # Lesson operations)
+The use cases are organized by domain areas:
 
-[//]: # (│   ├── approve/     # Lesson approval)
 
-[//]: # (│   ├── book/        # Lesson booking)
+```go
 
-[//]: # (│   ├── cancel/      # Lesson cancellation)
+internal/use_cases/
 
-[//]: # (│   ├── finish/      # Lesson completion)
+├── auth/            # Authentication
 
-[//]: # (│   ├── join/        # Lesson joining)
+│   ├── login/       # User login
 
-[//]: # (│   ├── start/       # Lesson start)
+│   └── registration/ # User registration
 
-[//]: # (│   └── get/         # Lesson retrieval)
+├── categories/      # Category management
 
-[//]: # (├── schedules/       # Schedule management)
+├── lessons/         # Lesson operations
 
-[//]: # (│   ├── add_time/    # Add schedule time)
+│   ├── approve/     # Lesson approval
 
-[//]: # (│   └── get_times/   # Get available times)
+│   ├── book/        # Lesson booking
 
-[//]: # (└── teachers/        # Teacher operations)
+│   ├── cancel/      # Lesson cancellation
 
-[//]: # (    ├── add_skill/   # Add teacher skill)
+│   ├── finish/      # Lesson completion
 
-[//]: # (    ├── become/      # Become a teacher)
+│   ├── join/        # Lesson joining
 
-[//]: # (    └── get/         # Teacher data retrieval)
+│   ├── start/       # Lesson start
 
-[//]: # (```)
+│   └── get/         # Lesson retrieval
 
-[//]: # ()
-[//]: # (### Database Schema)
+├── schedules/       # Schedule management
 
-[//]: # (Key tables and relationships:)
+│   ├── add_time/    # Add schedule time
 
-[//]: # ()
-[//]: # (1. **Users** - Core user information)
+│   └── get_times/   # Get available times
 
-[//]: # (2. **Teachers** - Teacher-specific data)
+└── teachers/        # Teacher operations
 
-[//]: # (3. **Lessons** - Lesson scheduling and management)
+    ├── add_skill/   # Add teacher skill
 
-[//]: # (4. **Categories** - Lesson categories)
+    ├── become/      # Become a teacher
 
-[//]: # (5. **Schedules** - Teacher availability)
+    └── get/         # Teacher data retrieval
 
-[//]: # (6. **Skills** - Teacher skills)
+```
 
-[//]: # ()
-[//]: # (Relationships:)
 
-[//]: # (- One-to-many between Teachers and Lessons)
+### Database Schema
 
-[//]: # (- Many-to-many between Teachers and Skills)
+Key tables and relationships:
 
-[//]: # (- One-to-many between Categories and Lessons)
 
-[//]: # ()
-[//]: # (### API Endpoints)
+1. **Users** - Core user information
 
-[//]: # (The API is organized into these main routes:)
+2. **Teachers** - Teacher-specific data
 
-[//]: # ()
-[//]: # (```go)
+3. **Lessons** - Lesson scheduling and management
 
-[//]: # (const &#40;)
+4. **Categories** - Lesson categories
 
-[//]: # (    authRoute     = "/auth"      # Authentication)
+5. **Schedules** - Teacher availability
 
-[//]: # (    userRoute     = "/user"      # User profile)
+6. **Skills** - Teacher skills
 
-[//]: # (    usersRoute    = "/users"     # Public user data)
 
-[//]: # (    teacherRoute  = "/teacher"   # Teacher operations)
+Relationships:
 
-[//]: # (    teachersRoute = "/teachers"  # Public teacher data)
+- One-to-many between Teachers and Lessons
 
-[//]: # (    lessonRoute   = "/lesson"    # Lesson operations)
+- Many-to-many between Teachers and Skills
 
-[//]: # (    lessonsRoute  = "/lessons"   # Lesson management)
+- One-to-many between Categories and Lessons
 
-[//]: # (    apiRoute      = "/api"       # Base API path)
 
-[//]: # (&#41;)
+### API Endpoints
 
-[//]: # (```)
+The API is organized into these main routes:
 
-[//]: # ()
-[//]: # (### Error Handling)
 
-[//]: # (The API uses consistent error handling:)
+```go
 
-[//]: # (- Standardized error responses)
+const (
 
-[//]: # (- Proper HTTP status codes)
+    authRoute     = "/auth"      # Authentication
 
-[//]: # (- Detailed error messages in development)
+    userRoute     = "/user"      # User profile
 
-[//]: # (- Secure error messages in production)
+    usersRoute    = "/users"     # Public user data
 
-[//]: # ()
-[//]: # (### Deployment)
+    teacherRoute  = "/teacher"   # Teacher operations
 
-[//]: # (The project uses Docker for containerization:)
+    teachersRoute = "/teachers"  # Public teacher data
 
-[//]: # (- `docker-compose up -d --build` for initial setup)
+    lessonRoute   = "/lesson"    # Lesson operations
 
-[//]: # (- `docker-compose up -d` for subsequent runs)
+    lessonsRoute  = "/lessons"   # Lesson management
 
-[//]: # (- `docker-compose down` to stop services)
+    apiRoute      = "/api"       # Base API path
 
-[//]: # ()
-[//]: # (### Contact)
+)
 
-[//]: # (For support, contact Ruslan via [Telegram]&#40;https://t.me/Ruslan20007&#41; or email at ruslanrbb8@gmail.com.)
+```
 
-[//]: # ()
-[//]: # (This documentation provides a concise overview of the Learn-Share backend architecture and key components. For detailed API specifications, refer to the Swagger documentation at `http://localhost:81`.)
+
+### Error Handling
+
+The API uses consistent error handling:
+
+- Standardized error responses
+
+- Proper HTTP status codes
+
+- Detailed error messages in development
+
+- Secure error messages in production
+
+
+### Deployment
+
+The project uses Docker for containerization:
+
+- `docker-compose up -d --build` for initial setup
+
+- `docker-compose up -d` for subsequent runs
+
+- `docker-compose down` to stop services
+
+
+### Contact
+
+For support, contact Ruslan via [Telegram](https://t.me/Ruslan20007) or email at ruslanrbb8@gmail.com.
+
+
+This documentation provides a concise overview of the Learn-Share backend architecture and key components. For detailed API specifications, refer to the Swagger documentation at `http://localhost:81`. -->
