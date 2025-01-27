@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/LearnShareApp/learn-share-backend/internal/application"
-	"github.com/LearnShareApp/learn-share-backend/internal/config"
-	"github.com/LearnShareApp/learn-share-backend/pkg/logger"
-	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/LearnShareApp/learn-share-backend/internal/application"
+	"github.com/LearnShareApp/learn-share-backend/internal/config"
+	"github.com/LearnShareApp/learn-share-backend/pkg/logger"
+	"go.uber.org/zap"
 )
 
 // @title        Learn-Share API
@@ -20,7 +21,7 @@ import (
 // @contact.url    https://t.me/Ruslan20007
 // @contact.email  ruslanrbb8@gmail.com
 
-// @host         localhost:81
+// @host         adoe.ru:81
 // @BasePath     /api
 // @securityDefinitions.apikey BearerAuth
 // @in header

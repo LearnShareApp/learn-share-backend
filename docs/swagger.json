@@ -10,7 +10,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:81",
+    "host": "adoe.ru:81",
     "basePath": "/api",
     "paths": {
         "/auth/login": {
