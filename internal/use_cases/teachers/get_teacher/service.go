@@ -18,9 +18,9 @@ func NewService(repo repo) *Service {
 	}
 }
 
-func (s *Service) Do(ctx context.Context, id int) (*entities.User, error) {
+func (s *Service) Do(ctx context.Context, userId int) (*entities.User, error) {
 
-	exists, err := s.repo.IsUserExistsById(ctx, id)
+	exists, err := s.repo.IsUserExistsById(ctx, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check is user exists: %w", err)
 	}
@@ -28,12 +28,12 @@ func (s *Service) Do(ctx context.Context, id int) (*entities.User, error) {
 		return nil, internalErrs.ErrorUserNotFound
 	}
 
-	user, err := s.repo.GetUserById(ctx, id)
+	user, err := s.repo.GetUserById(ctx, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
-	exists, err = s.repo.IsTeacherExistsByUserId(ctx, id)
+	exists, err = s.repo.IsTeacherExistsByUserId(ctx, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check is teacher exists by user id: %w", err)
 	}
@@ -41,14 +41,14 @@ func (s *Service) Do(ctx context.Context, id int) (*entities.User, error) {
 		return nil, internalErrs.ErrorTeacherNotFound
 	}
 
-	teacher, err := s.repo.GetTeacherByUserId(ctx, id)
+	teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get teacher: %w", err)
 	}
 
 	user.TeacherData = teacher
 
-	teacher.Skills, err = s.repo.GetSkillsByTeacherId(ctx, id)
+	teacher.Skills, err = s.repo.GetSkillsByTeacherId(ctx, teacher.Id)
 	if err != nil {
 		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
 			return user, nil

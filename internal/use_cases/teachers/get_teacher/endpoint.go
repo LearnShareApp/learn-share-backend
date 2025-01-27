@@ -30,8 +30,8 @@ const (
 func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		id := r.Context().Value(jwt.UserIDKey).(int)
-		if id == 0 {
+		userId := r.Context().Value(jwt.UserIDKey).(int)
+		if userId == 0 {
 			log.Error("id was missed in context")
 			if err := jsonutils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
@@ -39,7 +39,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		user, err := s.Do(r.Context(), id)
+		user, err := s.Do(r.Context(), userId)
 
 		if err != nil {
 			coveringErrors(w, log, err)
@@ -67,7 +67,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 // @Router /teachers/{id} [get]
 func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var id int
+		var teacherUserId int
 
 		paramId := r.PathValue("id")
 		if paramId == "" {
@@ -77,7 +77,7 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, err := strconv.Atoi(paramId)
+		teacherUserId, err := strconv.Atoi(paramId)
 
 		if err != nil {
 			log.Error("failed to parse id from URL path", zap.Error(err))
@@ -87,7 +87,7 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		user, err := s.Do(r.Context(), id)
+		user, err := s.Do(r.Context(), teacherUserId)
 
 		if err != nil {
 			coveringErrors(w, log, err)
