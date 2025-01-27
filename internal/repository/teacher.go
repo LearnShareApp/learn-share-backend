@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+	"github.com/jmoiron/sqlx"
+	"strings"
 )
 
 func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
@@ -110,30 +112,69 @@ func (r *Repository) GetTeacherById(ctx context.Context, id int) (*entities.Teac
 	return &teacher, nil
 }
 
-func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, error) {
-	const query = `
-    SELECT
-		u.user_id,
-		u.email,
-		u.name,
-		u.surname,
-		u.registration_date,
-		u.birthdate,
-		u.avatar,
-		t.teacher_id,
-		s.skill_id,
-		s.category_id,
-		s.video_card_link,
-		s.about,
-		s.rate,
-		s.is_active,
-		c.name as category_name
-	FROM users u
+func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int, isUsersTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error) {
+	// Base query
+	baseQuery := `
+    SELECT DISTINCT
+        u.user_id,
+        u.email,
+        u.name,
+        u.surname,
+        u.registration_date,
+        u.birthdate,
+        u.avatar,
+        t.teacher_id,
+        s.skill_id,
+        s.category_id,
+        s.video_card_link,
+        s.about,
+        s.rate,
+        s.is_active,
+        c.name as category_name
+    FROM users u
     INNER JOIN teachers t ON u.user_id = t.user_id
     INNER JOIN skills s ON t.teacher_id = s.teacher_id AND s.is_active
-    INNER JOIN categories c ON s.category_id = c.category_id`
+    INNER JOIN categories c ON s.category_id = c.category_id
+	`
 
-	// Временная структура для хранения результатов запроса
+	// Создаем именованные параметры для sqlx
+	namedParams := make(map[string]interface{})
+	var conditions []string
+
+	if isUsersTeachers {
+		baseQuery += `
+        INNER JOIN lessons l ON t.teacher_id = l.teacher_id 
+        INNER JOIN statuses st ON l.status_id = st.status_id AND st.name = :status_name
+    `
+		conditions = append(conditions, "l.student_id = :user_id")
+		namedParams["user_id"] = userId
+		namedParams["status_name"] = "finished"
+	}
+
+	if isFilteredByCategory {
+		conditions = append(conditions, "c.name = :category")
+		namedParams["category"] = category
+	}
+
+	query := baseQuery
+	if len(conditions) > 0 {
+		query += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	// Подготавливаем именованный запрос
+	namedQuery, args, err := sqlx.Named(query, namedParams)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build named query: %w", err)
+	}
+
+	// Конвертируем в $1, $2 формат для PostgreSQL
+	query, args, err = sqlx.In(namedQuery, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert named query: %w", err)
+	}
+	query = r.db.Rebind(query)
+
+	// Временная структура для результатов
 	type result struct {
 		entities.User
 		entities.Teacher
@@ -141,9 +182,9 @@ func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, e
 	}
 
 	var rows []result
-	err := r.db.SelectContext(ctx, &rows, query)
+	err = r.db.SelectContext(ctx, &rows, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 
 	// Мапа для группировки результатов
@@ -176,15 +217,7 @@ func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, e
 			}
 		}
 
-		skillExists := false
-		for _, skill := range user.TeacherData.Skills {
-			if skill.Id == row.Skill.Id {
-				skillExists = true
-				break
-			}
-		}
-
-		if !skillExists {
+		if !hasSkill(user.TeacherData.Skills, row.Skill.Id) {
 			user.TeacherData.Skills = append(user.TeacherData.Skills, &entities.Skill{
 				Id:            row.Skill.Id,
 				TeacherId:     row.Skill.TeacherId,
@@ -204,4 +237,13 @@ func (r *Repository) GetAllTeachersData(ctx context.Context) ([]entities.User, e
 	}
 
 	return users, nil
+}
+
+func hasSkill(skills []*entities.Skill, skillId int) bool {
+	for _, skill := range skills {
+		if skill.Id == skillId {
+			return true
+		}
+	}
+	return false
 }

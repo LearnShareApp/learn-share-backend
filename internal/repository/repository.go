@@ -37,10 +37,17 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 	}
 
 	categories := []entities.Category{
-		{Name: "Cooking", MinAge: 7},
-		{Name: "Programming", MinAge: 7},
-		{Name: "Drawing", MinAge: 0},
-		{Name: "Dancing", MinAge: 0},
+		{Name: "Cooking", MinAge: 12},
+		{Name: "Programming", MinAge: 6},
+		{Name: "Drawing", MinAge: 3},
+		{Name: "Dancing", MinAge: 6},
+		{Name: "English", MinAge: 6},
+		{Name: "Russian", MinAge: 6},
+		{Name: "Public Speaking", MinAge: 14},
+		{Name: "Physics", MinAge: 6},
+		{Name: "Biology", MinAge: 6},
+		{Name: "History", MinAge: 6},
+		{Name: "Maths", MinAge: 6},
 		//...
 	}
 
@@ -202,8 +209,7 @@ func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
         category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
         schedule_time_id INTEGER UNIQUE NOT NULL REFERENCES schedule_times(schedule_time_id) ON DELETE CASCADE,
         price INTEGER NOT NULL DEFAULT 0,
-        status_id INTEGER DEFAULT NULL REFERENCES statuses(status_id) ON DELETE CASCADE,
-        token TEXT NOT NULL DEFAULT ''
+        status_id INTEGER DEFAULT NULL REFERENCES statuses(status_id) ON DELETE CASCADE
     );`
 
 	var createTriggerFunc = fmt.Sprintf(`

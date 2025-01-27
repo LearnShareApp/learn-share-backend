@@ -61,3 +61,7 @@ func (s *Service) GenerateMeetingToken(roomName string) (string, error) {
 
 	return at.ToJWT()
 }
+
+func (s *Service) NameRoomByLessonId(lessonId int) string {
+	return fmt.Sprintf("lesson_#%d", lessonId)
+}

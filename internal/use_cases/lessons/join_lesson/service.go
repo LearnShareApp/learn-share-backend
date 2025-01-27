@@ -1,4 +1,4 @@
-package start_lesson
+package join_lesson
 
 import (
 	"context"
@@ -25,6 +25,7 @@ func NewService(repo repo, meetService MeetService) *Service {
 }
 
 func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, error) {
+
 	// is user exists
 	exists, err := s.repo.IsUserExistsById(ctx, userId)
 	if err != nil {
@@ -32,16 +33,6 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, err
 	}
 	if !exists {
 		return "", serviceErrs.ErrorUserNotFound
-	}
-
-	// is teacher exists by userId
-	exists, err = s.repo.IsTeacherExistsByUserId(ctx, userId)
-	if err != nil {
-		return "", fmt.Errorf("failed to check teacher existstance by userId: %w", err)
-	}
-
-	if !exists {
-		return "", serviceErrs.ErrorUserIsNotTeacher
 	}
 
 	// is lesson exists
@@ -59,25 +50,26 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, err
 		return "", fmt.Errorf("failed to get lesson by id: %w", err)
 	}
 
-	// get teacher
-	teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
-	if err != nil {
-		return "", fmt.Errorf("failed to get teacher by userId: %w", err)
-	}
+	// if user is not student => maybe he is a teacher (check it)
+	if lesson.StudentId != userId {
+		// is teacher exists by userId
+		exists, err = s.repo.IsTeacherExistsByUserId(ctx, userId)
+		if err != nil {
+			return "", fmt.Errorf("failed to check teacher existstance by userId: %w", err)
+		}
 
-	if lesson.TeacherId != teacher.Id {
-		return "", serviceErrs.ErrorNotRelatedTeacherToLesson
-	}
+		// if it's not the teacher for this lesson either => error
+		if !exists {
+			return "", serviceErrs.ErrorNotRelatedUserToLesson
+		}
 
-	// get waiting statusId
-	waitingStatusId, err := s.repo.GetStatusIdByStatusName(ctx, entities.WaitingStatusName)
-	if err != nil {
-		return "", fmt.Errorf("failed to get status by status name: %w", err)
-	}
-
-	// may start lesson if only was waiting status
-	if lesson.StatusId != waitingStatusId {
-		return "", serviceErrs.ErrorStatusNonWaiting
+		teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
+		if err != nil {
+			return "", fmt.Errorf("failed to get teacher by userId: %w", err)
+		}
+		if lesson.TeacherId != teacher.Id {
+			return "", serviceErrs.ErrorNotRelatedUserToLesson
+		}
 	}
 
 	// get ongoing statusId
@@ -86,14 +78,14 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, err
 		return "", fmt.Errorf("failed to get status by status name: %w", err)
 	}
 
+	// may join lesson if only was ongoing status
+	if lesson.StatusId != ongoingStatusId {
+		return "", serviceErrs.ErrorStatusNonOngoing
+	}
+
 	token, err := s.meetService.GenerateMeetingToken(s.meetService.NameRoomByLessonId(lessonId))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate meeting token: %w", err)
-	}
-
-	// save token and edit status
-	if err = s.repo.ChangeLessonStatus(ctx, lessonId, ongoingStatusId); err != nil {
-		return "", fmt.Errorf("failed to edit lesson status: %w", err)
 	}
 
 	return token, nil

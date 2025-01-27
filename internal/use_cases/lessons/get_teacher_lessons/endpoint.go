@@ -71,7 +71,6 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 				StudentName:    lessons[i].StudentUserData.Name,
 				StudentSurname: lessons[i].StudentUserData.Surname,
 				CategoryId:     lessons[i].CategoryId,
-				Token:          lessons[i].Token,
 				CategoryName:   lessons[i].CategoryName,
 				Status:         lessons[i].StatusName,
 				Datetime:       lessons[i].ScheduleTimeDatetime,

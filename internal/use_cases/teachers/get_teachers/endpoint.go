@@ -6,6 +6,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
 	"net/http"
+	"strconv"
 )
 
 const (
@@ -17,6 +18,8 @@ const (
 // @Description Get full teachers data (their user data, teacher data and skills)
 // @Tags teachers
 // @Produce json
+// @Param is_mine query boolean false "Filter my teachers"
+// @Param category query string false "Filter category"
 // @Success 200 {object} response
 // @Failure 401 {object} jsonutils.ErrorStruct
 // @Failure 500 {object} jsonutils.ErrorStruct
@@ -34,8 +37,20 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		// TODO filters: by category_id, by personal teachers (student - teacher)
-		teachers, err := s.Do(r.Context())
+		// get query as filters
+		isMyTeachers := r.URL.Query().Get("is_mine")
+		isMyTeachersBool, err := strconv.ParseBool(isMyTeachers)
+		if err != nil {
+			isMyTeachersBool = false
+		}
+
+		category := r.URL.Query().Get("category")
+		isFilterByCategory := true
+		if category == "" {
+			isFilterByCategory = false
+		}
+
+		teachers, err := s.Do(r.Context(), id, isMyTeachersBool, category, isFilterByCategory)
 
 		if err != nil {
 			log.Error(err.Error())

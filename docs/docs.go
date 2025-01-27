@@ -417,6 +417,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/lessons/{id}/join": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "generate meet token to join \"ongoing\" lesson (if user related to lesson)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lessons"
+                ],
+                "summary": "Join to lesson",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LessonID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/join_lesson.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/lessons/{id}/start": {
             "put": {
                 "security": [
@@ -787,6 +845,20 @@ const docTemplate = `{
                     "teachers"
                 ],
                 "summary": "Get full teachers data",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Filter my teachers",
+                        "name": "is_mine",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter category",
+                        "name": "category",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1095,10 +1167,6 @@ const docTemplate = `{
                 "teacher_user_id": {
                     "type": "integer",
                     "example": 1
-                },
-                "token": {
-                    "type": "string",
-                    "example": "headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee"
                 }
             }
         },
@@ -1215,10 +1283,6 @@ const docTemplate = `{
                 "student_surname": {
                     "type": "string",
                     "example": "Smith"
-                },
-                "token": {
-                    "type": "string",
-                    "example": "headerrrrrrrrrrrrr.bbbbbbbodybbbbbbbbbbb.subscribeeeeeeeeee"
                 }
             }
         },
@@ -1370,6 +1434,15 @@ const docTemplate = `{
                 "surname": {
                     "type": "string",
                     "example": "Smith"
+                }
+            }
+        },
+        "join_lesson.response": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 }
             }
         },

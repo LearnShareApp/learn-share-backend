@@ -73,7 +73,6 @@ func (r *Repository) GetLessonById(ctx context.Context, id int) (*entities.Lesso
 		lessons.schedule_time_id,
 		lessons.status_id,
 		lessons.price,
-		lessons.token,
 		categories.name as category_name,
 		statuses.name as status_name,
     	schedule_times.datetime as schedule_time_datetime
@@ -122,17 +121,6 @@ func (r *Repository) ChangeLessonStatus(ctx context.Context, lessonId int, statu
 	return nil
 }
 
-func (r *Repository) EditStatusAndTokenInLesson(ctx context.Context, lessonId int, statusId int, token string) error {
-	const query = `
-	UPDATE lessons SET status_id = $2, token = $3 WHERE lesson_id = $1
-	`
-
-	if _, err := r.db.ExecContext(ctx, query, lessonId, statusId, token); err != nil {
-		return fmt.Errorf("failed to update lesson status and set token: %w", err)
-	}
-	return nil
-}
-
 func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) ([]*entities.Lesson, error) {
 	const query = `
     SELECT
@@ -143,7 +131,6 @@ func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) (
 		lessons.schedule_time_id,
 		lessons.status_id,
 		lessons.price,
-		lessons.token,
 		users.user_id,
 		users.email,
 		users.name,
@@ -189,7 +176,6 @@ func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) (
 				ScheduleTimeId:       row.Lesson.ScheduleTimeId,
 				StatusId:             row.Lesson.StatusId,
 				Price:                row.Lesson.Price,
-				Token:                row.Lesson.Token,
 				StatusName:           row.StatusName,
 				CategoryName:         row.CategoryName,
 				ScheduleTimeDatetime: row.ScheduleTimeDatetime,
@@ -226,7 +212,6 @@ func (r *Repository) GetStudentLessonsByUserId(ctx context.Context, id int) ([]*
 		lessons.schedule_time_id,
 		lessons.status_id,
 		lessons.price,
-		lessons.token,
 		users.user_id,
 		users.email,
 		users.name,
@@ -273,7 +258,6 @@ func (r *Repository) GetStudentLessonsByUserId(ctx context.Context, id int) ([]*
 				ScheduleTimeId:       row.Lesson.ScheduleTimeId,
 				StatusId:             row.Lesson.StatusId,
 				Price:                row.Lesson.Price,
-				Token:                row.Lesson.Token,
 				StatusName:           row.StatusName,
 				CategoryName:         row.CategoryName,
 				ScheduleTimeDatetime: row.ScheduleTimeDatetime,
