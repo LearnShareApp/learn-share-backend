@@ -55,8 +55,8 @@ internal/
 ├── jsonutils/...              // json utils for transport
 ├── repository/...             // db repository: init, queries, transactions
 ├── service
-│   ├── jwt/service.go            // jwt: generate, validate
-│   └── livekit/service.go        // livekit: generate meeting tokens
+│   ├── jwt/service.go         // jwt: generate, validate
+│   └── livekit/service.go     // livekit: generate meeting tokens
 ├── transport/rest/
 │   ├── server.go              // rest api, routing, adding handlers & middlewares
 │   └── middlewares/...        // middlewares: auth (jwt), cors, logger
