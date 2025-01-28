@@ -24,8 +24,52 @@
 
 ## How to use
 
-* after starting project you can open swagger and try api: http://adoe.ru:81
-    * or http://localhost:81 for local start
+After starting project you can open swagger and try api: http://adoe.ru:81
+(or http://localhost:81 for local start) <br>
+
+
+## Rest API handlers
+
+You can see all handlers in my swagger: http://adoe.ru:81/swagger/index.html
+(or http://localhost:81/swagger/index.html for local start)
+But for shure i describe handlers also here:
+Here’s a concise tree-structured description of the API handlers:
+
+``` go
+API Handlers
+├── Auth
+│   ├── POST /auth/login            // Login with email and password
+│   └── POST /auth/signup           // Register a new user (student)
+│
+├── Categories
+│   └── GET /categories             // Get list of all categories
+│
+├── Lessons
+│   ├── POST /lesson                // Add unconfirmed lesson (lesson request)
+│   ├── GET /lessons                // Get lessons for students
+│   ├── PUT /lessons/{id}/approve   // Approve lesson
+│   ├── PUT /lessons/{id}/cancel    // Cancel lesson
+│   ├── PUT /lessons/{id}/finish    // Finish lesson
+│   ├── GET /lessons/{id}/join      // Join the lesson (generate meet token)
+│   └── PUT /lessons/{id}/start     // Start lesson (generate meet token)
+│
+├── Teachers
+│   ├── GET /teacher                // Get teacher data (by JWT)
+│   ├── POST /teacher               // Register as a teacher
+│   ├── GET /teacher/lessons        // Get lessons for teachers
+│   ├── GET /teacher/schedule       // Get times from schedule
+│   ├── POST /teacher/schedule      // Add time to schedule
+│   ├── POST /teacher/skill         // Register new skill for teacher
+│   ├── GET /teachers               // Get full teachers data
+│   ├── GET /teachers/{id}          // Get teacher data by UserID
+│   └── GET /teachers/{id}/schedule // Get times from schedule by UserID
+│
+└── Users
+    ├── GET /user/profile           // Get user profile (by JWT)
+    └── GET /users/{id}/profile     // Get user profile by UserID
+```
+
+
 
 ## The main technologies which i use in this project
 
