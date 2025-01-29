@@ -27,7 +27,6 @@
 After starting project you can open swagger and try api: http://adoe.ru:81/swagger/
 (or http://localhost:81/swagger/ for local start) <br>
 
-
 ## Rest API handlers
 
 You can see all handlers in my swagger: http://adoe.ru:81/swagger/index.html
