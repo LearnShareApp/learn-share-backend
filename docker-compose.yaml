@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:15
@@ -21,6 +19,26 @@ services:
       timeout: 5s
       retries: 5
 
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server --address ":9000" /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   app:
     build:
       context: .
@@ -29,11 +47,16 @@ services:
       - "${SERVER_PORT}"
     environment:
       DB_HOST: db
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
     networks:
       - backend
       - frontend
     depends_on:
       db:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   nginx:
@@ -51,7 +74,7 @@ services:
 
 volumes:
   postgres-data:
-  redis-data:
+  minio-data:
 
 networks:
   frontend:

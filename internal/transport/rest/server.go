@@ -183,9 +183,6 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	router.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("./swagger/doc.json"), // URL указывающий на JSON документацию
 	))
-	router.Get("/*", httpSwagger.Handler(
-		httpSwagger.URL("./swagger/doc.json"), // URL указывающий на JSON документацию
-	))
 
 	return &Server{
 		server: &http.Server{
