@@ -1,17 +1,23 @@
 package registration
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
+	"github.com/LearnShareApp/learn-share-backend/internal/imgutils"
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
 const Route = "/signup"
+const MaxImageWeight = 5 << 20
 
 // MakeHandler returns http.HandlerFunc
 // @Summary Register new user
@@ -36,7 +42,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		if req.Email == "" || req.Password == "" || req.Name == "" || req.Surname == "" { //  || req.Avatar == ""
+		if req.Email == "" || req.Password == "" || req.Name == "" || req.Surname == "" {
 			if err := jsonutils.RespondWith400(w, "email, name, surname or password is empty"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
@@ -50,6 +56,58 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
+		var avatarReader io.Reader
+		var avatarSize int64
+
+		// if upload avatar
+		if req.Avatar != "" {
+			log.Info(req.Avatar)
+			avatarBytes, err := base64.StdEncoding.DecodeString(req.Avatar)
+			log.Info(string(avatarBytes), zap.Error(err))
+			if err != nil {
+				if err = jsonutils.RespondWith400(w, "invalid avatar format"); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+				return
+			}
+
+			// check for weight
+			if len(avatarBytes) > MaxImageWeight {
+				if err = jsonutils.RespondWith400(w, "avatar is too large"); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+				return
+			}
+
+			// check is MIME-type (image)
+			mimeType := http.DetectContentType(avatarBytes)
+			if !strings.HasPrefix(mimeType, "image/") {
+				if err = jsonutils.RespondWith400(w, "file is not an image"); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+				return
+			}
+
+			width, height, err := imgutils.GetImageDimensions(avatarBytes)
+			if err != nil {
+				log.Error("failed to get image dimension", zap.Error(err))
+				if err = jsonutils.RespondWith500(w); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+				return
+			}
+
+			if width != height {
+				if err = jsonutils.RespondWith400(w, "avatar must have 1:1 aspect ratio"); err != nil {
+					log.Error("failed to send response", zap.Error(err))
+				}
+				return
+			}
+
+			avatarReader = bytes.NewReader(avatarBytes)
+			avatarSize = int64(len(avatarBytes))
+		}
+
 		user := &entities.User{
 			Email:     req.Email,
 			Password:  req.Password,
@@ -58,7 +116,10 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			Birthdate: req.Birthdate,
 		}
 
-		token, err := s.Do(r.Context(), user)
+		token, err := s.Do(r.Context(), user, &avatarReader, avatarSize)
+
+		// TODO: case with avatar
+
 		if err != nil {
 			if errors.Is(err, serviceErrors.ErrorUserExists) {
 				if err = jsonutils.RespondWithError(w, http.StatusConflict, err.Error()); err != nil {

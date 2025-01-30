@@ -312,6 +312,9 @@ definitions:
   registration.request:
     description: User registration request
     properties:
+      avatar:
+        example: base64 encoded image
+        type: string
       birthdate:
         example: "2000-01-01T00:00:00Z"
         type: string

@@ -1485,6 +1485,10 @@
                 "surname"
             ],
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "base64 encoded image"
+                },
                 "birthdate": {
                     "type": "string",
                     "example": "2000-01-01T00:00:00Z"

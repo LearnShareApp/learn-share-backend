@@ -36,13 +36,13 @@ func (r *Repository) IsUserExistsById(ctx context.Context, id int) (bool, error)
 
 func (r *Repository) CreateUser(ctx context.Context, user *entities.User) (int, error) {
 	const query = `
-	INSERT INTO users (email, password, name, surname, birthdate) 
-	VALUES ($1, $2, $3, $4, $5)
+	INSERT INTO users (email, password, name, surname, birthdate, avatar) 
+	VALUES ($1, $2, $3, $4, $5, $6)
 	RETURNING user_id
 	`
 
 	var userID int
-	if err := r.db.QueryRowContext(ctx, query, user.Email, user.Password, user.Name, user.Surname, user.Birthdate).Scan(&userID); err != nil {
+	if err := r.db.QueryRowContext(ctx, query, user.Email, user.Password, user.Name, user.Surname, user.Birthdate, user.Avatar).Scan(&userID); err != nil {
 		return 0, err
 	}
 	return userID, nil

@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/minio"
 	"os"
 	"strconv"
 
@@ -16,6 +17,7 @@ type Config struct {
 	Db           postgres.DbConfig
 	Server       rest.ServerConfig
 	LiveKit      livekit.ApiConfig
+	Minio        minio.MinioConfig
 	IsInitDb     bool
 	JwtSecretKey string
 }
@@ -25,6 +27,7 @@ func LoadConfig() (*Config, error) {
 	envPaths := []string{
 		".env",
 		"./config/.env",
+		"./internal/config/.env",
 	}
 
 	envFound := false
@@ -62,8 +65,27 @@ func LoadConfig() (*Config, error) {
 	config.Db.User = os.Getenv("DB_USER")
 	config.Db.Password = os.Getenv("DB_PASSWORD")
 
+	// LiveKit config
+	config.LiveKit.ApiKey = os.Getenv("LIVEKIT_API_KEY")
+	config.LiveKit.ApiSecret = os.Getenv("LIVEKIT_API_SECRET")
+
+	// Minio config
+	config.Minio.Port, err = getEnvAsInt("MINIO_PORT")
+	if err != nil {
+		return nil, fmt.Errorf("invalid MINIO_PORT: %w", err)
+	}
+	config.Minio.Host = os.Getenv("MINIO_HOST")
+	config.Minio.AccessKey = os.Getenv("MINIO_ACCESS_KEY")
+	config.Minio.SecretKey = os.Getenv("MINIO_SECRET_KEY")
+	config.Minio.Bucket = os.Getenv("MINIO_BUCKET")
+	var value = os.Getenv("IS_MINIO_SSL")
+	config.Minio.IsSSL, err = strconv.ParseBool(value)
+	if err != nil {
+		return nil, fmt.Errorf("invalid IS_MINIO_SSL: %w", err)
+	}
+
 	// Should Init Db
-	value := os.Getenv("IS_INIT_DB")
+	value = os.Getenv("IS_INIT_DB")
 	config.IsInitDb, err = strconv.ParseBool(value)
 	if err != nil {
 		return nil, fmt.Errorf("invalid IS_INIT_DB: %w", err)
@@ -71,10 +93,6 @@ func LoadConfig() (*Config, error) {
 
 	// JWT secret key
 	config.JwtSecretKey = os.Getenv("SECRET_KEY")
-
-	// LiveKit config
-	config.LiveKit.ApiKey = os.Getenv("LIVEKIT_API_KEY")
-	config.LiveKit.ApiSecret = os.Getenv("LIVEKIT_API_SECRET")
 
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("config validation failed: %w", err)
@@ -95,18 +113,19 @@ func getEnvAsInt(key string) (int, error) {
 // Validate config validation
 func (c *Config) Validate() error {
 
+	if c.Server.Port < 1 || c.Server.Port > 65535 {
+		return fmt.Errorf("invalid server port: %d", c.Server.Port)
+	}
+
 	if c.Db.Port < 1 || c.Db.Port > 65535 {
 		return fmt.Errorf("invalid database port: %d", c.Db.Port)
 	}
-
 	if c.Db.Host == "" {
 		return fmt.Errorf("database host cannot be empty")
 	}
-
 	if c.Db.DbName == "" {
 		return fmt.Errorf("database name cannot be empty")
 	}
-
 	if c.Db.User == "" {
 		return fmt.Errorf("database user cannot be empty")
 	}
@@ -118,9 +137,24 @@ func (c *Config) Validate() error {
 	if c.LiveKit.ApiKey == "" {
 		return fmt.Errorf("live kit api key cannot be empty")
 	}
-
 	if c.LiveKit.ApiSecret == "" {
 		return fmt.Errorf("live kit api secret cannot be empty")
+	}
+
+	if c.Minio.Port < 1 || c.Minio.Port > 65535 {
+		return fmt.Errorf("invalid minio port: %d", c.Minio.Port)
+	}
+	if c.Minio.Host == "" {
+		return fmt.Errorf("minio host cannot be empty")
+	}
+	if c.Minio.AccessKey == "" {
+		return fmt.Errorf("minio access key cannot be empty")
+	}
+	if c.Minio.SecretKey == "" {
+		return fmt.Errorf("minio secret key cannot be empty")
+	}
+	if c.Minio.Bucket == "" {
+		return fmt.Errorf("minio bucket cannot be empty")
 	}
 
 	return nil
@@ -140,8 +174,18 @@ func (c *Config) LogConfig() string {
 		logConfig.JwtSecretKey = "********"
 	}
 
+	if logConfig.LiveKit.ApiKey != "" {
+		logConfig.LiveKit.ApiKey = "********"
+	}
 	if logConfig.LiveKit.ApiSecret != "" {
 		logConfig.LiveKit.ApiSecret = "********"
+	}
+
+	if logConfig.Minio.AccessKey != "" {
+		logConfig.Minio.AccessKey = "********"
+	}
+	if logConfig.Minio.SecretKey != "" {
+		logConfig.Minio.SecretKey = "********"
 	}
 
 	// Convert to JSON with indents for readability
