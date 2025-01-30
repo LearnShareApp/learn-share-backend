@@ -54,7 +54,7 @@ func (s *Service) Do(ctx context.Context, user *entities.User, avatarReader *io.
 
 	var avatarName string
 	if avatarReader != nil {
-		avatarName = uuid.New().String()
+		avatarName = fmt.Sprintf("%s.png", uuid.New().String())
 		if err = s.objectStorage.UploadFile(ctx, avatarName, *avatarReader, avatarSize); err != nil {
 			return "", fmt.Errorf("failed to upload avatar: %w", err)
 		}

@@ -61,9 +61,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		// if upload avatar
 		if req.Avatar != "" {
-			log.Info(req.Avatar)
 			avatarBytes, err := base64.StdEncoding.DecodeString(req.Avatar)
-			log.Info(string(avatarBytes), zap.Error(err))
 			if err != nil {
 				if err = jsonutils.RespondWith400(w, "invalid avatar format"); err != nil {
 					log.Error("failed to send response", zap.Error(err))
