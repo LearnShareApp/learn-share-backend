@@ -462,6 +462,37 @@ paths:
       summary: Get categories
       tags:
       - categories
+  /image:
+    get:
+      description: Get image by filename
+      parameters:
+      - description: filename
+        in: query
+        name: filename
+        required: true
+        type: string
+      produces:
+      - image/*
+      responses:
+        "200":
+          description: Image file
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      summary: Get image
+      tags:
+      - image
   /lesson:
     post:
       consumes:

@@ -2,6 +2,7 @@ package get_user
 
 import (
 	"errors"
+	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
@@ -54,16 +55,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			}
 		}
 
-		resp := response{
-			Id:               user.Id,
-			Email:            user.Email,
-			Name:             user.Name,
-			Surname:          user.Surname,
-			RegistrationDate: user.RegistrationDate,
-			Birthdate:        user.Birthdate,
-			Avatar:           user.Avatar,
-			IsTeacher:        user.IsTeacher,
-		}
+		resp := mappingToResponse(user)
 
 		if err = jsonutils.SuccessRespondWith200(w, resp); err != nil {
 			log.Error("failed to send response", zap.Error(err))
@@ -119,18 +111,25 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		resp := response{
-			Id:               user.Id,
-			Email:            user.Email,
-			Name:             user.Name,
-			Surname:          user.Surname,
-			RegistrationDate: user.RegistrationDate,
-			Birthdate:        user.Birthdate,
-			IsTeacher:        user.IsTeacher,
-		}
+		resp := mappingToResponse(user)
 
 		if err = jsonutils.SuccessRespondWith200(w, resp); err != nil {
 			log.Error("failed to send response", zap.Error(err))
 		}
 	}
+}
+
+func mappingToResponse(user *entities.User) *response {
+	resp := response{
+		Id:               user.Id,
+		Email:            user.Email,
+		Name:             user.Name,
+		Surname:          user.Surname,
+		RegistrationDate: user.RegistrationDate,
+		Birthdate:        user.Birthdate,
+		Avatar:           user.Avatar,
+		IsTeacher:        user.IsTeacher,
+	}
+
+	return &resp
 }

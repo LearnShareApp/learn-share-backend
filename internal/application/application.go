@@ -12,6 +12,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
@@ -95,6 +96,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		startLessonSrv          = start_lesson.NewService(repo, leveKitService)
 		finishLessonSrv         = finish_lesson.NewService(repo)
 		joinLessonSrv           = join_lesson.NewService(repo, leveKitService)
+		getImagSrv              = get_image.NewService(minioService)
 	)
 
 	services := rest.NewServices(jwtService,
@@ -116,6 +118,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		startLessonSrv,
 		finishLessonSrv,
 		joinLessonSrv,
+		getImagSrv,
 	)
 
 	restServer := rest.NewServer(services, config.Server, log)

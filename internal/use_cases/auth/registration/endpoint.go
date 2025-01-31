@@ -117,8 +117,6 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		token, err := s.Do(r.Context(), user, avatarReader, avatarSize)
 
-		// TODO: case with avatar
-
 		if err != nil {
 			if errors.Is(err, serviceErrors.ErrorUserExists) {
 				if err = jsonutils.RespondWithError(w, http.StatusConflict, err.Error()); err != nil {
