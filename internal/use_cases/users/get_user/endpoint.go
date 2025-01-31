@@ -61,6 +61,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			Surname:          user.Surname,
 			RegistrationDate: user.RegistrationDate,
 			Birthdate:        user.Birthdate,
+			Avatar:           user.Avatar,
 			IsTeacher:        user.IsTeacher,
 		}
 

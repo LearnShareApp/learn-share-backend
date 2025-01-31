@@ -78,6 +78,9 @@ definitions:
       status:
         example: verification
         type: string
+      teacher_avatar:
+        example: uuid.png
+        type: string
       teacher_id:
         example: 1
         type: integer
@@ -100,6 +103,9 @@ definitions:
     type: object
   get_teacher.response:
     properties:
+      avatar:
+        example: uuid.png
+        type: string
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
@@ -164,6 +170,9 @@ definitions:
       status:
         example: verification
         type: string
+      student_avatar:
+        example: uuid.png
+        type: string
       student_id:
         example: 1
         type: integer
@@ -211,6 +220,9 @@ definitions:
     type: object
   get_teachers.teacher:
     properties:
+      avatar:
+        example: uuid.png
+        type: string
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
@@ -258,6 +270,9 @@ definitions:
     type: object
   get_user.response:
     properties:
+      avatar:
+        example: uuid.png
+        type: string
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
@@ -421,6 +436,8 @@ paths:
           description: Conflict
           schema:
             $ref: '#/definitions/jsonutils.ErrorStruct'
+        "413":
+          description: Request Entity Too Large
         "500":
           description: Internal Server Error
           schema:

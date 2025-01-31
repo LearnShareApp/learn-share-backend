@@ -168,29 +168,16 @@ func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) (
 	for _, row := range rows {
 		lesson, exists := lessonsMap[row.Lesson.Id]
 		if !exists {
-			lesson = &entities.Lesson{
-				Id:                   row.Lesson.Id,
-				StudentId:            row.Lesson.StudentId,
-				TeacherId:            row.Lesson.TeacherId,
-				CategoryId:           row.Lesson.CategoryId,
-				ScheduleTimeId:       row.Lesson.ScheduleTimeId,
-				StatusId:             row.Lesson.StatusId,
-				Price:                row.Lesson.Price,
-				StatusName:           row.StatusName,
-				CategoryName:         row.CategoryName,
-				ScheduleTimeDatetime: row.ScheduleTimeDatetime,
-			}
+			lesson = &row.Lesson
+			lesson.StatusName = row.StatusName
+			lesson.CategoryName = row.CategoryName
+			lesson.ScheduleTimeDatetime = row.ScheduleTimeDatetime
+
 			lessonsMap[row.Lesson.Id] = lesson
 		}
 
 		if lesson.StudentUserData == nil {
-			lesson.StudentUserData = &entities.User{
-				Id:      row.User.Id,
-				Email:   row.User.Email,
-				Name:    row.User.Name,
-				Surname: row.User.Surname,
-				Avatar:  row.User.Avatar,
-			}
+			lesson.StudentUserData = &row.User
 		}
 	}
 
@@ -250,29 +237,16 @@ func (r *Repository) GetStudentLessonsByUserId(ctx context.Context, id int) ([]*
 	for _, row := range rows {
 		lesson, exists := lessonsMap[row.Lesson.Id]
 		if !exists {
-			lesson = &entities.Lesson{
-				Id:                   row.Lesson.Id,
-				StudentId:            row.Lesson.StudentId,
-				TeacherId:            row.Lesson.TeacherId,
-				CategoryId:           row.Lesson.CategoryId,
-				ScheduleTimeId:       row.Lesson.ScheduleTimeId,
-				StatusId:             row.Lesson.StatusId,
-				Price:                row.Lesson.Price,
-				StatusName:           row.StatusName,
-				CategoryName:         row.CategoryName,
-				ScheduleTimeDatetime: row.ScheduleTimeDatetime,
-			}
+			lesson = &row.Lesson
+			lesson.StatusName = row.StatusName
+			lesson.CategoryName = row.CategoryName
+			lesson.ScheduleTimeDatetime = row.ScheduleTimeDatetime
+
 			lessonsMap[row.Lesson.Id] = lesson
 		}
 
 		if lesson.TeacherUserData == nil {
-			lesson.TeacherUserData = &entities.User{
-				Id:      row.User.Id,
-				Email:   row.User.Email,
-				Name:    row.User.Name,
-				Surname: row.User.Surname,
-				Avatar:  row.User.Avatar,
-			}
+			lesson.TeacherUserData = &row.User
 		}
 	}
 

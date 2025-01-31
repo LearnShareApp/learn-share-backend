@@ -3,6 +3,7 @@ package minio
 import (
 	"context"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage"
 	"github.com/minio/minio-go/v7"
 	"io"
 )
@@ -19,8 +20,8 @@ func NewService(client *minio.Client, bucket string) *Service {
 	}
 }
 
-func (s *Service) UploadFile(ctx context.Context, fileName string, file io.Reader, fileSize int64) error {
-	_, err := s.client.PutObject(ctx, s.bucket, fileName, file, fileSize, minio.PutObjectOptions{})
+func (s *Service) UploadFile(ctx context.Context, file *object_storage.File) error {
+	_, err := s.client.PutObject(ctx, s.bucket, file.Name, file.FileReader, file.Size, minio.PutObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to upload file: %w", err)
 	}

@@ -12,6 +12,7 @@ type respLessons struct {
 	TeacherUserId  int       `json:"teacher_user_id" example:"1"`
 	TeacherName    string    `json:"teacher_name" example:"John"`
 	TeacherSurname string    `json:"teacher_surname" example:"Smith"`
+	TeacherAvatar  string    `json:"teacher_avatar" example:"uuid.png"`
 	CategoryId     int       `json:"category_id" example:"1"`
 	CategoryName   string    `json:"category_name" example:"Programming"`
 	Status         string    `json:"status" example:"verification"`

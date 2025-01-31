@@ -29,6 +29,7 @@ const MaxImageWeight = 5 << 20
 // @Success 201 {object} response
 // @Failure 400 {object} jsonutils.ErrorStruct
 // @Failure 409 {object} jsonutils.ErrorStruct
+// @Failure 413
 // @Failure 500 {object} jsonutils.ErrorStruct
 // @Router /auth/signup [post]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
@@ -114,7 +115,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			Birthdate: req.Birthdate,
 		}
 
-		token, err := s.Do(r.Context(), user, &avatarReader, avatarSize)
+		token, err := s.Do(r.Context(), user, avatarReader, avatarSize)
 
 		// TODO: case with avatar
 

@@ -11,6 +11,7 @@ type respLessons struct {
 	StudentId      int       `json:"student_id" example:"1"`
 	StudentName    string    `json:"student_name" example:"John"`
 	StudentSurname string    `json:"student_surname" example:"Smith"`
+	StudentAvatar  string    `json:"student_avatar" example:"uuid.png"`
 	CategoryId     int       `json:"category_id" example:"1"`
 	CategoryName   string    `json:"category_name" example:"Programming"`
 	Status         string    `json:"status" example:"verification"`

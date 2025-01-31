@@ -114,6 +114,9 @@ const docTemplate = `{
                             "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
+                    "413": {
+                        "description": "Request Entity Too Large"
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -1152,6 +1155,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "verification"
                 },
+                "teacher_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "teacher_id": {
                     "type": "integer",
                     "example": 1
@@ -1184,6 +1191,10 @@ const docTemplate = `{
         "get_teacher.response": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
@@ -1272,6 +1283,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "verification"
                 },
+                "student_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "student_id": {
                     "type": "integer",
                     "example": 1
@@ -1340,6 +1355,10 @@ const docTemplate = `{
         "get_teachers.teacher": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
@@ -1407,6 +1426,10 @@ const docTemplate = `{
         "get_user.response": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
