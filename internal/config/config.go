@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/pkg/minio"
+	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
 	"os"
 	"strconv"
 

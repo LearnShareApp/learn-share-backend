@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
@@ -72,6 +73,7 @@ type Services struct {
 	StartLessonSrv          *start_lesson.Service
 	FinishLessonSrv         *finish_lesson.Service
 	JoinLessonSrv           *join_lesson.Service
+	GetImageSrv             *get_image.Service
 }
 
 type Server struct {
@@ -97,7 +99,8 @@ func NewServices(jwtSrv *jwt.Service,
 	approveLessonSrv *approve_lesson.Service,
 	startLessonSrv *start_lesson.Service,
 	finishLessonSrv *finish_lesson.Service,
-	joinLesson *join_lesson.Service) *Services {
+	joinLesson *join_lesson.Service,
+	getImageSrv *get_image.Service) *Services {
 	return &Services{
 		JwtSrv:                  jwtSrv,
 		RegSrv:                  reg,
@@ -118,6 +121,7 @@ func NewServices(jwtSrv *jwt.Service,
 		StartLessonSrv:          startLessonSrv,
 		FinishLessonSrv:         finishLessonSrv,
 		JoinLessonSrv:           joinLesson,
+		GetImageSrv:             getImageSrv,
 	}
 }
 
@@ -142,8 +146,12 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	apiRouter.Get(get_categories.Route, get_categories.MakeHandler(services.GetCategoriesSrv, log))
 
 	// users route
+	apiRouter.Get(get_image.Route, get_image.MakeHandler(services.GetImageSrv, log))
+
+	// users route
 	usersRouter := chi.NewRouter()
 	usersRouter.Get(get_user.PublicRoute, get_user.MakePublicHandler(services.GetProfileSrv, log))
+	apiRouter.Mount(usersRoute, usersRouter)
 
 	// teachers route
 	teachersRouter := chi.NewRouter()
@@ -174,8 +182,6 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Put(path.Join(lessonsRoute, finish_lesson.Route), finish_lesson.MakeHandler(services.FinishLessonSrv, log))
 		r.Get(path.Join(lessonsRoute, join_lesson.Route), join_lesson.MakeHandler(services.JoinLessonSrv, log))
 	})
-
-	apiRouter.Mount(usersRoute, usersRouter)
 
 	router.Mount(apiRoute, apiRouter)
 

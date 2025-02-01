@@ -194,17 +194,7 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	for _, row := range rows {
 		user, exists := usersMap[row.User.Id]
 		if !exists {
-			user = &entities.User{
-				Id:               row.User.Id,
-				Email:            row.User.Email,
-				Name:             row.User.Name,
-				Surname:          row.User.Surname,
-				Password:         row.User.Password,
-				RegistrationDate: row.User.RegistrationDate,
-				Birthdate:        row.User.Birthdate,
-				IsTeacher:        false,
-				TeacherData:      nil,
-			}
+			user = &row.User
 			usersMap[row.User.Id] = user
 		}
 
@@ -218,16 +208,7 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		}
 
 		if !hasSkill(user.TeacherData.Skills, row.Skill.Id) {
-			user.TeacherData.Skills = append(user.TeacherData.Skills, &entities.Skill{
-				Id:            row.Skill.Id,
-				TeacherId:     row.Skill.TeacherId,
-				CategoryId:    row.Skill.CategoryId,
-				CategoryName:  row.Skill.CategoryName,
-				VideoCardLink: row.Skill.VideoCardLink,
-				About:         row.Skill.About,
-				Rate:          row.Skill.Rate,
-				IsActive:      row.Skill.IsActive,
-			})
+			user.TeacherData.Skills = append(user.TeacherData.Skills, &row.Skill)
 		}
 	}
 

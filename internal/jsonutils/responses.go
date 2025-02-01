@@ -3,6 +3,7 @@ package jsonutils
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -25,6 +26,27 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) error
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if _, err = w.Write(response); err != nil {
+		return fmt.Errorf("failed to write response: %w", err)
+	}
+	return nil
+}
+
+func RespondWithImage(w http.ResponseWriter, code int, reader io.Reader, imgExtension string) error {
+	if imgExtension != "png" && imgExtension != "jpg" {
+		respondErr := RespondWithError(w,
+			http.StatusInternalServerError,
+			"Unsupported image extension")
+		if respondErr != nil {
+			return respondErr
+		}
+		return fmt.Errorf("unsupported image extension: %s", imgExtension)
+	}
+	
+	w.WriteHeader(code)
+	w.Header().Set("Content-Type", "image/"+imgExtension)
+	w.Header().Set("Cache-Control", "public, max-age=3600") // cache for 1 hour
+
+	if _, err := io.Copy(w, reader); err != nil {
 		return fmt.Errorf("failed to write response: %w", err)
 	}
 	return nil

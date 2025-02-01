@@ -114,6 +114,9 @@ const docTemplate = `{
                             "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
+                    "413": {
+                        "description": "Request Entity Too Large"
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -138,6 +141,53 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/get_categories.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/image": {
+            "get": {
+                "description": "Get image by filename",
+                "produces": [
+                    "image/*"
+                ],
+                "tags": [
+                    "image"
+                ],
+                "summary": "Get image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "filename",
+                        "name": "filename",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image file",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
                     "500": {
@@ -1152,6 +1202,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "verification"
                 },
+                "teacher_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "teacher_id": {
                     "type": "integer",
                     "example": 1
@@ -1184,6 +1238,10 @@ const docTemplate = `{
         "get_teacher.response": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
@@ -1272,6 +1330,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "verification"
                 },
+                "student_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "student_id": {
                     "type": "integer",
                     "example": 1
@@ -1340,6 +1402,10 @@ const docTemplate = `{
         "get_teachers.teacher": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
@@ -1407,6 +1473,10 @@ const docTemplate = `{
         "get_user.response": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
@@ -1549,7 +1619,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "adoe.ru:81",
+	Host:             "localhost:81",
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "Learn-Share API",

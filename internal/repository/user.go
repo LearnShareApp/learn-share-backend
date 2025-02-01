@@ -66,7 +66,7 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*entitie
 }
 
 func (r *Repository) GetUserById(ctx context.Context, id int) (*entities.User, error) {
-	const query = `SELECT user_id, email, password, name, surname, birthdate, registration_date FROM public.users WHERE user_id = $1`
+	const query = `SELECT user_id, email, password, name, surname, registration_date, birthdate, avatar FROM public.users WHERE user_id = $1`
 
 	var user entities.User
 	err := r.db.GetContext(ctx, &user, query, id)

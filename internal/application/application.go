@@ -12,6 +12,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
@@ -28,7 +29,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teachers"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
-	"github.com/LearnShareApp/learn-share-backend/pkg/minio"
+	minio2 "github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"os"
@@ -51,11 +52,11 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	}
 	log.Info("connected to database successfully")
 
-	minioClient, err := minio.NewClient(&config.Minio)
+	minioClient, err := minio2.NewClient(&config.Minio)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to minio: %v", err)
 	}
-	if err = minio.CreateBucket(ctx, minioClient, config.Minio.Bucket); err != nil {
+	if err = minio2.CreateBucket(ctx, minioClient, config.Minio.Bucket); err != nil {
 		return nil, fmt.Errorf("failed to create minio bucket: %v", err)
 	}
 
@@ -74,7 +75,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 
 	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
 	leveKitService := livekit.NewService(config.LiveKit)
-	minioService := minio.NewService(minioClient, config.Minio.Bucket)
+	minioService := minio2.NewService(minioClient, config.Minio.Bucket)
 
 	var (
 		registrationSrv         = registration.NewService(repo, jwtService, minioService)
@@ -95,6 +96,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		startLessonSrv          = start_lesson.NewService(repo, leveKitService)
 		finishLessonSrv         = finish_lesson.NewService(repo)
 		joinLessonSrv           = join_lesson.NewService(repo, leveKitService)
+		getImagSrv              = get_image.NewService(minioService)
 	)
 
 	services := rest.NewServices(jwtService,
@@ -116,6 +118,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		startLessonSrv,
 		finishLessonSrv,
 		joinLessonSrv,
+		getImagSrv,
 	)
 
 	restServer := rest.NewServer(services, config.Server, log)
