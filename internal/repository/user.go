@@ -81,3 +81,19 @@ func (r *Repository) GetUserById(ctx context.Context, id int) (*entities.User, e
 
 	return &user, nil
 }
+
+func (r *Repository) UpdateUser(ctx context.Context, userId int, user *entities.User) error {
+	const query = `
+	UPDATE users SET (name, surname, password, birthdate, avatar) = ($2, $3, $4, $5, $6) WHERE user_id = $1
+	`
+
+	if _, err := r.db.ExecContext(ctx, query, userId,
+		user.Name,
+		user.Surname,
+		user.Password,
+		user.Birthdate,
+		user.Avatar); err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
+	}
+	return nil
+}

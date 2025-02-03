@@ -1048,6 +1048,61 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Edit base data about user (optional fields)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Edit user",
+                "parameters": [
+                    {
+                        "description": "Update Info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edit_user.request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
             }
         },
         "/users/{id}/profile": {
@@ -1146,6 +1201,32 @@ const docTemplate = `{
                     "description": "@Description exactly teacherID, not his userID",
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "edit_user.request": {
+            "description": "User registration request",
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "base64 encoded image"
+                },
+                "birthdate": {
+                    "type": "string",
+                    "example": "2000-01-01T00:00:00Z"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "strongpass123"
+                },
+                "surname": {
+                    "type": "string",
+                    "example": "Smith"
                 }
             }
         },

@@ -20,6 +20,9 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teachers"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/login"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/registration"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/edit_user"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
@@ -27,8 +30,6 @@ import (
 	"time"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/middlewares"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
@@ -59,6 +60,7 @@ type Services struct {
 	LoginSrv                *login.Service
 	GetCategoriesSrv        *get_categories.Service
 	GetProfileSrv           *get_user.Service
+	EditProfileSrv          *edit_user.Service
 	BecomeTeacherSrv        *become_teacher.Service
 	AddSkillSrv             *add_skill.Service
 	GetTeacherSrv           *get_teacher.Service
@@ -86,6 +88,7 @@ func NewServices(jwtSrv *jwt.Service,
 	login *login.Service,
 	getCategories *get_categories.Service,
 	getProfile *get_user.Service,
+	editProfileSrv *edit_user.Service,
 	becomeTeacherSrv *become_teacher.Service,
 	addSkillSrv *add_skill.Service,
 	getTeacher *get_teacher.Service,
@@ -107,6 +110,7 @@ func NewServices(jwtSrv *jwt.Service,
 		LoginSrv:                login,
 		GetCategoriesSrv:        getCategories,
 		GetProfileSrv:           getProfile,
+		EditProfileSrv:          editProfileSrv,
 		BecomeTeacherSrv:        becomeTeacherSrv,
 		AddSkillSrv:             addSkillSrv,
 		GetTeacherSrv:           getTeacher,
@@ -181,6 +185,8 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Put(path.Join(lessonsRoute, start_lesson.Route), start_lesson.MakeHandler(services.StartLessonSrv, log))
 		r.Put(path.Join(lessonsRoute, finish_lesson.Route), finish_lesson.MakeHandler(services.FinishLessonSrv, log))
 		r.Get(path.Join(lessonsRoute, join_lesson.Route), join_lesson.MakeHandler(services.JoinLessonSrv, log))
+
+		r.Patch(path.Join(userRoute, edit_user.Route), edit_user.MakeHandler(services.EditProfileSrv, log))
 	})
 
 	router.Mount(apiRoute, apiRouter)

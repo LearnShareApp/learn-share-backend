@@ -2,7 +2,6 @@ package registration
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
@@ -12,12 +11,10 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 )
 
 const Route = "/signup"
-const MaxImageWeight = 5 << 20
 
 // MakeHandler returns http.HandlerFunc
 // @Summary Register new user
@@ -62,32 +59,16 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		// if upload avatar
 		if req.Avatar != "" {
-			avatarBytes, err := base64.StdEncoding.DecodeString(req.Avatar)
+			imageBytes, err := imgutils.DecodeImage(req.Avatar)
+
 			if err != nil {
-				if err = jsonutils.RespondWith400(w, "invalid avatar format"); err != nil {
+				if err = jsonutils.RespondWith400(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
 			}
 
-			// check for weight
-			if len(avatarBytes) > MaxImageWeight {
-				if err = jsonutils.RespondWith400(w, "avatar is too large"); err != nil {
-					log.Error("failed to send response", zap.Error(err))
-				}
-				return
-			}
-
-			// check is MIME-type (image)
-			mimeType := http.DetectContentType(avatarBytes)
-			if !strings.HasPrefix(mimeType, "image/") {
-				if err = jsonutils.RespondWith400(w, "file is not an image"); err != nil {
-					log.Error("failed to send response", zap.Error(err))
-				}
-				return
-			}
-
-			width, height, err := imgutils.GetImageDimensions(avatarBytes)
+			width, height, err := imgutils.GetImageDimensions(imageBytes)
 			if err != nil {
 				log.Error("failed to get image dimension", zap.Error(err))
 				if err = jsonutils.RespondWith500(w); err != nil {
@@ -96,15 +77,21 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 				return
 			}
 
-			if width != height {
-				if err = jsonutils.RespondWith400(w, "avatar must have 1:1 aspect ratio"); err != nil {
+			if err = imgutils.CheckDimension(1, 1, width, height); err != nil {
+				if err = jsonutils.RespondWith400(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
 			}
-
-			avatarReader = bytes.NewReader(avatarBytes)
-			avatarSize = int64(len(avatarBytes))
+			avatarReader = bytes.NewReader(imageBytes)
+			defer func() {
+				if closer, ok := avatarReader.(io.Closer); ok {
+					if err := closer.Close(); err != nil {
+						log.Error("failed to close reader", zap.Error(err))
+					}
+				}
+			}()
+			avatarSize = int64(len(imageBytes))
 		}
 
 		user := &entities.User{
