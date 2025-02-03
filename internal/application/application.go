@@ -9,8 +9,6 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/login"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
@@ -27,9 +25,12 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teachers"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/login"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/registration"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/edit_user"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
-	minio2 "github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
+	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"os"
@@ -52,11 +53,11 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	}
 	log.Info("connected to database successfully")
 
-	minioClient, err := minio2.NewClient(&config.Minio)
+	minioClient, err := minio.NewClient(&config.Minio)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to minio: %v", err)
 	}
-	if err = minio2.CreateBucket(ctx, minioClient, config.Minio.Bucket); err != nil {
+	if err = minio.CreateBucket(ctx, minioClient, config.Minio.Bucket); err != nil {
 		return nil, fmt.Errorf("failed to create minio bucket: %v", err)
 	}
 
@@ -75,13 +76,14 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 
 	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
 	leveKitService := livekit.NewService(config.LiveKit)
-	minioService := minio2.NewService(minioClient, config.Minio.Bucket)
+	minioService := minio.NewService(minioClient, config.Minio.Bucket)
 
 	var (
 		registrationSrv         = registration.NewService(repo, jwtService, minioService)
 		loginSrv                = login.NewService(repo, jwtService)
 		getCategoriesSrv        = get_categories.NewService(repo)
 		getProfileSrv           = get_user.NewService(repo)
+		editUserSrv             = edit_user.NewService(repo, minioService)
 		becomeTeacherSrv        = become_teacher.NewService(repo)
 		addSkillSrv             = add_skill.NewService(repo)
 		getTeacherSrv           = get_teacher.NewService(repo)
@@ -104,6 +106,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		loginSrv,
 		getCategoriesSrv,
 		getProfileSrv,
+		editUserSrv,
 		becomeTeacherSrv,
 		addSkillSrv,
 		getTeacherSrv,

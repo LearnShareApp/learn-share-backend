@@ -40,6 +40,25 @@ definitions:
     - schedule_time_id
     - teacher_id
     type: object
+  edit_user.request:
+    description: User registration request
+    properties:
+      avatar:
+        example: base64 encoded image
+        type: string
+      birthdate:
+        example: "2000-01-01T00:00:00Z"
+        type: string
+      name:
+        example: John
+        type: string
+      password:
+        example: strongpass123
+        type: string
+      surname:
+        example: Smith
+        type: string
+    type: object
   get_categories.category:
     description: data of category
     properties:
@@ -1041,6 +1060,41 @@ paths:
       security:
       - BearerAuth: []
       summary: Get user profile
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Edit base data about user (optional fields)
+      parameters:
+      - description: Update Info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/edit_user.request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "413":
+          description: Request Entity Too Large
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Edit user
       tags:
       - users
   /users/{id}/profile:
