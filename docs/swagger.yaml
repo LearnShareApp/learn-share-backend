@@ -128,9 +128,15 @@ definitions:
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
+      count_of_students:
+        example: 0
+        type: integer
       email:
         example: qwerty@example.com
         type: string
+      finished_lessons:
+        example: 0
+        type: integer
       name:
         example: John
         type: string
@@ -245,9 +251,15 @@ definitions:
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
+      count_of_students:
+        example: 0
+        type: integer
       email:
         example: qwerty@example.com
         type: string
+      finished_lessons:
+        example: 0
+        type: integer
       name:
         example: John
         type: string

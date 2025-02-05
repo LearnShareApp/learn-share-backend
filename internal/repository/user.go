@@ -90,7 +90,6 @@ func (r *Repository) GetUserStatByUserId(ctx context.Context, id int) (*entities
         COUNT(DISTINCT CASE WHEN s.name = $3 THEN l.lesson_id END) as count_of_waiting_lesson,
         COUNT(DISTINCT CASE WHEN s.name = $1 THEN l.teacher_id END) as count_of_teachers
     FROM lessons l
-    INNER JOIN users u ON u.user_id = l.student_id
     INNER JOIN statuses s ON s.status_id = l.status_id
     WHERE l.student_id = $4
     `

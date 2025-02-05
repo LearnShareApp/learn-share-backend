@@ -46,6 +46,13 @@ func (s *Service) Do(ctx context.Context, userId int) (*entities.User, error) {
 		return nil, fmt.Errorf("failed to get teacher: %w", err)
 	}
 
+	stat, err := s.repo.GetShortStatTeacherById(ctx, teacher.Id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stat teacher: %w", err)
+	}
+
+	teacher.TeacherStat = *stat
+
 	user.TeacherData = teacher
 
 	teacher.Skills, err = s.repo.GetSkillsByTeacherId(ctx, teacher.Id)

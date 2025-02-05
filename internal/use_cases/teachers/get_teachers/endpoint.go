@@ -97,6 +97,8 @@ func mappingResponse(users []entities.User) *response {
 			RegistrationDate: users[i].RegistrationDate,
 			Birthdate:        users[i].Birthdate,
 			Avatar:           users[i].Avatar,
+			FinishedLessons:  users[i].TeacherData.TeacherStat.CountOfFinishedLesson,
+			CountOfStudents:  users[i].TeacherData.TeacherStat.CountOfStudents,
 			Skills:           skills,
 		})
 	}

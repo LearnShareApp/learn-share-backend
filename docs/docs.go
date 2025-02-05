@@ -1327,9 +1327,17 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
                 },
+                "count_of_students": {
+                    "type": "integer",
+                    "example": 0
+                },
                 "email": {
                     "type": "string",
                     "example": "qwerty@example.com"
+                },
+                "finished_lessons": {
+                    "type": "integer",
+                    "example": 0
                 },
                 "name": {
                     "type": "string",
@@ -1491,9 +1499,17 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
                 },
+                "count_of_students": {
+                    "type": "integer",
+                    "example": 0
+                },
                 "email": {
                     "type": "string",
                     "example": "qwerty@example.com"
+                },
+                "finished_lessons": {
+                    "type": "integer",
+                    "example": 0
                 },
                 "name": {
                     "type": "string",

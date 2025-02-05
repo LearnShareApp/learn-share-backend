@@ -79,7 +79,12 @@ func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (
 }
 
 func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error) {
-	const query = `SELECT teacher_id, user_id FROM teachers WHERE user_id = $1`
+	const query = `
+		SELECT 
+		    teacher_id, 
+		    user_id 
+		FROM teachers 
+		WHERE user_id = $1`
 
 	var teacher entities.Teacher
 	err := r.db.GetContext(ctx, &teacher, query, id)
@@ -112,10 +117,37 @@ func (r *Repository) GetTeacherById(ctx context.Context, id int) (*entities.Teac
 	return &teacher, nil
 }
 
+func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int) (*entities.TeacherStatistic, error) {
+	const query = `
+    SELECT 
+        COUNT(DISTINCT CASE WHEN s.name = $1 THEN l.lesson_id END) as count_of_finished_lesson,
+        COUNT(DISTINCT CASE WHEN s.name = $1 THEN l.student_id END) as count_of_students
+    FROM lessons l
+    INNER JOIN statuses s ON s.status_id = l.status_id
+    WHERE l.teacher_id = $2
+    `
+
+	var stat entities.TeacherStatistic
+	err := r.db.GetContext(ctx, &stat, query,
+		entities.FinishedStatusName, // $1
+		teacherId,                   // $2
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("teacher statistic not found: %w", err)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to find teacher's statistic by teacherId: %w", err)
+	}
+
+	return &stat, nil
+}
+
 func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int, isUsersTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error) {
 	// Base query
 	baseQuery := `
-    SELECT DISTINCT
+    SELECT
         u.user_id,
         u.email,
         u.name,
@@ -130,25 +162,30 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
         s.about,
         s.rate,
         s.is_active,
-        c.name as category_name
+        c.name as category_name,
+        COUNT(DISTINCT CASE WHEN st.name = :finished_status_name THEN l.lesson_id END) as count_of_finished_lesson,
+        COUNT(DISTINCT CASE WHEN st.name = :finished_status_name THEN l.student_id END) as count_of_students
     FROM users u
     INNER JOIN teachers t ON u.user_id = t.user_id
     INNER JOIN skills s ON t.teacher_id = s.teacher_id AND s.is_active
     INNER JOIN categories c ON s.category_id = c.category_id
+    LEFT JOIN lessons l ON t.teacher_id = l.teacher_id
+    LEFT JOIN statuses st ON st.status_id = l.status_id
+    GROUP BY u.user_id, u.email, u.name, u.surname, u.registration_date, u.birthdate,
+         u.avatar, t.teacher_id, s.skill_id, s.category_id, s.video_card_link,
+         s.about, s.rate, s.is_active, c.name, st.name, l.student_id
 	`
 
 	// named params for query
 	namedParams := make(map[string]interface{})
+	namedParams["finished_status_name"] = entities.FinishedStatusName
+
 	var conditions []string
 
 	if isUsersTeachers {
-		baseQuery += `
-        INNER JOIN lessons l ON t.teacher_id = l.teacher_id 
-        INNER JOIN statuses st ON l.status_id = st.status_id AND st.name = :status_name
-    `
+		conditions = append(conditions, "st.name = :finished_status_name")
 		conditions = append(conditions, "l.student_id = :user_id")
 		namedParams["user_id"] = userId
-		namedParams["status_name"] = "finished"
 	}
 
 	if isFilteredByCategory {
@@ -158,7 +195,7 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 
 	query := baseQuery
 	if len(conditions) > 0 {
-		query += " WHERE " + strings.Join(conditions, " AND ")
+		query += " HAVING " + strings.Join(conditions, " AND ")
 	}
 
 	// prepare named query
@@ -168,16 +205,17 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	}
 
 	// converting into $1, $2, ... PostgreSQL format
-	query, args, err = sqlx.In(namedQuery, args...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert named query: %w", err)
-	}
-	query = r.db.Rebind(query)
+	//query, args, err = sqlx.In(namedQuery, args...)
+	//if err != nil {
+	//	return nil, fmt.Errorf("failed to convert named query: %w", err)
+	//}
+	query = r.db.Rebind(namedQuery)
 
 	type result struct {
 		entities.User
 		entities.Teacher
 		entities.Skill
+		entities.TeacherStatistic
 	}
 
 	var rows []result
@@ -200,14 +238,17 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		if user.TeacherData == nil {
 			user.IsTeacher = true
 			user.TeacherData = &entities.Teacher{
-				Id:     row.Teacher.Id,
-				UserId: row.Teacher.UserId,
-				Skills: make([]*entities.Skill, 0),
+				Id:          row.Teacher.Id,
+				UserId:      row.Teacher.UserId,
+				Skills:      make([]*entities.Skill, 0),
+				TeacherStat: row.TeacherStatistic,
 			}
 		}
 
-		if !hasSkill(user.TeacherData.Skills, row.Skill.Id) {
+		skillMap := make(map[int]bool)
+		if !skillMap[row.Skill.Id] {
 			user.TeacherData.Skills = append(user.TeacherData.Skills, &row.Skill)
+			skillMap[row.Skill.Id] = true
 		}
 	}
 
@@ -217,13 +258,4 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	}
 
 	return users, nil
-}
-
-func hasSkill(skills []*entities.Skill, skillId int) bool {
-	for _, skill := range skills {
-		if skill.Id == skillId {
-			return true
-		}
-	}
-	return false
 }
