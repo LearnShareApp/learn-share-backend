@@ -6,6 +6,8 @@ import (
 )
 
 type repo interface {
+	IsUserExistsById(ctx context.Context, id int) (bool, error)
 	GetUserById(ctx context.Context, id int) (*entities.User, error)
+	GetUserStatByUserId(gs context.Context, id int) (*entities.StudentStatistic, error)
 	IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error)
 }

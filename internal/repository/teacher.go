@@ -137,7 +137,7 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
     INNER JOIN categories c ON s.category_id = c.category_id
 	`
 
-	// Создаем именованные параметры для sqlx
+	// named params for query
 	namedParams := make(map[string]interface{})
 	var conditions []string
 
@@ -161,20 +161,19 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		query += " WHERE " + strings.Join(conditions, " AND ")
 	}
 
-	// Подготавливаем именованный запрос
+	// prepare named query
 	namedQuery, args, err := sqlx.Named(query, namedParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build named query: %w", err)
 	}
 
-	// Конвертируем в $1, $2 формат для PostgreSQL
+	// converting into $1, $2, ... PostgreSQL format
 	query, args, err = sqlx.In(namedQuery, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert named query: %w", err)
 	}
 	query = r.db.Rebind(query)
 
-	// Временная структура для результатов
 	type result struct {
 		entities.User
 		entities.Teacher

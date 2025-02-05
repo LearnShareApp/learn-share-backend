@@ -1562,9 +1562,17 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
                 },
+                "count_of_teachers": {
+                    "type": "integer",
+                    "example": 0
+                },
                 "email": {
                     "type": "string",
                     "example": "qwerty@example.com"
+                },
+                "finished_lessons": {
+                    "type": "integer",
+                    "example": 0
                 },
                 "id": {
                     "type": "integer",
@@ -1585,6 +1593,14 @@ const docTemplate = `{
                 "surname": {
                     "type": "string",
                     "example": "Smith"
+                },
+                "verification_lessons": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "waiting_lessons": {
+                    "type": "integer",
+                    "example": 0
                 }
             }
         },

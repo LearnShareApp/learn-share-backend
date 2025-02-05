@@ -40,19 +40,18 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		user, err := s.Do(r.Context(), id)
 		if err != nil {
-			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
-				if err = jsonutils.RespondWith401(w, err.Error()); err != nil {
-					log.Error("failed to send response", zap.Error(err))
-				}
-				return
-
-			} else {
+			switch {
+			case errors.Is(err, serviceErrors.ErrorUserNotFound):
+				err = jsonutils.RespondWith401(w, err.Error())
+			default:
 				log.Error(err.Error())
-				if err = jsonutils.RespondWith500(w); err != nil {
-					log.Error("failed to send response", zap.Error(err))
-				}
-				return
+				err = jsonutils.RespondWith500(w)
 			}
+
+			if err != nil {
+				log.Error("failed to send response", zap.Error(err))
+			}
+			return
 		}
 
 		resp := mappingToResponse(user)
@@ -96,16 +95,17 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		}
 
 		user, err := s.Do(r.Context(), id)
+
 		if err != nil {
-			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
-				if err := jsonutils.RespondWith404(w, serviceErrors.ErrorUserNotFound.Error()); err != nil {
-					log.Error("failed to send response", zap.Error(err))
-				}
-				return
+			switch {
+			case errors.Is(err, serviceErrors.ErrorUserNotFound):
+				err = jsonutils.RespondWith404(w, err.Error())
+			default:
+				log.Error(err.Error())
+				err = jsonutils.RespondWith500(w)
 			}
 
-			log.Error(err.Error())
-			if err = jsonutils.RespondWith500(w); err != nil {
+			if err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -121,14 +121,18 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 func mappingToResponse(user *entities.User) *response {
 	resp := response{
-		Id:               user.Id,
-		Email:            user.Email,
-		Name:             user.Name,
-		Surname:          user.Surname,
-		RegistrationDate: user.RegistrationDate,
-		Birthdate:        user.Birthdate,
-		Avatar:           user.Avatar,
-		IsTeacher:        user.IsTeacher,
+		Id:                  user.Id,
+		Email:               user.Email,
+		Name:                user.Name,
+		Surname:             user.Surname,
+		RegistrationDate:    user.RegistrationDate,
+		Birthdate:           user.Birthdate,
+		Avatar:              user.Avatar,
+		FinishedLessons:     user.Stat.CountOfFinishedLesson,
+		VerificationLessons: user.Stat.CountOfVerificationLesson,
+		WaitingLessons:      user.Stat.CountOfWaitingLesson,
+		CountOfTeachers:     user.Stat.CountOfTeachers,
+		IsTeacher:           user.IsTeacher,
 	}
 
 	return &resp

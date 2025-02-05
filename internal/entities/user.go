@@ -11,6 +11,8 @@ type User struct {
 	RegistrationDate time.Time `db:"registration_date"`
 	Birthdate        time.Time `db:"birthdate"`
 	Avatar           string    `db:"avatar"`
-	IsTeacher        bool      `db:"-"`
-	TeacherData      *Teacher  `db:"-"`
+
+	Stat        StudentStatistic `db:"-"`
+	IsTeacher   bool             `db:"-"`
+	TeacherData *Teacher         `db:"-"`
 }

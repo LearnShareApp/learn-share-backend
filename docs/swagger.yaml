@@ -295,9 +295,15 @@ definitions:
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
+      count_of_teachers:
+        example: 0
+        type: integer
       email:
         example: qwerty@example.com
         type: string
+      finished_lessons:
+        example: 0
+        type: integer
       id:
         example: 1
         type: integer
@@ -313,6 +319,12 @@ definitions:
       surname:
         example: Smith
         type: string
+      verification_lessons:
+        example: 0
+        type: integer
+      waiting_lessons:
+        example: 0
+        type: integer
     type: object
   join_lesson.response:
     properties:
