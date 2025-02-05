@@ -130,6 +130,8 @@ func mappingToResponse(user *entities.User) *response {
 		RegistrationDate: user.RegistrationDate,
 		Birthdate:        user.Birthdate,
 		Avatar:           user.Avatar,
+		FinishedLessons:  user.TeacherData.TeacherStat.CountOfFinishedLesson,
+		CountOfStudents:  user.TeacherData.TeacherStat.CountOfStudents,
 		Skills:           make([]skill, 0, len(user.TeacherData.Skills)),
 	}
 

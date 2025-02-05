@@ -2,7 +2,6 @@ package get_user
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
@@ -19,13 +18,27 @@ func NewService(repo repo) *Service {
 }
 
 func (s *Service) Do(ctx context.Context, id int) (*entities.User, error) {
+	exists, err := s.repo.IsUserExistsById(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check existence of user by id %d: %w", id, err)
+	}
+
+	if !exists {
+		return nil, internalErrs.ErrorUserNotFound
+	}
 
 	user, err := s.repo.GetUserById(ctx, id)
 	if err != nil {
-		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
-			return nil, internalErrs.ErrorUserNotFound
-		}
 		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	stat, err := s.repo.GetUserStatByUserId(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user statistic: %w", err)
+	}
+
+	if stat != nil {
+		user.Stat = *stat
 	}
 
 	user.IsTeacher, err = s.repo.IsTeacherExistsByUserId(ctx, user.Id)

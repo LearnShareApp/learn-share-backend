@@ -13,6 +13,8 @@ type response struct {
 	RegistrationDate time.Time `json:"registration_date" example:"2022-09-09T10:10:10+09:00"`
 	Birthdate        time.Time `json:"birthdate" example:"2002-09-09T10:10:10+09:00"`
 	Avatar           string    `json:"avatar" example:"uuid.png"`
+	FinishedLessons  int       `json:"finished_lessons" example:"0"`
+	CountOfStudents  int       `json:"count_of_students" example:"0"`
 	Skills           []skill   `json:"skills"`
 }
 
