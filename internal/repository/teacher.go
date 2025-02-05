@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/jmoiron/sqlx"
-	"strings"
 )
 
 func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
@@ -120,10 +121,10 @@ func (r *Repository) GetTeacherById(ctx context.Context, id int) (*entities.Teac
 func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int) (*entities.TeacherStatistic, error) {
 	const query = `
     SELECT 
-        COUNT(DISTINCT CASE WHEN s.name = $1 THEN l.lesson_id END) as count_of_finished_lesson,
-        COUNT(DISTINCT CASE WHEN s.name = $1 THEN l.student_id END) as count_of_students
+        COUNT(DISTINCT l.lesson_id) FILTER (WHERE st.name = $1) as count_of_finished_lesson,
+		COUNT(DISTINCT l.student_id) FILTER (WHERE st.name = $1) as count_of_students
     FROM lessons l
-    INNER JOIN statuses s ON s.status_id = l.status_id
+    INNER JOIN statuses st ON st.status_id = l.status_id
     WHERE l.teacher_id = $2
     `
 
@@ -147,33 +148,40 @@ func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int)
 func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int, isUsersTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error) {
 	// Base query
 	baseQuery := `
-    SELECT
-        u.user_id,
-        u.email,
-        u.name,
-        u.surname,
-        u.registration_date,
-        u.birthdate,
-        u.avatar,
-        t.teacher_id,
-        s.skill_id,
-        s.category_id,
-        s.video_card_link,
-        s.about,
-        s.rate,
-        s.is_active,
-        c.name as category_name,
-        COUNT(DISTINCT CASE WHEN st.name = :finished_status_name THEN l.lesson_id END) as count_of_finished_lesson,
-        COUNT(DISTINCT CASE WHEN st.name = :finished_status_name THEN l.student_id END) as count_of_students
-    FROM users u
-    INNER JOIN teachers t ON u.user_id = t.user_id
-    INNER JOIN skills s ON t.teacher_id = s.teacher_id AND s.is_active
-    INNER JOIN categories c ON s.category_id = c.category_id
-    LEFT JOIN lessons l ON t.teacher_id = l.teacher_id
-    LEFT JOIN statuses st ON st.status_id = l.status_id
-    GROUP BY u.user_id, u.email, u.name, u.surname, u.registration_date, u.birthdate,
-         u.avatar, t.teacher_id, s.skill_id, s.category_id, s.video_card_link,
-         s.about, s.rate, s.is_active, c.name, st.name, l.student_id
+	WITH lesson_teacher_stats AS (
+		SELECT
+			l.teacher_id,
+			COUNT(DISTINCT l.lesson_id) FILTER (WHERE st.name = :finished_status_name) as count_of_finished_lesson,
+			COUNT(DISTINCT l.student_id) FILTER (WHERE st.name = :finished_status_name) as count_of_students
+		FROM lessons l
+		LEFT JOIN statuses st ON st.status_id = l.status_id
+		GROUP BY l.teacher_id
+	)
+
+	SELECT
+		u.user_id,
+		u.email,
+		u.name,
+		u.surname,
+		u.registration_date,
+		u.birthdate,
+		u.avatar,
+		t.teacher_id,
+		s.skill_id,
+		s.category_id,
+		s.video_card_link,
+		s.about,
+		s.rate,
+		s.is_active,
+		c.name as category_name,
+		COALESCE(ls.count_of_finished_lesson, 0) as count_of_finished_lesson,
+		COALESCE(ls.count_of_students, 0) as count_of_students
+	FROM users u
+	INNER JOIN teachers t ON u.user_id = t.user_id
+	INNER JOIN skills s ON t.teacher_id = s.teacher_id
+	INNER JOIN categories c ON s.category_id = c.category_id
+	LEFT JOIN lesson_teacher_stats ls ON t.teacher_id = ls.teacher_id
+	WHERE s.is_active
 	`
 
 	// named params for query
@@ -195,7 +203,7 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 
 	query := baseQuery
 	if len(conditions) > 0 {
-		query += " HAVING " + strings.Join(conditions, " AND ")
+		query += " AND " + strings.Join(conditions, " AND ")
 	}
 
 	// prepare named query
@@ -245,10 +253,8 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 			}
 		}
 
-		skillMap := make(map[int]bool)
-		if !skillMap[row.Skill.Id] {
+		if !hasSkill(user.TeacherData.Skills, row.Skill.Id) {
 			user.TeacherData.Skills = append(user.TeacherData.Skills, &row.Skill)
-			skillMap[row.Skill.Id] = true
 		}
 	}
 
@@ -258,4 +264,13 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	}
 
 	return users, nil
+}
+
+func hasSkill(skills []*entities.Skill, skillId int) bool {
+	for _, skill := range skills {
+		if skill.Id == skillId {
+			return true
+		}
+	}
+	return false
 }
