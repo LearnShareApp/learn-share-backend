@@ -148,13 +148,13 @@ func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int)
 func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int, isUsersTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error) {
 	// Base query
 	baseQuery := `
-	WITH lesson_teacher_stats AS (
+	WITH teacher_stats AS (
 		SELECT
 			l.teacher_id,
 			COUNT(DISTINCT l.lesson_id) FILTER (WHERE st.name = :finished_status_name) as count_of_finished_lesson,
 			COUNT(DISTINCT l.student_id) FILTER (WHERE st.name = :finished_status_name) as count_of_students
 		FROM lessons l
-		LEFT JOIN statuses st ON st.status_id = l.status_id
+		LEFT JOIN statuses st ON l.status_id = st.status_id
 		GROUP BY l.teacher_id
 	)
 
@@ -174,13 +174,15 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		s.rate,
 		s.is_active,
 		c.name as category_name,
-		COALESCE(ls.count_of_finished_lesson, 0) as count_of_finished_lesson,
-		COALESCE(ls.count_of_students, 0) as count_of_students
+		COALESCE(ts.count_of_finished_lesson, 0) as count_of_finished_lesson,
+		COALESCE(ts.count_of_students, 0) as count_of_students
 	FROM users u
 	INNER JOIN teachers t ON u.user_id = t.user_id
 	INNER JOIN skills s ON t.teacher_id = s.teacher_id
 	INNER JOIN categories c ON s.category_id = c.category_id
-	LEFT JOIN lesson_teacher_stats ls ON t.teacher_id = ls.teacher_id
+	LEFT JOIN teacher_stats ts ON t.teacher_id = ts.teacher_id
+	LEFT JOIN lessons l ON t.teacher_id = l.teacher_id
+	LEFT JOIN statuses st ON l.status_id = st.status_id
 	WHERE s.is_active
 	`
 
