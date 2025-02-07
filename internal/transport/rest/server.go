@@ -10,6 +10,8 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/finish_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_lesson_shortdata"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/join_lesson"
@@ -48,6 +50,7 @@ const (
 	lessonRoute   = "/lesson"
 	lessonsRoute  = "/lessons"
 	apiRoute      = "/api"
+	studentRoute  = "/student"
 )
 
 type ServerConfig struct {
@@ -70,6 +73,8 @@ type Services struct {
 	BookLessonSrv           *book_lesson.Service
 	GetLessonsForTeacherSrv *get_teacher_lessons.Service
 	GetLessonsForStudentSrv *get_student_lessons.Service
+	GetLessonSrv            *get_lesson.Service
+	GetLessonSortSrv        *get_lesson_shortdata.Service
 	CancelLessonSrv         *cancel_lesson.Service
 	ApproveLessonSrv        *approve_lesson.Service
 	StartLessonSrv          *start_lesson.Service
@@ -98,6 +103,8 @@ func NewServices(jwtSrv *jwt.Service,
 	bookLessonSrv *book_lesson.Service,
 	getLessonsForTeacherSrv *get_teacher_lessons.Service,
 	getLessonsForStudentSrv *get_student_lessons.Service,
+	getLessonSrv *get_lesson.Service,
+	getLessonSortSrv *get_lesson_shortdata.Service,
 	cancelLessonSrv *cancel_lesson.Service,
 	approveLessonSrv *approve_lesson.Service,
 	startLessonSrv *start_lesson.Service,
@@ -120,6 +127,8 @@ func NewServices(jwtSrv *jwt.Service,
 		BookLessonSrv:           bookLessonSrv,
 		GetLessonsForTeacherSrv: getLessonsForTeacherSrv,
 		GetLessonsForStudentSrv: getLessonsForStudentSrv,
+		GetLessonSrv:            getLessonSrv,
+		GetLessonSortSrv:        getLessonSortSrv,
 		CancelLessonSrv:         cancelLessonSrv,
 		ApproveLessonSrv:        approveLessonSrv,
 		StartLessonSrv:          startLessonSrv,
@@ -149,7 +158,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	// categories route
 	apiRouter.Get(get_categories.Route, get_categories.MakeHandler(services.GetCategoriesSrv, log))
 
-	// users route
+	// image route
 	apiRouter.Get(get_image.Route, get_image.MakeHandler(services.GetImageSrv, log))
 
 	// users route
@@ -163,6 +172,12 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	teachersRouter.Get(get_times.PublicRoute, get_times.MakePublicHandler(services.GetScheduleTimesSrv, log))
 	apiRouter.Mount(teachersRoute, teachersRouter)
 
+	// lessons route
+	lessonsRouter := chi.NewRouter()
+	lessonsRouter.Get(get_lesson.Route, get_lesson.MakeHandler(services.GetLessonSrv, log))
+	lessonsRouter.Get(get_lesson_shortdata.Route, get_lesson_shortdata.MakeHandler(services.GetLessonSortSrv, log))
+	apiRouter.Mount(lessonsRoute, lessonsRouter)
+
 	// protected routes
 	apiRouter.Group(func(r chi.Router) {
 		r.Use(middlewares.JWTMiddleware(services.JwtSrv, log.Named("jwt_middleware")))
@@ -173,7 +188,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Get(path.Join(teacherRoute, get_times.ProtectedRoute), get_times.MakeProtectedHandler(services.GetScheduleTimesSrv, log))
 		r.Get(path.Join(teachersRoute, get_teachers.Route), get_teachers.MakeHandler(services.GetTeachersSrv, log))
 		r.Get(path.Join(teacherRoute, get_teacher_lessons.Route), get_teacher_lessons.MakeHandler(services.GetLessonsForTeacherSrv, log))
-		r.Get(path.Join(lessonsRoute, get_student_lessons.Route), get_student_lessons.MakeHandler(services.GetLessonsForStudentSrv, log))
+		r.Get(path.Join(studentRoute, get_student_lessons.Route), get_student_lessons.MakeHandler(services.GetLessonsForStudentSrv, log))
 
 		r.Post(path.Join(teacherRoute, become_teacher.Route), become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))

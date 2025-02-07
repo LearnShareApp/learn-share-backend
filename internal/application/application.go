@@ -15,6 +15,8 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/finish_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_lesson_shortdata"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/join_lesson"
@@ -93,6 +95,8 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		bookLessonSrv           = book_lesson.NewService(repo)
 		getLessonsForTeacherSrv = get_teacher_lessons.NewService(repo)
 		getLessonsForStudentSrv = get_student_lessons.NewService(repo)
+		getLessonSrv            = get_lesson.NewService(repo)
+		getLessonShortDataSrv   = get_lesson_shortdata.NewService(repo)
 		cancelLessonSrv         = cancel_lesson.NewService(repo)
 		approveLessonSrv        = approve_lesson.NewService(repo)
 		startLessonSrv          = start_lesson.NewService(repo, leveKitService)
@@ -116,6 +120,8 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		bookLessonSrv,
 		getLessonsForTeacherSrv,
 		getLessonsForStudentSrv,
+		getLessonSrv,
+		getLessonShortDataSrv,
 		cancelLessonSrv,
 		approveLessonSrv,
 		startLessonSrv,

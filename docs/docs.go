@@ -259,26 +259,30 @@ const docTemplate = `{
                 }
             }
         },
-        "/lessons": {
+        "/lessons/{id}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Return all lessons which have student",
+                "description": "Return lesson data by lesson's id",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "lessons"
                 ],
-                "summary": "Get lessons for students",
+                "summary": "Get lesson data by lesson's id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LessonID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/get_student_lessons.response"
+                            "$ref": "#/definitions/get_lesson.response"
                         }
                     },
                     "400": {
@@ -287,8 +291,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
@@ -525,6 +529,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/lessons/{id}/short-data": {
+            "get": {
+                "description": "Return lesson short data by lesson's id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lessons"
+                ],
+                "summary": "Get lesson really short data by lesson's id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LessonID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_lesson_shortdata.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/lessons/{id}/start": {
             "put": {
                 "security": [
@@ -570,6 +621,49 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/lessons": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Return all lessons which have student",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Get lessons for students",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_student_lessons.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/jsonutils.ErrorStruct"
                         }
@@ -1257,6 +1351,96 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/get_categories.category"
                     }
+                }
+            }
+        },
+        "get_lesson.response": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "category_name": {
+                    "type": "string",
+                    "example": "Programming"
+                },
+                "datetime": {
+                    "type": "string",
+                    "example": "2025-02-01T09:00:00Z"
+                },
+                "lesson_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "verification"
+                },
+                "student_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
+                "student_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "student_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "student_surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "teacher_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "teacher_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "teacher_surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "teacher_user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "get_lesson_shortdata.response": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "category_name": {
+                    "type": "string",
+                    "example": "Programming"
+                },
+                "lesson_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "student_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "teacher_user_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

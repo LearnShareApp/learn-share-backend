@@ -10,19 +10,19 @@ import (
 )
 
 const (
-	Route = ""
+	Route = "/lessons"
 )
 
 // MakeHandler returns http.HandlerFunc
 // @Summary Get lessons for students
 // @Description Return all lessons which have student
-// @Tags lessons
+// @Tags students
 // @Produce json
 // @Success 200 {object} response
 // @Failure 400 {object} jsonutils.ErrorStruct
 // @Failure 401 {object} jsonutils.ErrorStruct
 // @Failure 500 {object} jsonutils.ErrorStruct
-// @Router /lessons [get]
+// @Router /student/lessons [get]
 // @Security     BearerAuth
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
