@@ -144,6 +144,7 @@ func mappingToResponse(user *entities.User) *response {
 			VideoCardLink: sk.VideoCardLink,
 			About:         sk.About,
 			Rate:          sk.Rate,
+			ReviewsCount:  sk.CountOfRates,
 		})
 	}
 

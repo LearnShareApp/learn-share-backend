@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	"github.com/jmoiron/sqlx"
 )
@@ -86,6 +87,10 @@ func (r *Repository) CreateTables(ctx context.Context) error {
 
 	if err = createReviewsTable(ctx, tx); err != nil {
 		return fmt.Errorf("error creating reviews table: %w", err)
+	}
+
+	if err = createReviewTrigger(ctx, tx); err != nil {
+		return fmt.Errorf("error creating review trigger: %w", err)
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -268,16 +273,61 @@ func createReviewsTable(ctx context.Context, tx *sqlx.Tx) error {
 		reviews_id SERIAL PRIMARY KEY,
 		teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
 	    student_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+	    category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
 	    skill_id INTEGER NOT NULL REFERENCES skills(skill_id) ON DELETE CASCADE,
 	    rate SMALLINT NOT NULL,
 		comment TEXT NOT NULL DEFAULT '',
-	    CONSTRAINT unique_teacher_student_skill UNIQUE (teacher_id, student_id, skill_id)
+	    CONSTRAINT unique_review UNIQUE (teacher_id, student_id, category_id, skill_id)
 	);
 	`
 
 	_, err := tx.ExecContext(ctx, query)
 	if err != nil {
 		return fmt.Errorf("failed to execute reviews table creation: %w", err)
+	}
+
+	return nil
+}
+
+func createReviewTrigger(ctx context.Context, tx *sqlx.Tx) error {
+	const createTriggerFunc = `
+	CREATE OR REPLACE FUNCTION update_skill_on_review()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		UPDATE skills
+		SET 
+			count_of_rates = count_of_rates + 1,
+			total_rate_score = total_rate_score + NEW.rate,
+			rate = (total_rate_score + NEW.rate)::decimal / (count_of_rates + 1)
+		WHERE skill_id = NEW.skill_id;
+		RETURN NEW;
+	END;
+	$$ LANGUAGE plpgsql;
+	`
+
+	const createTrigger = `
+	DO $$
+	BEGIN
+		IF NOT EXISTS (
+			SELECT trigger_name 
+			FROM information_schema.triggers 
+			WHERE event_object_table = 'reviews' 
+			AND trigger_name = 'update_skill_on_review'
+		) THEN
+			CREATE TRIGGER update_skill_on_review
+			AFTER INSERT ON reviews
+			FOR EACH ROW
+			EXECUTE FUNCTION update_skill_on_review();
+		END IF;
+	END $$;
+	`
+
+	queries := []string{createTriggerFunc, createTrigger}
+
+	for _, query := range queries {
+		if _, err := tx.ExecContext(ctx, query); err != nil {
+			return fmt.Errorf("failed to execute review trigger query: %w", err)
+		}
 	}
 
 	return nil

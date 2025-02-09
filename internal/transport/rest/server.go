@@ -3,6 +3,10 @@ package rest
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"path"
+	"time"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
@@ -16,6 +20,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/join_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/add_review"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -27,9 +32,6 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/edit_user"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"net/http"
-	"path"
-	"time"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/middlewares"
 	"github.com/go-chi/chi/v5"
@@ -51,6 +53,7 @@ const (
 	lessonsRoute  = "/lessons"
 	apiRoute      = "/api"
 	studentRoute  = "/student"
+	reviewRoute   = "/review"
 )
 
 type ServerConfig struct {
@@ -81,6 +84,7 @@ type Services struct {
 	FinishLessonSrv         *finish_lesson.Service
 	JoinLessonSrv           *join_lesson.Service
 	GetImageSrv             *get_image.Service
+	AddReviewSrv            *add_review.Service
 }
 
 type Server struct {
@@ -110,10 +114,12 @@ func NewServices(jwtSrv *jwt.Service,
 	startLessonSrv *start_lesson.Service,
 	finishLessonSrv *finish_lesson.Service,
 	joinLesson *join_lesson.Service,
-	getImageSrv *get_image.Service) *Services {
+	getImageSrv *get_image.Service,
+	addReviewSrv *add_review.Service) *Services {
 	return &Services{
-		JwtSrv:                  jwtSrv,
-		RegSrv:                  reg,
+		JwtSrv: jwtSrv,
+		RegSrv: reg,
+
 		LoginSrv:                login,
 		GetCategoriesSrv:        getCategories,
 		GetProfileSrv:           getProfile,
@@ -135,6 +141,7 @@ func NewServices(jwtSrv *jwt.Service,
 		FinishLessonSrv:         finishLessonSrv,
 		JoinLessonSrv:           joinLesson,
 		GetImageSrv:             getImageSrv,
+		AddReviewSrv:            addReviewSrv,
 	}
 }
 
@@ -189,17 +196,18 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 		r.Get(path.Join(teachersRoute, get_teachers.Route), get_teachers.MakeHandler(services.GetTeachersSrv, log))
 		r.Get(path.Join(teacherRoute, get_teacher_lessons.Route), get_teacher_lessons.MakeHandler(services.GetLessonsForTeacherSrv, log))
 		r.Get(path.Join(studentRoute, get_student_lessons.Route), get_student_lessons.MakeHandler(services.GetLessonsForStudentSrv, log))
+		r.Get(path.Join(lessonsRoute, join_lesson.Route), join_lesson.MakeHandler(services.JoinLessonSrv, log))
 
 		r.Post(path.Join(teacherRoute, become_teacher.Route), become_teacher.MakeHandler(services.BecomeTeacherSrv, log))
 		r.Post(path.Join(teacherRoute, add_skill.Route), add_skill.MakeHandler(services.AddSkillSrv, log))
 		r.Post(path.Join(teacherRoute, add_time.Route), add_time.MakeHandler(services.AddScheduleTimeSrv, log))
 		r.Post(path.Join(lessonRoute, book_lesson.Route), book_lesson.MakeHandler(services.BookLessonSrv, log))
+		r.Post(path.Join(reviewRoute, add_review.Route), add_review.MakeHandler(services.AddReviewSrv, log))
 
 		r.Put(path.Join(lessonsRoute, cancel_lesson.Route), cancel_lesson.MakeHandler(services.CancelLessonSrv, log))
 		r.Put(path.Join(lessonsRoute, approve_lesson.Route), approve_lesson.MakeHandler(services.ApproveLessonSrv, log))
 		r.Put(path.Join(lessonsRoute, start_lesson.Route), start_lesson.MakeHandler(services.StartLessonSrv, log))
 		r.Put(path.Join(lessonsRoute, finish_lesson.Route), finish_lesson.MakeHandler(services.FinishLessonSrv, log))
-		r.Get(path.Join(lessonsRoute, join_lesson.Route), join_lesson.MakeHandler(services.JoinLessonSrv, log))
 
 		r.Patch(path.Join(userRoute, edit_user.Route), edit_user.MakeHandler(services.EditProfileSrv, log))
 	})

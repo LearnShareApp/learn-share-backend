@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/lib/pq"
-	"time"
 )
 
 func (r *Repository) CreateUnconfirmedLesson(ctx context.Context, lesson *entities.Lesson) error {
@@ -108,6 +109,24 @@ func (r *Repository) GetLessonById(ctx context.Context, id int) (*entities.Lesso
 	lesson.ScheduleTimeDatetime = resp.ScheduleTimeDatetime
 
 	return &lesson, nil
+}
+
+func (r *Repository) IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx context.Context, teacherId int, studentId int, categoryId int) (bool, error) {
+	const query = `
+	SELECT EXISTS(
+		SELECT 1 FROM lessons l
+		LEFT JOIN statuses st ON l.status_id = st.status_id
+		WHERE l.teacher_id = $1 AND l.student_id = $2 AND l.category_id = $3 AND st.name = $4
+	)
+	`
+
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, query, teacherId, studentId, categoryId, entities.FinishedStatusName)
+	if err != nil {
+		return false, fmt.Errorf("failed to check finished lesson existence by teacher id, student id and category id: %w", err)
+	}
+	return exists, nil
+
 }
 
 func (r *Repository) ChangeLessonStatus(ctx context.Context, lessonId int, statusId int) error {

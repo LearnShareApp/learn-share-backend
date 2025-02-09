@@ -28,6 +28,7 @@ var (
 	ErrorLessonNotFound            = errors.New("lesson not found")
 	ErrorNotRelatedUserToLesson    = errors.New("user no related to this lesson")
 	ErrorNotRelatedTeacherToLesson = errors.New("teacher no related to this lesson")
+	ErrorFinishedLessonNotFound    = errors.New("finished lesson not found")
 
 	ErrorStatusNonVerification = errors.New("non-verification status")
 	ErrorStatusNonWaiting      = errors.New("non-waiting status")
@@ -35,4 +36,6 @@ var (
 
 	ErrorImageNotFound       = errors.New("image not found")
 	ErrorIncorrectFileFormat = errors.New("incorrect file format")
+
+	ErrorReviewExists = errors.New("review already exists")
 )

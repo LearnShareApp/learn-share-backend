@@ -42,6 +42,24 @@ func (r *Repository) IsSkillExistsByTeacherIdAndCategoryId(ctx context.Context, 
 	return exists, nil
 }
 
+func (r *Repository) GetSkillIdByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (int, error) {
+	const query = `
+	SELECT skill_id FROM skills WHERE teacher_id = $1 AND category_id = $2`
+
+	var id int
+	err := r.db.GetContext(ctx, &id, query, teacherId, categoryId)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return 0, internalErrs.ErrorSelectEmpty
+	}
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to find skills: %w", err)
+	}
+
+	return id, nil
+}
+
 func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entities.Skill, error) {
 	const query = `
 	SELECT 
@@ -51,6 +69,8 @@ func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entit
 		s.video_card_link, 
 		s.about, 
 		s.rate, 
+		S.total_rate_score,
+		s.count_of_rates,
 		s.is_active,
 		c.name as category_name
 	FROM skills s

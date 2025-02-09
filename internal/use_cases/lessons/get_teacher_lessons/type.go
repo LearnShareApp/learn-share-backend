@@ -9,6 +9,7 @@ type response struct {
 type respLessons struct {
 	LessonId       int       `json:"lesson_id" example:"1"`
 	StudentId      int       `json:"student_id" example:"1"`
+	StudentEmail   string    `json:"student_email" example:"test@test.com"`
 	StudentName    string    `json:"student_name" example:"John"`
 	StudentSurname string    `json:"student_surname" example:"Smith"`
 	StudentAvatar  string    `json:"student_avatar" example:"uuid.png"`
