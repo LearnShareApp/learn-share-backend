@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
@@ -21,6 +24,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/join_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/add_review"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -35,8 +39,6 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"os"
-	"time"
 )
 
 type Application struct {
@@ -103,6 +105,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		finishLessonSrv         = finish_lesson.NewService(repo)
 		joinLessonSrv           = join_lesson.NewService(repo, leveKitService)
 		getImagSrv              = get_image.NewService(minioService)
+		addReviewSrv            = add_review.NewService(repo)
 	)
 
 	services := rest.NewServices(jwtService,
@@ -128,6 +131,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		finishLessonSrv,
 		joinLessonSrv,
 		getImagSrv,
+		addReviewSrv,
 	)
 
 	restServer := rest.NewServer(services, config.Server, log)

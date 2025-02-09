@@ -67,11 +67,13 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 			TeacherId:      lesson.TeacherId,
 			TeacherUserId:  lesson.TeacherUserData.Id,
+			TeacherEmail:   lesson.TeacherUserData.Email,
 			TeacherName:    lesson.TeacherUserData.Name,
 			TeacherSurname: lesson.TeacherUserData.Surname,
 			TeacherAvatar:  lesson.TeacherUserData.Avatar,
 
 			StudentId:      lesson.StudentId,
+			StudentEmail:   lesson.StudentUserData.Email,
 			StudentName:    lesson.StudentUserData.Name,
 			StudentSurname: lesson.StudentUserData.Surname,
 			StudentAvatar:  lesson.StudentUserData.Avatar,

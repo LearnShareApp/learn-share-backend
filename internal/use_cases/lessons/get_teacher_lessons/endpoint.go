@@ -68,6 +68,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			resp.Lessons[i] = respLessons{
 				LessonId:       lessons[i].Id,
 				StudentId:      lessons[i].StudentId,
+				StudentEmail:   lessons[i].StudentUserData.Email,
 				StudentName:    lessons[i].StudentUserData.Name,
 				StudentSurname: lessons[i].StudentUserData.Surname,
 				StudentAvatar:  lessons[i].StudentUserData.Avatar,

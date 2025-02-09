@@ -10,6 +10,7 @@ type respLessons struct {
 	LessonId       int       `json:"lesson_id" example:"1"`
 	TeacherId      int       `json:"teacher_id" example:"1"`
 	TeacherUserId  int       `json:"teacher_user_id" example:"1"`
+	TeacherEmail   string    `json:"teacher_email" example:"test@test.com"`
 	TeacherName    string    `json:"teacher_name" example:"John"`
 	TeacherSurname string    `json:"teacher_surname" example:"Smith"`
 	TeacherAvatar  string    `json:"teacher_avatar" example:"uuid.png"`

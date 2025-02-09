@@ -1,5 +1,25 @@
 basePath: /api
 definitions:
+  add_review.request:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      comment:
+        example: some comment
+        type: string
+      rate:
+        example: 1
+        type: integer
+      teacher_id:
+        example: 1
+        type: integer
+    required:
+    - category_id
+    - comment
+    - rate
+    - teacher_id
+    type: object
   add_skill.request:
     properties:
       about:
@@ -885,6 +905,53 @@ paths:
       summary: Start lesson
       tags:
       - lessons
+  /review:
+    post:
+      consumes:
+      - application/json
+      description: Create review if authorized user (student) had lesson with this
+        teacher and this category
+      parameters:
+      - description: Review data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/add_review.request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/jsonutils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Create review
+      tags:
+      - reviews
   /student/lessons:
     get:
       description: Return all lessons which have student

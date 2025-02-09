@@ -1,7 +1,8 @@
-package book_lesson
+package add_review
 
 import (
 	"context"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 )
 
@@ -11,7 +12,7 @@ type repo interface {
 	GetTeacherById(ctx context.Context, id int) (*entities.Teacher, error)
 	IsCategoryExistsById(ctx context.Context, id int) (bool, error)
 	IsSkillExistsByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (bool, error)
-	IsScheduleTimeExistsById(ctx context.Context, id int) (bool, error)
-	GetScheduleTimeById(ctx context.Context, id int) (*entities.ScheduleTime, error)
-	CreateUnconfirmedLesson(ctx context.Context, lesson *entities.Lesson) error
+	GetSkillIdByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (int, error)
+	IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx context.Context, teacherId int, studentId int, categoryId int) (bool, error)
+	CreateReview(ctx context.Context, review *entities.Review) error
 }

@@ -7,11 +7,13 @@ type response struct {
 
 	TeacherId      int    `json:"teacher_id" example:"1"`
 	TeacherUserId  int    `json:"teacher_user_id" example:"1"`
+	TeacherEmail   string `json:"teacher_email" example:"test@test.com"`
 	TeacherName    string `json:"teacher_name" example:"John"`
 	TeacherSurname string `json:"teacher_surname" example:"Smith"`
 	TeacherAvatar  string `json:"teacher_avatar" example:"uuid.png"`
 
 	StudentId      int    `json:"student_id" example:"1"`
+	StudentEmail   string `json:"student_email" example:"test@test.com"`
 	StudentName    string `json:"student_name" example:"John"`
 	StudentSurname string `json:"student_surname" example:"Smith"`
 	StudentAvatar  string `json:"student_avatar" example:"uuid.png"`
