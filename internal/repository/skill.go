@@ -70,7 +70,7 @@ func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entit
 		s.about, 
 		s.rate, 
 		S.total_rate_score,
-		s.count_of_rates,
+		s.reviews_count,
 		s.is_active,
 		c.name as category_name
 	FROM skills s

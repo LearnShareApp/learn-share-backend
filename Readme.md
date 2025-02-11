@@ -37,35 +37,44 @@ Here’s a concise tree-structured description of the API handlers:
 ``` go
 API Handlers
 ├── Auth
-│   ├── POST /auth/login            // Login with email and password
-│   └── POST /auth/signup           // Register a new user (student)
-│
-├── Categories
-│   └── GET /categories             // Get list of all categories
+│   ├── POST /auth/login             // Login with email and password
+│   └── POST /auth/signup            // Register a new user (student)
+│ 
+├── Categories 
+│   └── GET /categories              // Get list of all categories
+│ 
+├── Image 
+│   └── GET /image                   // Get image by filename
 │
 ├── Lessons
-│   ├── POST /lesson                // Add unconfirmed lesson (lesson request)
-│   ├── GET /lessons                // Get lessons for students
-│   ├── PUT /lessons/{id}/approve   // Approve lesson
-│   ├── PUT /lessons/{id}/cancel    // Cancel lesson
-│   ├── PUT /lessons/{id}/finish    // Finish lesson
-│   ├── GET /lessons/{id}/join      // Join the lesson (generate meet token)
-│   └── PUT /lessons/{id}/start     // Start lesson (generate meet token)
+│   ├── POST /lesson                 // Add unconfirmed lesson (lesson request)
+│   ├── GET /lessons                 // Get lessons for students
+│   ├── GET /lessons/{id}            // Get lesson data by lesson's id
+│   ├── GET /lessons/{id}/short-data // Get lesson really short data by lesson's id
+│   ├── PUT /lessons/{id}/approve    // Approve lesson
+│   ├── PUT /lessons/{id}/cancel     // Cancel lesson
+│   ├── PUT /lessons/{id}/finish     // Finish lesson
+│   ├── GET /lessons/{id}/join       // Join the lesson (generate meet token)
+│   └── PUT /lessons/{id}/start      // Start lesson (generate meet token)
+│
+├── Reviews
+│   └── POST /review                 // Create review
 │
 ├── Teachers
-│   ├── GET /teacher                // Get teacher data (by JWT)
-│   ├── POST /teacher               // Register as a teacher
-│   ├── GET /teacher/lessons        // Get lessons for teachers
-│   ├── GET /teacher/schedule       // Get times from schedule
-│   ├── POST /teacher/schedule      // Add time to schedule
-│   ├── POST /teacher/skill         // Register new skill for teacher
-│   ├── GET /teachers               // Get full teachers data
-│   ├── GET /teachers/{id}          // Get teacher data by UserID
-│   └── GET /teachers/{id}/schedule // Get times from schedule by UserID
-│
-└── Users
-    ├── GET /user/profile           // Get user profile (by JWT)
-    └── GET /users/{id}/profile     // Get user profile by UserID
+│   ├── GET /teacher                 // Get teacher data (by JWT)
+│   ├── POST /teacher                // Register as a teacher
+│   ├── GET /teacher/lessons         // Get lessons for teachers
+│   ├── GET /teacher/schedule        // Get times from schedule
+│   ├── POST /teacher/schedule       // Add time to schedule
+│   ├── POST /teacher/skill          // Register new skill for teacher
+│   ├── GET /teachers                // Get full teachers data
+│   ├── GET /teachers/{id}           // Get teacher data by UserID
+│   └── GET /teachers/{id}/schedule  // Get times from schedule by UserID
+│ 
+└── Users 
+    ├── GET /user/profile            // Get user profile (by JWT)
+    ├── PATCH /user/profile          // Edit user profile
+    └── GET /users/{id}/profile      // Get user profile by UserID
 ```
 
 
@@ -82,6 +91,7 @@ API Handlers
 * [bcrypt](https://pkg.go.dev/golang.org/x/crypto/bcrypt) - password hashing
 * [sqlx](https://github.com/jmoiron/sqlx) - database communication
 * [livekit](https://livekit.io/) - video communication (generating tokens for frontend)
+* [minio](https://min.io/) - object storage for images
 
 ## Project structure
 
@@ -95,9 +105,10 @@ internal/
 ├── config/config.go           // load, validate config from env
 ├── entities/...               // entities for db and business logic
 ├── errors/...                 // errors in business logic, repo and transport
+├── imgutils/...               // image utils for operations under image 
 ├── jsonutils/...              // json utils for transport
 ├── repository/...             // db repository: init, queries, transactions
-├── service
+├── service/
 │   ├── jwt/service.go         // jwt: generate, validate
 │   └── livekit/service.go     // livekit: generate meeting tokens
 ├── transport/rest/
@@ -107,6 +118,7 @@ internal/
 pkg/
 ├── db/postgres/postgres.go    // postgres: connect
 ├── hasher/hasher.go           // hash: bcrypt
+├── object_storage/...         // object storage: for saving images
 └── logger/logger.go           // logger: zap, configurations
 ```
 #### Use_case structure
@@ -120,6 +132,7 @@ Every use case has 4 files (some of them have 3 files)
 ### Docker
 3 containers:
 * `postgres` - database
+* `minio` - object storage
 * `nginx` - reverse proxy
 * `app-1` - backend application
 ## Contact

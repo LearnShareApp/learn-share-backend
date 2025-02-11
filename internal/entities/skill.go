@@ -9,6 +9,6 @@ type Skill struct {
 	About          string  `db:"about"`
 	Rate           float32 `db:"rate"`
 	TotalRateScore int     `db:"total_rate_score"`
-	CountOfRates   int     `db:"count_of_rates"`
+	ReviewsCount   int     `db:"reviews_count"`
 	IsActive       bool    `db:"is_active"`
 }

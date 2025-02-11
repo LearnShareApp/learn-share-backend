@@ -1480,6 +1480,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "uuid.png"
                 },
+                "student_email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                },
                 "student_id": {
                     "type": "integer",
                     "example": 1
@@ -1495,6 +1499,10 @@ const docTemplate = `{
                 "teacher_avatar": {
                     "type": "string",
                     "example": "uuid.png"
+                },
+                "teacher_email": {
+                    "type": "string",
+                    "example": "test@test.com"
                 },
                 "teacher_id": {
                     "type": "integer",
@@ -1570,6 +1578,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "uuid.png"
                 },
+                "teacher_email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                },
                 "teacher_id": {
                     "type": "integer",
                     "example": 1
@@ -1609,6 +1621,14 @@ const docTemplate = `{
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
+                },
+                "common_rate": {
+                    "type": "number",
+                    "example": 0
+                },
+                "common_reviews_count": {
+                    "type": "integer",
+                    "example": 0
                 },
                 "count_of_students": {
                     "type": "integer",
@@ -1666,8 +1686,12 @@ const docTemplate = `{
                     "example": "Category"
                 },
                 "rate": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 5
+                },
+                "reviews_count": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "skill_id": {
                     "type": "integer",
@@ -1705,6 +1729,10 @@ const docTemplate = `{
                 "student_avatar": {
                     "type": "string",
                     "example": "uuid.png"
+                },
+                "student_email": {
+                    "type": "string",
+                    "example": "test@test.com"
                 },
                 "student_id": {
                     "type": "integer",
@@ -1758,8 +1786,12 @@ const docTemplate = `{
                     "example": "Category"
                 },
                 "rate": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 5
+                },
+                "reviews_count": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "skill_id": {
                     "type": "integer",
@@ -1781,6 +1813,14 @@ const docTemplate = `{
                 "birthdate": {
                     "type": "string",
                     "example": "2002-09-09T10:10:10+09:00"
+                },
+                "common_rate": {
+                    "type": "number",
+                    "example": 0
+                },
+                "common_reviews_count": {
+                    "type": "integer",
+                    "example": 0
                 },
                 "count_of_students": {
                     "type": "integer",

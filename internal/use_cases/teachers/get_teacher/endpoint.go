@@ -122,17 +122,20 @@ func coveringErrors(w http.ResponseWriter, log *zap.Logger, err error) {
 
 func mappingToResponse(user *entities.User) *response {
 	resp := response{
-		TeacherId:        user.TeacherData.Id,
-		UserId:           user.Id,
-		Email:            user.Email,
-		Name:             user.Name,
-		Surname:          user.Surname,
-		RegistrationDate: user.RegistrationDate,
-		Birthdate:        user.Birthdate,
-		Avatar:           user.Avatar,
-		FinishedLessons:  user.TeacherData.TeacherStat.CountOfFinishedLesson,
-		CountOfStudents:  user.TeacherData.TeacherStat.CountOfStudents,
-		Skills:           make([]skill, 0, len(user.TeacherData.Skills)),
+		TeacherId:          user.TeacherData.Id,
+		UserId:             user.Id,
+		Email:              user.Email,
+		Name:               user.Name,
+		Surname:            user.Surname,
+		RegistrationDate:   user.RegistrationDate,
+		Birthdate:          user.Birthdate,
+		Avatar:             user.Avatar,
+		FinishedLessons:    user.TeacherData.TeacherStat.CountOfFinishedLesson,
+		CountOfStudents:    user.TeacherData.TeacherStat.CountOfStudents,
+		CommonRate:         user.TeacherData.Rate,
+		CommonReviewsCount: user.TeacherData.ReviewsCount,
+
+		Skills: make([]skill, 0, len(user.TeacherData.Skills)),
 	}
 
 	// remap entity skill to response skill-type
@@ -144,7 +147,7 @@ func mappingToResponse(user *entities.User) *response {
 			VideoCardLink: sk.VideoCardLink,
 			About:         sk.About,
 			Rate:          sk.Rate,
-			ReviewsCount:  sk.CountOfRates,
+			ReviewsCount:  sk.ReviewsCount,
 		})
 	}
 

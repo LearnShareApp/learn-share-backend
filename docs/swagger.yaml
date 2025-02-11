@@ -120,6 +120,9 @@ definitions:
       student_avatar:
         example: uuid.png
         type: string
+      student_email:
+        example: test@test.com
+        type: string
       student_id:
         example: 1
         type: integer
@@ -131,6 +134,9 @@ definitions:
         type: string
       teacher_avatar:
         example: uuid.png
+        type: string
+      teacher_email:
+        example: test@test.com
         type: string
       teacher_id:
         example: 1
@@ -186,6 +192,9 @@ definitions:
       teacher_avatar:
         example: uuid.png
         type: string
+      teacher_email:
+        example: test@test.com
+        type: string
       teacher_id:
         example: 1
         type: integer
@@ -214,6 +223,12 @@ definitions:
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
+      common_rate:
+        example: 0
+        type: number
+      common_reviews_count:
+        example: 0
+        type: integer
       count_of_students:
         example: 0
         type: integer
@@ -256,6 +271,9 @@ definitions:
         type: string
       rate:
         example: 5
+        type: number
+      reviews_count:
+        example: 1
         type: integer
       skill_id:
         example: 1
@@ -283,6 +301,9 @@ definitions:
         type: string
       student_avatar:
         example: uuid.png
+        type: string
+      student_email:
+        example: test@test.com
         type: string
       student_id:
         example: 1
@@ -321,6 +342,9 @@ definitions:
         type: string
       rate:
         example: 5
+        type: number
+      reviews_count:
+        example: 1
         type: integer
       skill_id:
         example: 1
@@ -337,6 +361,12 @@ definitions:
       birthdate:
         example: "2002-09-09T10:10:10+09:00"
         type: string
+      common_rate:
+        example: 0
+        type: number
+      common_reviews_count:
+        example: 0
+        type: integer
       count_of_students:
         example: 0
         type: integer
