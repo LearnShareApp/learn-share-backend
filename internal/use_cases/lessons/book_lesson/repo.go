@@ -7,11 +7,9 @@ import (
 
 type repo interface {
 	IsUserExistsById(ctx context.Context, id int) (bool, error)
-	IsTeacherExistsById(ctx context.Context, id int) (bool, error)
 	GetTeacherById(ctx context.Context, id int) (*entities.Teacher, error)
 	IsCategoryExistsById(ctx context.Context, id int) (bool, error)
 	IsSkillExistsByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (bool, error)
-	IsScheduleTimeExistsById(ctx context.Context, id int) (bool, error)
 	GetScheduleTimeById(ctx context.Context, id int) (*entities.ScheduleTime, error)
 	CreateUnconfirmedLesson(ctx context.Context, lesson *entities.Lesson) error
 }

@@ -2,9 +2,10 @@ package edit_user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
-	"github.com/LearnShareApp/learn-share-backend/internal/errors"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/pkg/hasher"
 	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage"
 	"github.com/google/uuid"
@@ -29,24 +30,17 @@ func NewService(repo repo, storageService ObjectStorageService) *Service {
 }
 
 func (s *Service) Do(ctx context.Context, userId int, user *entities.User, avatarReader io.Reader, avatarSize int64) error {
-
-	exists, err := s.repo.IsUserExistsById(ctx, userId)
-	if err != nil {
-		return fmt.Errorf("failed to find user: %w", err)
-	}
-
-	if !exists {
-		return errors.ErrorUserNotFound
-	}
-
 	oldUserData, err := s.repo.GetUserById(ctx, userId)
 	if err != nil {
+		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
+			return internalErrs.ErrorUserNotFound
+		}
 		return fmt.Errorf("failed to get user: %w", err)
 	}
 
 	if user.Password != "" {
 		if len(user.Password) < 4 {
-			return errors.ErrorPasswordTooShort
+			return internalErrs.ErrorPasswordTooShort
 		}
 
 		hashedPassword, err := hasher.HashPassword(user.Password)

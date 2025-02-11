@@ -28,18 +28,12 @@ func (s *Service) Do(ctx context.Context, lesson *entities.Lesson) error {
 		return serviceErrs.ErrorUserNotFound
 	}
 
-	// is teacher exists
-	exists, err = s.repo.IsTeacherExistsById(ctx, lesson.TeacherId)
-	if err != nil {
-		return fmt.Errorf("failed to check teacher existstance by id: %w", err)
-	}
-	if !exists {
-		return serviceErrs.ErrorTeacherNotFound
-	}
-
 	// is student != teacher
 	teacher, err := s.repo.GetTeacherById(ctx, lesson.TeacherId)
 	if err != nil {
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return serviceErrs.ErrorTeacherNotFound
+		}
 		return fmt.Errorf("failed to get teacher by id: %w", err)
 	}
 	if teacher.UserId == lesson.StudentId {
@@ -64,18 +58,12 @@ func (s *Service) Do(ctx context.Context, lesson *entities.Lesson) error {
 		return serviceErrs.ErrorSkillUnregistered
 	}
 
-	// is schedule time exists by schedule id
-	exists, err = s.repo.IsScheduleTimeExistsById(ctx, lesson.ScheduleTimeId)
-	if err != nil {
-		return fmt.Errorf("failed to check schedule existstance by id: %w", err)
-	}
-	if !exists {
-		return serviceErrs.ErrorScheduleTimeNotFound
-	}
-
 	// is this time still available and owner is this teacher
 	scheduleTime, err := s.repo.GetScheduleTimeById(ctx, lesson.ScheduleTimeId)
 	if err != nil {
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return serviceErrs.ErrorScheduleTimeNotFound
+		}
 		return fmt.Errorf("failed to get schedule time by id: %w", err)
 	}
 	if scheduleTime.TeacherId != lesson.TeacherId {

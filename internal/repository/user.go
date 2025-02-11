@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
-	"github.com/LearnShareApp/learn-share-backend/internal/errors"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
 func (r *Repository) IsUserExistsByEmail(ctx context.Context, email string) (bool, error) {
@@ -54,8 +55,8 @@ func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*entitie
 	var user entities.User
 	err := r.db.GetContext(ctx, &user, query, email)
 
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("user not found: %w", err)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, internalErrs.ErrorSelectEmpty
 	}
 
 	if err != nil {
@@ -71,11 +72,11 @@ func (r *Repository) GetUserById(ctx context.Context, id int) (*entities.User, e
 	var user entities.User
 	err := r.db.GetContext(ctx, &user, query, id)
 
-	if err == sql.ErrNoRows {
-		return nil, errors.ErrorSelectEmpty
-	}
-
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
+
 		return nil, fmt.Errorf("failed to find user by id: %w", err)
 	}
 
@@ -102,11 +103,11 @@ func (r *Repository) GetUserStatByUserId(ctx context.Context, id int) (*entities
 		id,                              // $4
 	)
 
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("user statistic not found: %w", err)
-	}
-
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
+
 		return nil, fmt.Errorf("failed to find user's statistic by user id: %w", err)
 	}
 

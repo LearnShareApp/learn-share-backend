@@ -134,12 +134,11 @@ func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int)
 		teacherId,                   // $2
 	)
 
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("teacher statistic not found: %w", err)
-	}
-
 	if err != nil {
-		return nil, fmt.Errorf("failed to find teacher's statistic by teacherId: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("teacher statistic not found: %w", err)
+		}
+		return nil, fmt.Errorf("failed to calculate teacher's statistic by teacherId: %w", err)
 	}
 
 	return &stat, nil
@@ -217,10 +216,6 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	}
 
 	// converting into $1, $2, ... PostgreSQL format
-	//query, args, err = sqlx.In(namedQuery, args...)
-	//if err != nil {
-	//	return nil, fmt.Errorf("failed to convert named query: %w", err)
-	//}
 	query = r.db.Rebind(namedQuery)
 
 	type result struct {
@@ -233,6 +228,9 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	var rows []result
 	err = r.db.SelectContext(ctx, &rows, query, args...)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return []entities.User{}, nil
+		}
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 

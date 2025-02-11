@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"time"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
@@ -56,6 +57,9 @@ func (r *Repository) GetScheduleTimeById(ctx context.Context, id int) (*entities
 	err := r.db.GetContext(ctx, &scheduleTime, query, id)
 
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
 		return nil, fmt.Errorf("failed to get schadule_time existence by scheduleTimeID: %w", err)
 	}
 

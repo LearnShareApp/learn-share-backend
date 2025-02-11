@@ -2,6 +2,7 @@ package start_lesson
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
@@ -33,36 +34,23 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, err
 	if !exists {
 		return "", serviceErrs.ErrorUserNotFound
 	}
-
-	// is teacher exists by userId
-	exists, err = s.repo.IsTeacherExistsByUserId(ctx, userId)
+	
+	// get teacher
+	teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
 	if err != nil {
-		return "", fmt.Errorf("failed to check teacher existstance by userId: %w", err)
-	}
-
-	if !exists {
-		return "", serviceErrs.ErrorUserIsNotTeacher
-	}
-
-	// is lesson exists
-	exists, err = s.repo.IsLessonExistsById(ctx, lessonId)
-	if err != nil {
-		return "", fmt.Errorf("failed to check lesson existstance by id: %w", err)
-	}
-	if !exists {
-		return "", serviceErrs.ErrorLessonNotFound
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return "", serviceErrs.ErrorUserIsNotTeacher
+		}
+		return "", fmt.Errorf("failed to get teacher by userId: %w", err)
 	}
 
 	// get lesson
 	lesson, err := s.repo.GetLessonById(ctx, lessonId)
 	if err != nil {
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return "", serviceErrs.ErrorLessonNotFound
+		}
 		return "", fmt.Errorf("failed to get lesson by id: %w", err)
-	}
-
-	// get teacher
-	teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
-	if err != nil {
-		return "", fmt.Errorf("failed to get teacher by userId: %w", err)
 	}
 
 	if lesson.TeacherId != teacher.Id {

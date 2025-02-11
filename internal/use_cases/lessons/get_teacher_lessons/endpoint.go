@@ -60,22 +60,26 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			}
 		}
 
-		resp := response{
-			Lessons: make([]respLessons, len(lessons)),
-		}
+		var resp response
 
-		for i := range lessons {
-			resp.Lessons[i] = respLessons{
-				LessonId:       lessons[i].Id,
-				StudentId:      lessons[i].StudentId,
-				StudentEmail:   lessons[i].StudentUserData.Email,
-				StudentName:    lessons[i].StudentUserData.Name,
-				StudentSurname: lessons[i].StudentUserData.Surname,
-				StudentAvatar:  lessons[i].StudentUserData.Avatar,
-				CategoryId:     lessons[i].CategoryId,
-				CategoryName:   lessons[i].CategoryName,
-				Status:         lessons[i].StatusName,
-				Datetime:       lessons[i].ScheduleTimeDatetime,
+		if lessons != nil {
+			resp = response{
+				Lessons: make([]respLessons, len(lessons)),
+			}
+
+			for i := range lessons {
+				resp.Lessons[i] = respLessons{
+					LessonId:       lessons[i].Id,
+					StudentId:      lessons[i].StudentId,
+					StudentEmail:   lessons[i].StudentUserData.Email,
+					StudentName:    lessons[i].StudentUserData.Name,
+					StudentSurname: lessons[i].StudentUserData.Surname,
+					StudentAvatar:  lessons[i].StudentUserData.Avatar,
+					CategoryId:     lessons[i].CategoryId,
+					CategoryName:   lessons[i].CategoryName,
+					Status:         lessons[i].StatusName,
+					Datetime:       lessons[i].ScheduleTimeDatetime,
+				}
 			}
 		}
 

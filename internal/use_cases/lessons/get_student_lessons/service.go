@@ -2,6 +2,7 @@ package get_student_lessons
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
@@ -30,6 +31,9 @@ func (s *Service) Do(ctx context.Context, userId int) ([]*entities.Lesson, error
 	//get lessons
 	lessons, err := s.repo.GetStudentLessonsByUserId(ctx, userId)
 	if err != nil {
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("failed to get student lessons: %w", err)
 	}
 
