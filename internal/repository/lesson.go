@@ -31,7 +31,7 @@ func (r *Repository) CreateUnconfirmedLesson(ctx context.Context, lesson *entiti
 		lesson.CategoryId,
 		lesson.ScheduleTimeId); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
-			// Код ошибки 23505 означает unique_violation
+			// error code 23505 mean unique_violation
 			if pqErr.Code == "23505" {
 				return internalErrs.ErrorNonUniqueData
 			}
@@ -177,6 +177,9 @@ func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) (
 	var rows []result
 	err := r.db.SelectContext(ctx, &rows, query, id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
 		return nil, err
 	}
 
@@ -246,6 +249,9 @@ func (r *Repository) GetStudentLessonsByUserId(ctx context.Context, id int) ([]*
 	var rows []result
 	err := r.db.SelectContext(ctx, &rows, query, id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
 		return nil, err
 	}
 

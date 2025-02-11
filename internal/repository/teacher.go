@@ -50,6 +50,7 @@ func (r *Repository) CreateTeacher(ctx context.Context, userId int) error {
 	return nil
 }
 
+// CreateTeacherIfNotExists check is teacher exists in db, create if not and return teacher_id
 func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (int, error) {
 	const (
 		selectQuery = `
@@ -69,7 +70,6 @@ func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (
 	if err == nil {
 		return teacherId, nil
 	} else if !errors.Is(err, sql.ErrNoRows) {
-		// Если ошибка не sql.ErrNoRows, возвращаем её
 		return 0, fmt.Errorf("failed to select teacher: %w", err)
 	}
 
@@ -83,7 +83,9 @@ func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.
 	const query = `
 		SELECT 
 		    teacher_id, 
-		    user_id 
+		    user_id,
+		    rate,
+		    reviews_count
 		FROM teachers 
 		WHERE user_id = $1`
 
@@ -102,7 +104,13 @@ func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.
 }
 
 func (r *Repository) GetTeacherById(ctx context.Context, id int) (*entities.Teacher, error) {
-	const query = `SELECT teacher_id, user_id FROM teachers WHERE teacher_id = $1`
+	const query = `
+		SELECT 
+    		teacher_id, 
+    		user_id,
+    		rate,
+		    reviews_count
+		FROM teachers WHERE teacher_id = $1`
 
 	var teacher entities.Teacher
 	err := r.db.GetContext(ctx, &teacher, query, id)
@@ -134,12 +142,11 @@ func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int)
 		teacherId,                   // $2
 	)
 
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("teacher statistic not found: %w", err)
-	}
-
 	if err != nil {
-		return nil, fmt.Errorf("failed to find teacher's statistic by teacherId: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("teacher statistic not found: %w", err)
+		}
+		return nil, fmt.Errorf("failed to calculate teacher's statistic by teacherId: %w", err)
 	}
 
 	return &stat, nil
@@ -167,13 +174,15 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		u.birthdate,
 		u.avatar,
 		t.teacher_id,
+		t.rate,
+		t.reviews_count,
 		s.skill_id,
 		s.category_id,
 		s.video_card_link,
 		s.about,
 		s.rate,
-		S.total_rate_score,
-		s.count_of_rates,
+		s.total_rate_score,
+		s.reviews_count,
 		s.is_active,
 		c.name as category_name,
 		COALESCE(ts.count_of_finished_lesson, 0) as count_of_finished_lesson,
@@ -217,10 +226,6 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	}
 
 	// converting into $1, $2, ... PostgreSQL format
-	//query, args, err = sqlx.In(namedQuery, args...)
-	//if err != nil {
-	//	return nil, fmt.Errorf("failed to convert named query: %w", err)
-	//}
 	query = r.db.Rebind(namedQuery)
 
 	type result struct {
@@ -233,6 +238,9 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	var rows []result
 	err = r.db.SelectContext(ctx, &rows, query, args...)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return []entities.User{}, nil
+		}
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 

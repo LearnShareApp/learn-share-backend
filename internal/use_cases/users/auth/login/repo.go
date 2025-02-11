@@ -6,6 +6,5 @@ import (
 )
 
 type repo interface {
-	IsUserExistsByEmail(ctx context.Context, email string) (bool, error)
 	GetUserByEmail(ctx context.Context, email string) (*entities.User, error)
 }

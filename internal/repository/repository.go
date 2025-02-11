@@ -125,7 +125,10 @@ func createTeachersTable(ctx context.Context, tx *sqlx.Tx) error {
 	const query = `
     CREATE TABLE IF NOT EXISTS public.teachers(
         teacher_id SERIAL PRIMARY KEY NOT NULL,
-        user_id INTEGER UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+        user_id INTEGER UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+        rate FLOAT NOT NULL DEFAULT 0.0,
+        total_rate_score INTEGER NOT NULL DEFAULT 0,
+        reviews_count INTEGER NOT NULL DEFAULT 0
     );
     `
 
@@ -162,7 +165,7 @@ func createSkillsTable(ctx context.Context, tx *sqlx.Tx) error {
 		about TEXT,
 		rate FLOAT NOT NULL DEFAULT 0,
 	    total_rate_score INTEGER NOT NULL DEFAULT 0,
-	    count_of_rates INTEGER NOT NULL DEFAULT 0,
+	    reviews_count INTEGER NOT NULL DEFAULT 0,
 		is_active BOOLEAN NOT NULL DEFAULT TRUE, -- по хорошему FALSE но это если делать механизм подтверждения
 		CONSTRAINT unique_teacher_category UNIQUE (teacher_id, category_id) -- Уникальность teacher_id и category_id
 	);
@@ -291,36 +294,46 @@ func createReviewsTable(ctx context.Context, tx *sqlx.Tx) error {
 
 func createReviewTrigger(ctx context.Context, tx *sqlx.Tx) error {
 	const createTriggerFunc = `
-	CREATE OR REPLACE FUNCTION update_skill_on_review()
-	RETURNS TRIGGER AS $$
-	BEGIN
-		UPDATE skills
-		SET 
-			count_of_rates = count_of_rates + 1,
-			total_rate_score = total_rate_score + NEW.rate,
-			rate = (total_rate_score + NEW.rate)::decimal / (count_of_rates + 1)
-		WHERE skill_id = NEW.skill_id;
-		RETURN NEW;
-	END;
-	$$ LANGUAGE plpgsql;
-	`
+    CREATE OR REPLACE FUNCTION update_skill_and_teacher_on_review()
+    RETURNS TRIGGER AS $$
+    BEGIN
+       -- Update skills table
+       UPDATE skills
+       SET 
+          reviews_count = reviews_count + 1,
+          total_rate_score = total_rate_score + NEW.rate,
+          rate = (total_rate_score + NEW.rate)::decimal / (reviews_count + 1)
+       WHERE skill_id = NEW.skill_id;
+       
+       -- Update teachers table
+       UPDATE teachers
+       SET 
+          reviews_count = reviews_count + 1,
+          total_rate_score = total_rate_score + NEW.rate,
+          rate = (total_rate_score + NEW.rate)::decimal / (reviews_count + 1)
+       WHERE teacher_id = NEW.teacher_id;
+       
+       RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+    `
 
 	const createTrigger = `
-	DO $$
-	BEGIN
-		IF NOT EXISTS (
-			SELECT trigger_name 
-			FROM information_schema.triggers 
-			WHERE event_object_table = 'reviews' 
-			AND trigger_name = 'update_skill_on_review'
-		) THEN
-			CREATE TRIGGER update_skill_on_review
-			AFTER INSERT ON reviews
-			FOR EACH ROW
-			EXECUTE FUNCTION update_skill_on_review();
-		END IF;
-	END $$;
-	`
+    DO $$
+    BEGIN
+       IF NOT EXISTS (
+          SELECT trigger_name 
+          FROM information_schema.triggers 
+          WHERE event_object_table = 'reviews' 
+          AND trigger_name = 'update_skill_and_teacher_on_review'
+       ) THEN
+          CREATE TRIGGER update_skill_and_teacher_on_review
+          AFTER INSERT ON reviews
+          FOR EACH ROW
+          EXECUTE FUNCTION update_skill_and_teacher_on_review();
+       END IF;
+    END $$;
+    `
 
 	queries := []string{createTriggerFunc, createTrigger}
 

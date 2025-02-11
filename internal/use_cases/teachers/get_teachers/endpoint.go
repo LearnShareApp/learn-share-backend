@@ -85,22 +85,24 @@ func mappingResponse(users []entities.User) *response {
 				VideoCardLink: sk.VideoCardLink,
 				About:         sk.About,
 				Rate:          sk.Rate,
-				ReviewsCount:  sk.CountOfRates,
+				ReviewsCount:  sk.ReviewsCount,
 			}
 		}
 
 		resp.Teachers = append(resp.Teachers, teacher{
-			TeacherId:        users[i].TeacherData.Id,
-			UserId:           users[i].Id,
-			Email:            users[i].Email,
-			Name:             users[i].Name,
-			Surname:          users[i].Surname,
-			RegistrationDate: users[i].RegistrationDate,
-			Birthdate:        users[i].Birthdate,
-			Avatar:           users[i].Avatar,
-			FinishedLessons:  users[i].TeacherData.TeacherStat.CountOfFinishedLesson,
-			CountOfStudents:  users[i].TeacherData.TeacherStat.CountOfStudents,
-			Skills:           skills,
+			TeacherId:          users[i].TeacherData.Id,
+			UserId:             users[i].Id,
+			Email:              users[i].Email,
+			Name:               users[i].Name,
+			Surname:            users[i].Surname,
+			RegistrationDate:   users[i].RegistrationDate,
+			Birthdate:          users[i].Birthdate,
+			Avatar:             users[i].Avatar,
+			FinishedLessons:    users[i].TeacherData.TeacherStat.CountOfFinishedLesson,
+			CountOfStudents:    users[i].TeacherData.TeacherStat.CountOfStudents,
+			CommonRate:         users[i].TeacherData.Rate,
+			CommonReviewsCount: users[i].TeacherData.ReviewsCount,
+			Skills:             skills,
 		})
 	}
 

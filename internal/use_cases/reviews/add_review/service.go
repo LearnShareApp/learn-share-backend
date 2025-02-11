@@ -29,17 +29,12 @@ func (s *Service) Do(ctx context.Context, review *entities.Review) error {
 		return serviceErrs.ErrorUserNotFound
 	}
 
-	// is teacher exists
-	exists, err = s.repo.IsTeacherExistsById(ctx, review.TeacherId)
-	if err != nil {
-		return fmt.Errorf("failed to check teacher existstance by user id: %w", err)
-	}
-	if !exists {
-		return serviceErrs.ErrorTeacherNotFound
-	}
 	// get teacher
 	teacher, err := s.repo.GetTeacherById(ctx, review.TeacherId)
 	if err != nil {
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return serviceErrs.ErrorTeacherNotFound
+		}
 		return fmt.Errorf("failed to get teacher by id: %w", err)
 	}
 	// is teacher == student
@@ -56,14 +51,15 @@ func (s *Service) Do(ctx context.Context, review *entities.Review) error {
 		return serviceErrs.ErrorCategoryNotFound
 	}
 
-	// is skill exists by teacher id and category id
-	exists, err = s.repo.IsSkillExistsByTeacherIdAndCategoryId(ctx, review.TeacherId, review.CategoryId)
+	// get skill id
+	skillId, err := s.repo.GetSkillIdByTeacherIdAndCategoryId(ctx, review.TeacherId, review.CategoryId)
 	if err != nil {
-		return fmt.Errorf("failed to check skill existstance by teacher id and category id: %w", err)
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return serviceErrs.ErrorSkillUnregistered
+		}
+		return fmt.Errorf("failed to get skill id by teacher id and category id: %w", err)
 	}
-	if !exists {
-		return serviceErrs.ErrorSkillUnregistered
-	}
+	review.SkillId = skillId
 
 	// is student has finished lesson with this teacher and this category
 	exists, err = s.repo.IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx, review.TeacherId, review.StudentId, review.CategoryId)
@@ -73,13 +69,6 @@ func (s *Service) Do(ctx context.Context, review *entities.Review) error {
 	if !exists {
 		return serviceErrs.ErrorFinishedLessonNotFound
 	}
-
-	// get skill id
-	skillId, err := s.repo.GetSkillIdByTeacherIdAndCategoryId(ctx, review.TeacherId, review.CategoryId)
-	if err != nil {
-		return fmt.Errorf("failed to get skill id by teacher id and category id: %w", err)
-	}
-	review.SkillId = skillId
 
 	// create review
 	if err = s.repo.CreateReview(ctx, review); err != nil {

@@ -2,9 +2,10 @@ package login
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
-	"github.com/LearnShareApp/learn-share-backend/internal/errors"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/pkg/hasher"
 )
 
@@ -25,22 +26,16 @@ func NewService(repo repo, service JwtService) *Service {
 }
 
 func (s *Service) Do(ctx context.Context, reqUser *entities.User) (string, error) {
-	exists, err := s.repo.IsUserExistsByEmail(ctx, reqUser.Email)
-	if err != nil {
-		return "", fmt.Errorf("failed to find reqUser: %w", err)
-	}
-
-	if !exists {
-		return "", errors.ErrorUserNotFound
-	}
-
 	realUser, err := s.repo.GetUserByEmail(ctx, reqUser.Email)
 	if err != nil {
+		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
+			return "", internalErrs.ErrorUserNotFound
+		}
 		return "", fmt.Errorf("failed to get user: %w", err)
 	}
 
 	if !hasher.ComparePassword(reqUser.Password, realUser.Password) {
-		return "", errors.ErrorPasswordIncorrect
+		return "", internalErrs.ErrorPasswordIncorrect
 	}
 
 	token, err := s.jwtService.GenerateJWTToken(realUser.Id)

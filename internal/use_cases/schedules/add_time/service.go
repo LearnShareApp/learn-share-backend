@@ -2,8 +2,9 @@ package add_time
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/internal/errors"
+	intenalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"time"
 )
 
@@ -25,22 +26,15 @@ func (s *Service) Do(ctx context.Context, userId int, datetime time.Time) error 
 	}
 
 	if !exists {
-		return errors.ErrorUserNotFound
-	}
-
-	// is teacher exists
-	exists, err = s.repo.IsTeacherExistsByUserId(ctx, userId)
-	if err != nil {
-		return fmt.Errorf("failed to check teacher existstance by user id: %w", err)
-	}
-
-	if !exists {
-		return errors.ErrorUserIsNotTeacher
+		return intenalErrs.ErrorUserNotFound
 	}
 
 	// get teacher
 	teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
 	if err != nil {
+		if errors.Is(err, intenalErrs.ErrorSelectEmpty) {
+			return intenalErrs.ErrorUserIsNotTeacher
+		}
 		return fmt.Errorf("failed to get teacher by user id: %w", err)
 	}
 
@@ -49,7 +43,7 @@ func (s *Service) Do(ctx context.Context, userId int, datetime time.Time) error 
 		return fmt.Errorf("failed to check time existstance by user id: %w", err)
 	}
 	if exists {
-		return errors.ErrorScheduleTimeExists
+		return intenalErrs.ErrorScheduleTimeExists
 	}
 
 	if err = s.repo.CreateScheduleTime(ctx, teacher.Id, datetime); err != nil {
