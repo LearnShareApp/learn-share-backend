@@ -6,18 +6,18 @@ import (
 	"strconv"
 )
 
-func GetIdFromRequestPath(r *http.Request) (int, error) {
-	var id int
+func GetIntParamFromRequestPath(r *http.Request, paramName string) (int, error) {
+	var number int
 
-	paramId := r.PathValue("id")
-	if paramId == "" {
-		return 0, fmt.Errorf("missing {id} param in url")
+	param := r.PathValue(paramName)
+	if param == "" {
+		return 0, fmt.Errorf("missing {%s} param in url", paramName)
 	}
 
-	id, err := strconv.Atoi(paramId)
+	number, err := strconv.Atoi(param)
 
 	if err != nil {
 		return 0, err
 	}
-	return id, nil
+	return number, nil
 }

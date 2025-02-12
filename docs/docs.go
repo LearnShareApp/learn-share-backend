@@ -771,8 +771,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/get_teacher.response"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/httputils.ErrorStruct"
                         }
@@ -1099,7 +1099,7 @@ const docTemplate = `{
         },
         "/teachers/{id}": {
             "get": {
-                "description": "Get all info about teacher (user info + teacher + his skills) by his UserID in route (/api/teachers/{id})",
+                "description": "Get all info about teacher (user info + teacher + his skills) by his TeacherID in route (/api/teachers/{id})",
                 "produces": [
                     "application/json"
                 ],
@@ -1110,7 +1110,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Teacher's UserID",
+                        "description": "Teacher's ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1187,7 +1187,7 @@ const docTemplate = `{
         },
         "/teachers/{id}/schedule": {
             "get": {
-                "description": "Get lessons times from teacher schedule (by his UserID)",
+                "description": "Get lessons times from teacher schedule (by teacher ID)",
                 "produces": [
                     "application/json"
                 ],
@@ -1198,7 +1198,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Teacher's UserID",
+                        "description": "Teacher's ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1209,6 +1209,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/get_times.response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "404": {

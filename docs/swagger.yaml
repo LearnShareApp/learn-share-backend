@@ -1020,8 +1020,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/get_teacher.response'
-        "401":
-          description: Unauthorized
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
         "404":
@@ -1235,9 +1235,9 @@ paths:
   /teachers/{id}:
     get:
       description: Get all info about teacher (user info + teacher + his skills) by
-        his UserID in route (/api/teachers/{id})
+        his TeacherID in route (/api/teachers/{id})
       parameters:
-      - description: Teacher's UserID
+      - description: Teacher's ID
         in: path
         name: id
         required: true
@@ -1293,9 +1293,9 @@ paths:
       - teachers
   /teachers/{id}/schedule:
     get:
-      description: Get lessons times from teacher schedule (by his UserID)
+      description: Get lessons times from teacher schedule (by teacher ID)
       parameters:
-      - description: Teacher's UserID
+      - description: Teacher's ID
         in: path
         name: id
         required: true
@@ -1307,6 +1307,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/get_times.response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:

@@ -1,6 +1,6 @@
 # learn-share-backend
 
-## For start project
+## To start the project
 
 > [!Note]
 > If you want to start the project on your local PC, you should clone from the `local-start` branch
@@ -24,7 +24,7 @@
 
 ## How to use
 
-After starting project you can open swagger and try api: http://adoe.ru:81/swagger/
+After starting the project, you can open Swagger and try the API: http://adoe.ru:81/swagger/
 (or http://localhost:81/swagger/ for local start) <br>
 
 ## Rest API handlers
@@ -67,9 +67,10 @@ API Handlers
 │   ├── GET /teacher/schedule        // Get times from schedule
 │   ├── POST /teacher/schedule       // Add time to schedule
 │   ├── POST /teacher/skill          // Register new skill for teacher
+│   ├── GET /teachers/{id}/reviews   // Get all about teacher by his teacher's ID
 │   ├── GET /teachers                // Get full teachers data
-│   ├── GET /teachers/{id}           // Get teacher data by UserID
-│   └── GET /teachers/{id}/schedule  // Get times from schedule by UserID
+│   ├── GET /teachers/{id}           // Get teacher data by ID
+│   └── GET /teachers/{id}/schedule  // Get times from schedule by ID
 │ 
 └── Users 
     ├── GET /user/profile            // Get user profile (by JWT)
@@ -106,7 +107,7 @@ internal/
 ├── entities/...               // entities for db and business logic
 ├── errors/...                 // errors in business logic, repo and transport
 ├── imgutils/...               // image utils for operations under image 
-├── jsonutils/...              // json utils for transport
+├── httputils/...              // http utils for transport layer
 ├── repository/...             // db repository: init, queries, transactions
 ├── service/
 │   ├── jwt/service.go         // jwt: generate, validate

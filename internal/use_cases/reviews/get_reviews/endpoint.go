@@ -26,7 +26,7 @@ const (
 // @Router /teachers/{id}/reviews [get]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		teacherId, err := httputils.GetIdFromRequestPath(r)
+		teacherId, err := httputils.GetIntParamFromRequestPath(r, "id")
 		if err != nil {
 			if err := httputils.RespondWith400(w, "missed or not-number {id} param in url path"); err != nil {
 				log.Error("failed to send response", zap.Error(err))

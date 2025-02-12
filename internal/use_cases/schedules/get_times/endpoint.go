@@ -2,13 +2,13 @@ package get_times
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
-	"net/http"
-	"strconv"
 )
 
 const (
@@ -39,7 +39,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		times, err := s.Do(r.Context(), userId)
+		times, err := s.DoByUserId(r.Context(), userId)
 
 		if err != nil {
 			coveringErrors(w, log, err)
@@ -55,39 +55,29 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	}
 }
 
-// MakePublicHandler returns http.HandlerFunc which handle get schedule, get user id from http param
+// MakePublicHandler returns http.HandlerFunc which handle get schedule, get teacher id from http param
 // @Summary Get times from schedule
-// @Description Get lessons times from teacher schedule (by his UserID)
+// @Description Get lessons times from teacher schedule (by teacher ID)
 // @Tags teachers
 // @Produce json
-// @Param id path int true "Teacher's UserID"
+// @Param id path int true "Teacher's ID"
 // @Success 200 {object} response
+// @Failure 403 {object} httputils.ErrorStruct
 // @Failure 404 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
 // @Router /teachers/{id}/schedule [get]
 func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var id int
+		teacherId, err := httputils.GetIntParamFromRequestPath(r, "id")
 
-		paramId := r.PathValue("id")
-		if paramId == "" {
+		if err != nil {
 			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
 		}
 
-		id, err := strconv.Atoi(paramId)
-
-		if err != nil {
-			log.Error("failed to parse id from URL path", zap.Error(err))
-			if err := httputils.RespondWith500(w); err != nil {
-				log.Error("failed to send response", zap.Error(err))
-			}
-			return
-		}
-
-		user, err := s.Do(r.Context(), id)
+		user, err := s.DoByTeacherId(r.Context(), teacherId)
 
 		if err != nil {
 			coveringErrors(w, log, err)
@@ -104,19 +94,18 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 }
 
 func coveringErrors(w http.ResponseWriter, log *zap.Logger, err error) {
-	if errors.Is(err, serviceErrors.ErrorUserNotFound) {
-		if err := httputils.RespondWith404(w, serviceErrors.ErrorUserNotFound.Error()); err != nil {
-			log.Error("failed to send response", zap.Error(err))
-		}
-	} else if errors.Is(err, serviceErrors.ErrorUserIsNotTeacher) {
-		if err := httputils.RespondWith404(w, serviceErrors.ErrorUserIsNotTeacher.Error()); err != nil {
-			log.Error("failed to send response", zap.Error(err))
-		}
-	} else {
+	switch {
+	case errors.Is(err, serviceErrors.ErrorUserIsNotTeacher):
+		err = httputils.RespondWith403(w, serviceErrors.ErrorUserIsNotTeacher.Error())
+	case errors.Is(err, serviceErrors.ErrorTeacherNotFound):
+		err = httputils.RespondWith404(w, serviceErrors.ErrorTeacherNotFound.Error())
+	default:
 		log.Error(err.Error())
-		if err = httputils.RespondWith500(w); err != nil {
-			log.Error("failed to send response", zap.Error(err))
-		}
+		err = httputils.RespondWith500(w)
+	}
+
+	if err != nil {
+		log.Error("failed to send error response", zap.Error(err))
 	}
 }
 
