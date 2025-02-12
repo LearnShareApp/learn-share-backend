@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
 	"net/http"
@@ -22,8 +22,8 @@ const (
 // @Tags users
 // @Produce json
 // @Success 200 {object} response
-// @Failure 401 {object} jsonutils.ErrorStruct
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 401 {object} httputils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /user/profile [get]
 // @Security     BearerAuth
 func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
@@ -32,7 +32,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		id := r.Context().Value(jwt.UserIDKey).(int)
 		if id == 0 {
 			log.Error("id was missed in context")
-			if err := jsonutils.RespondWith500(w); err != nil {
+			if err := httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -42,10 +42,10 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = jsonutils.RespondWith401(w, err.Error())
+				err = httputils.RespondWith401(w, err.Error())
 			default:
 				log.Error(err.Error())
-				err = jsonutils.RespondWith500(w)
+				err = httputils.RespondWith500(w)
 			}
 
 			if err != nil {
@@ -56,7 +56,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		resp := mappingToResponse(user)
 
-		if err = jsonutils.SuccessRespondWith200(w, resp); err != nil {
+		if err = httputils.SuccessRespondWith200(w, resp); err != nil {
 			log.Error("failed to send response", zap.Error(err))
 		}
 	}
@@ -69,8 +69,8 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 // @Produce json
 // @Param id path int true "User ID"
 // @Success 200 {object} response
-// @Failure 404 {object} jsonutils.ErrorStruct
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 404 {object} httputils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /users/{id}/profile [get]
 func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +78,7 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		paramId := r.PathValue("id")
 		if paramId == "" {
-			if err := jsonutils.RespondWith400(w, "missed {id} param in url path"); err != nil {
+			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -88,7 +88,7 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		if err != nil {
 			log.Error("failed to parse id from URL path", zap.Error(err))
-			if err := jsonutils.RespondWith500(w); err != nil {
+			if err := httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -99,10 +99,10 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = jsonutils.RespondWith404(w, err.Error())
+				err = httputils.RespondWith404(w, err.Error())
 			default:
 				log.Error(err.Error())
-				err = jsonutils.RespondWith500(w)
+				err = httputils.RespondWith500(w)
 			}
 
 			if err != nil {
@@ -113,7 +113,7 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		resp := mappingToResponse(user)
 
-		if err = jsonutils.SuccessRespondWith200(w, resp); err != nil {
+		if err = httputils.SuccessRespondWith200(w, resp); err != nil {
 			log.Error("failed to send response", zap.Error(err))
 		}
 	}

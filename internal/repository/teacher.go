@@ -79,6 +79,27 @@ func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (
 	return teacherId, nil
 }
 
+func (r *Repository) GetTeacherIdByUserId(ctx context.Context, id int) (int, error) {
+	const query = `
+		SELECT 
+		    teacher_id
+		FROM teachers 
+		WHERE user_id = $1`
+
+	var teacherId int
+	err := r.db.GetContext(ctx, &teacherId, query, id)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return 0, internalErrs.ErrorSelectEmpty
+	}
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to find teacherId by user id: %w", err)
+	}
+
+	return teacherId, nil
+}
+
 func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error) {
 	const query = `
 		SELECT 

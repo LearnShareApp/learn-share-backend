@@ -7,7 +7,7 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
 )
@@ -24,12 +24,12 @@ const (
 // @Produce json
 // @Param request body request true "Review data"
 // @Success 201
-// @Failure 400 {object} jsonutils.ErrorStruct
-// @Failure 401 {object} jsonutils.ErrorStruct
-// @Failure 403 {object} jsonutils.ErrorStruct
-// @Failure 404 {object} jsonutils.ErrorStruct
-// @Failure 409 {object} jsonutils.ErrorStruct
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 400 {object} httputils.ErrorStruct
+// @Failure 401 {object} httputils.ErrorStruct
+// @Failure 403 {object} httputils.ErrorStruct
+// @Failure 404 {object} httputils.ErrorStruct
+// @Failure 409 {object} httputils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /review [post]
 // @Security     BearerAuth
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
@@ -38,7 +38,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		userId := r.Context().Value(jwt.UserIDKey).(int)
 		if userId == 0 {
 			log.Error("id was missed in context")
-			if err := jsonutils.RespondWith500(w); err != nil {
+			if err := httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -47,21 +47,21 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		var req request
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = jsonutils.RespondWith400(w, "failed to decode body"); err != nil {
+			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
 		}
 
 		if req.TeacherId == 0 || req.CategoryId == 0 || req.Rate == 0 || req.Comment == "" {
-			if err := jsonutils.RespondWith400(w, "teacher_id, category_id, rate or comment are empty"); err != nil {
+			if err := httputils.RespondWith400(w, "teacher_id, category_id, rate or comment are empty"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
 		}
 
 		if req.Rate > 5 {
-			if err := jsonutils.RespondWith400(w, "rate must be less or equal than 5"); err != nil {
+			if err := httputils.RespondWith400(w, "rate must be less or equal than 5"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -79,22 +79,22 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = jsonutils.RespondWith401(w, serviceErrors.ErrorUserNotFound.Error())
+				err = httputils.RespondWith401(w, serviceErrors.ErrorUserNotFound.Error())
 			case errors.Is(err, serviceErrors.ErrorTeacherNotFound):
-				err = jsonutils.RespondWith404(w, serviceErrors.ErrorTeacherNotFound.Error())
+				err = httputils.RespondWith404(w, serviceErrors.ErrorTeacherNotFound.Error())
 			case errors.Is(err, serviceErrors.ErrorStudentAndTeacherSame):
-				err = jsonutils.RespondWith400(w, "teacher can not review himself")
+				err = httputils.RespondWith400(w, "teacher can not review himself")
 			case errors.Is(err, serviceErrors.ErrorCategoryNotFound):
-				err = jsonutils.RespondWith404(w, serviceErrors.ErrorCategoryNotFound.Error())
+				err = httputils.RespondWith404(w, serviceErrors.ErrorCategoryNotFound.Error())
 			case errors.Is(err, serviceErrors.ErrorSkillUnregistered):
-				err = jsonutils.RespondWith404(w, serviceErrors.ErrorSkillUnregistered.Error())
+				err = httputils.RespondWith404(w, serviceErrors.ErrorSkillUnregistered.Error())
 			case errors.Is(err, serviceErrors.ErrorFinishedLessonNotFound):
-				err = jsonutils.RespondWith403(w, "You have not finished lesson with this teacher and this category")
+				err = httputils.RespondWith403(w, "You have not finished lesson with this teacher and this category")
 			case errors.Is(err, serviceErrors.ErrorReviewExists):
-				err = jsonutils.RespondWith409(w, serviceErrors.ErrorReviewExists.Error())
+				err = httputils.RespondWith409(w, serviceErrors.ErrorReviewExists.Error())
 			default:
 				log.Error(err.Error())
-				err = jsonutils.RespondWith500(w)
+				err = httputils.RespondWith500(w)
 			}
 
 			if err != nil {
@@ -102,7 +102,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			}
 			return
 		}
-		respondErr := jsonutils.SuccessRespondWith201(w, struct{}{})
+		respondErr := httputils.SuccessRespondWith201(w, struct{}{})
 		if respondErr != nil {
 			log.Error("failed to send response", zap.Error(respondErr))
 		}

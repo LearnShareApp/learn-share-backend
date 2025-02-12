@@ -454,15 +454,15 @@ definitions:
         example: 0
         type: integer
     type: object
+  httputils.ErrorStruct:
+    properties:
+      error:
+        type: string
+    type: object
   join_lesson.response:
     properties:
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type: string
-    type: object
-  jsonutils.ErrorStruct:
-    properties:
-      error:
         type: string
     type: object
   login.request:
@@ -556,15 +556,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Login user
       tags:
       - auth
@@ -590,17 +590,17 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "413":
           description: Request Entity Too Large
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Register new user
       tags:
       - auth
@@ -617,7 +617,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Get categories
       tags:
       - categories
@@ -640,15 +640,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Get image
       tags:
       - image
@@ -673,19 +673,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Add Unconfirmed lesson (lesson request)
@@ -710,15 +710,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Get lesson data by lesson's id
       tags:
       - lessons
@@ -740,19 +740,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Approve lesson
@@ -775,19 +775,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Cancel lesson
@@ -811,19 +811,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Finished lesson
@@ -849,19 +849,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Join the lesson
@@ -886,15 +886,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Get lesson really short data by lesson's id
       tags:
       - lessons
@@ -917,19 +917,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Start lesson
@@ -956,27 +956,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Create review
@@ -995,15 +995,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Get lessons for students
@@ -1020,18 +1020,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/get_teacher.response'
-        "401":
-          description: Unauthorized
+        "403":
+          description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Get teacher data
@@ -1048,15 +1048,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: User registrate also as teacher
@@ -1075,19 +1075,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Get lessons for teachers
@@ -1106,15 +1106,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Get times from schedule
@@ -1139,23 +1139,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Add time to schedule
@@ -1182,19 +1182,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Registrate new skill
@@ -1222,11 +1222,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Get full teachers data
@@ -1235,9 +1235,9 @@ paths:
   /teachers/{id}:
     get:
       description: Get all info about teacher (user info + teacher + his skills) by
-        his UserID in route (/api/teachers/{id})
+        his TeacherID in route (/api/teachers/{id})
       parameters:
-      - description: Teacher's UserID
+      - description: Teacher's ID
         in: path
         name: id
         required: true
@@ -1252,19 +1252,50 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Get teacher data
+      tags:
+      - teachers
+  /teachers/{id}/reviews:
+    get:
+      consumes:
+      - application/json
+      description: Get all reviews by teacher's ID
+      parameters:
+      - description: Teacher's ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      summary: Get reviews by teacher's ID
       tags:
       - teachers
   /teachers/{id}/schedule:
     get:
-      description: Get lessons times from teacher schedule (by his UserID)
+      description: Get lessons times from teacher schedule (by teacher ID)
       parameters:
-      - description: Teacher's UserID
+      - description: Teacher's ID
         in: path
         name: id
         required: true
@@ -1276,14 +1307,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/get_times.response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Get times from schedule
       tags:
       - teachers
@@ -1301,11 +1336,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Get user profile
@@ -1330,17 +1365,17 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "413":
           description: Request Entity Too Large
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
       summary: Edit user
@@ -1365,11 +1400,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/jsonutils.ErrorStruct'
+            $ref: '#/definitions/httputils.ErrorStruct'
       summary: Get user profile
       tags:
       - users

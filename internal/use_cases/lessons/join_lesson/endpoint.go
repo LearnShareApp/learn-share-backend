@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
 )
@@ -22,10 +22,10 @@ const (
 // @Produce json
 // @Param id path int true "LessonID"
 // @Success 200 {object} response
-// @Failure 400 {object} jsonutils.ErrorStruct
-// @Failure 401 {object} jsonutils.ErrorStruct
-// @Failure 403 {object} jsonutils.ErrorStruct
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 400 {object} httputils.ErrorStruct
+// @Failure 401 {object} httputils.ErrorStruct
+// @Failure 403 {object} httputils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /lessons/{id}/join [get]
 // @Security     BearerAuth
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
@@ -33,7 +33,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		// get lesson id from path
 		paramId := r.PathValue("id")
 		if paramId == "" {
-			if err := jsonutils.RespondWith400(w, "missed {id} param in url path"); err != nil {
+			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -41,7 +41,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		lessonId, err := strconv.Atoi(paramId)
 		if err != nil {
 			log.Error("failed to parse id from URL path", zap.Error(err))
-			if err := jsonutils.RespondWith500(w); err != nil {
+			if err := httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -51,7 +51,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		userId := r.Context().Value(jwt.UserIDKey).(int)
 		if userId == 0 {
 			log.Error("id was missed in context")
-			if err := jsonutils.RespondWith500(w); err != nil {
+			if err := httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -60,28 +60,28 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		token, err := s.Do(r.Context(), userId, lessonId)
 		if err != nil {
 			if errors.Is(err, serviceErrors.ErrorUserNotFound) {
-				if err = jsonutils.RespondWith401(w, serviceErrors.ErrorUserNotFound.Error()); err != nil {
+				if err = httputils.RespondWith401(w, serviceErrors.ErrorUserNotFound.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			} else if errors.Is(err, serviceErrors.ErrorLessonNotFound) {
-				if err = jsonutils.RespondWith404(w, serviceErrors.ErrorLessonNotFound.Error()); err != nil {
+				if err = httputils.RespondWith404(w, serviceErrors.ErrorLessonNotFound.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			} else if errors.Is(err, serviceErrors.ErrorUserIsNotTeacher) {
-				if err = jsonutils.RespondWith403(w, "unavailable operation for students"); err != nil {
+				if err = httputils.RespondWith403(w, "unavailable operation for students"); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			} else if errors.Is(err, serviceErrors.ErrorNotRelatedUserToLesson) {
-				if err = jsonutils.RespondWith403(w, serviceErrors.ErrorNotRelatedUserToLesson.Error()); err != nil {
+				if err = httputils.RespondWith403(w, serviceErrors.ErrorNotRelatedUserToLesson.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			} else if errors.Is(err, serviceErrors.ErrorStatusNonOngoing) {
-				if err = jsonutils.RespondWith403(w, "can start a lesson if only the lesson had a ongoing status"); err != nil {
+				if err = httputils.RespondWith403(w, "can start a lesson if only the lesson had a ongoing status"); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			} else {
 				log.Error(err.Error())
-				if err = jsonutils.RespondWith500(w); err != nil {
+				if err = httputils.RespondWith500(w); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 			}
@@ -89,7 +89,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		}
 
 		resp := response{Token: token}
-		respondErr := jsonutils.SuccessRespondWith200(w, resp)
+		respondErr := httputils.SuccessRespondWith200(w, resp)
 		if respondErr != nil {
 			log.Error("failed to send response", zap.Error(respondErr))
 		}

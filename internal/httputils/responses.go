@@ -1,4 +1,4 @@
-package jsonutils
+package httputils
 
 import (
 	"encoding/json"
@@ -41,7 +41,7 @@ func RespondWithImage(w http.ResponseWriter, code int, reader io.Reader, imgExte
 		}
 		return fmt.Errorf("unsupported image extension: %s", imgExtension)
 	}
-	
+
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "image/"+imgExtension)
 	w.Header().Set("Cache-Control", "public, max-age=3600") // cache for 1 hour
@@ -78,15 +78,15 @@ func RespondWith403(w http.ResponseWriter, message string) error {
 		message)
 }
 
-func RespondWith409(w http.ResponseWriter, message string) error {
-	return RespondWithError(w,
-		http.StatusConflict,
-		message)
-}
-
 func RespondWith404(w http.ResponseWriter, message string) error {
 	return RespondWithError(w,
 		http.StatusNotFound,
+		message)
+}
+
+func RespondWith409(w http.ResponseWriter, message string) error {
+	return RespondWithError(w,
+		http.StatusConflict,
 		message)
 }
 

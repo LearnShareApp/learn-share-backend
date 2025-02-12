@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"go.uber.org/zap"
 )
 
@@ -22,15 +22,15 @@ const Route = "/image"
 // @Produce image/*
 // @Param filename query string true "filename"
 // @Success 200 {file} binary "Image file"
-// @Failure 400 {object} jsonutils.ErrorStruct
-// @Failure 404 {object} jsonutils.ErrorStruct
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 400 {object} httputils.ErrorStruct
+// @Failure 404 {object} httputils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /image [get]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		filename := r.URL.Query().Get("filename")
 		if filename == "" {
-			if err := jsonutils.RespondWith400(w, "missing filename parameter"); err != nil {
+			if err := httputils.RespondWith400(w, "missing filename parameter"); err != nil {
 				log.Error("failed to respond with 400", zap.Error(err))
 			}
 			return
@@ -38,14 +38,14 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		extension := strings.TrimPrefix(filepath.Ext(filename), ".")
 		if extension == "" {
-			if err := jsonutils.RespondWith400(w, "missing extension in filename"); err != nil {
+			if err := httputils.RespondWith400(w, "missing extension in filename"); err != nil {
 				log.Error("failed to respond with 400", zap.Error(err))
 			}
 			return
 		}
 
 		if !slices.Contains(SupportedExtension, extension) {
-			if err := jsonutils.RespondWith400(w, "unsupported extension"); err != nil {
+			if err := httputils.RespondWith400(w, "unsupported extension"); err != nil {
 				log.Error("failed to respond with 400", zap.Error(err))
 			}
 			return
@@ -63,12 +63,12 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorImageNotFound):
-				err = jsonutils.RespondWith404(w, err.Error())
+				err = httputils.RespondWith404(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorIncorrectFileFormat):
-				err = jsonutils.RespondWith400(w, err.Error())
+				err = httputils.RespondWith400(w, err.Error())
 			default:
 				log.Error(err.Error())
-				err = jsonutils.RespondWith500(w)
+				err = httputils.RespondWith500(w)
 			}
 
 			if err != nil {
@@ -77,7 +77,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			return
 		}
 
-		if err := jsonutils.RespondWithImage(w, http.StatusOK, reader, extension); err != nil {
+		if err := httputils.RespondWithImage(w, http.StatusOK, reader, extension); err != nil {
 			log.Error("failed to send response", zap.Error(err))
 		}
 	}
