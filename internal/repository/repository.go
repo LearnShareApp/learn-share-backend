@@ -273,7 +273,7 @@ func createLessonsTable(ctx context.Context, tx *sqlx.Tx) error {
 func createReviewsTable(ctx context.Context, tx *sqlx.Tx) error {
 	const query = `
 	CREATE TABLE IF NOT EXISTS public.reviews (
-		reviews_id SERIAL PRIMARY KEY,
+		review_id SERIAL PRIMARY KEY,
 		teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
 	    student_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 	    category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,

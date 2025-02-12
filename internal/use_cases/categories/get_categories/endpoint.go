@@ -1,7 +1,7 @@
 package get_categories
 
 import (
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -14,7 +14,7 @@ const Route = "/categories"
 // @Tags categories
 // @Produce json
 // @Success 200 {object} response
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /categories [get]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +22,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		categories, err := s.Do(r.Context())
 		if err != nil {
 			log.Error(err.Error())
-			if err = jsonutils.RespondWith500(w); err != nil {
+			if err = httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -39,7 +39,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			})
 		}
 
-		respondErr := jsonutils.SuccessRespondWith200(w, resp)
+		respondErr := httputils.SuccessRespondWith200(w, resp)
 		if respondErr != nil {
 			log.Error("failed to send response", zap.Error(respondErr))
 		}

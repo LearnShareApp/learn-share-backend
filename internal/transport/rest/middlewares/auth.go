@@ -3,7 +3,7 @@ package middlewares
 import (
 	"context"
 	"errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
 	"net/http"
@@ -24,7 +24,7 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 			// Получаем заголовок Authorization
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
-				if err := jsonutils.RespondWith401(w, "missed Authorization header (required)"); err != nil {
+				if err := httputils.RespondWith401(w, "missed Authorization header (required)"); err != nil {
 					log.Error("failed to write response", zap.Error(err))
 				}
 				return
@@ -33,7 +33,7 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 			// Проверяем формат заголовка (Bearer Token)
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || parts[0] != "Bearer" {
-				if err := jsonutils.RespondWith401(w, "Invalid token format"); err != nil {
+				if err := httputils.RespondWith401(w, "Invalid token format"); err != nil {
 					log.Error("failed to write response", zap.Error(err))
 				}
 				return
@@ -47,14 +47,14 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 			if err != nil {
 				if errors.Is(err, validator.GetExpiredError()) {
 					log.Error("token expired", zap.Error(err))
-					if err = jsonutils.RespondWith401(w, "token expired"); err != nil {
+					if err = httputils.RespondWith401(w, "token expired"); err != nil {
 						log.Error("failed to write response", zap.Error(err))
 					}
 					return
 				}
 
 				log.Error("failed to validate token", zap.Error(err))
-				if err = jsonutils.RespondWith401(w, "Failed to validate token"); err != nil {
+				if err = httputils.RespondWith401(w, "Failed to validate token"); err != nil {
 					log.Error("failed to write response", zap.Error(err))
 				}
 				return
@@ -64,7 +64,7 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 			userID, err := validator.ExtractUserID(claims)
 			if err != nil {
 				log.Error("failed to extract user ID", zap.Error(err))
-				if err = jsonutils.RespondWith401(w, "Invalid token: missing field: user_id"); err != nil {
+				if err = httputils.RespondWith401(w, "Invalid token: missing field: user_id"); err != nil {
 					log.Error("failed to write response", zap.Error(err))
 				}
 				return

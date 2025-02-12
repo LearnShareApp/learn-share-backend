@@ -21,6 +21,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/join_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/add_review"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/get_reviews"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -85,6 +86,7 @@ type Services struct {
 	JoinLessonSrv           *join_lesson.Service
 	GetImageSrv             *get_image.Service
 	AddReviewSrv            *add_review.Service
+	GetReviewsSrv           *get_reviews.Service
 }
 
 type Server struct {
@@ -115,7 +117,8 @@ func NewServices(jwtSrv *jwt.Service,
 	finishLessonSrv *finish_lesson.Service,
 	joinLesson *join_lesson.Service,
 	getImageSrv *get_image.Service,
-	addReviewSrv *add_review.Service) *Services {
+	addReviewSrv *add_review.Service,
+	getReviewsSrv *get_reviews.Service) *Services {
 	return &Services{
 		JwtSrv: jwtSrv,
 		RegSrv: reg,
@@ -142,6 +145,7 @@ func NewServices(jwtSrv *jwt.Service,
 		JoinLessonSrv:           joinLesson,
 		GetImageSrv:             getImageSrv,
 		AddReviewSrv:            addReviewSrv,
+		GetReviewsSrv:           getReviewsSrv,
 	}
 }
 
@@ -177,6 +181,7 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 	teachersRouter := chi.NewRouter()
 	teachersRouter.Get(get_teacher.PublicRoute, get_teacher.MakePublicHandler(services.GetTeacherSrv, log))
 	teachersRouter.Get(get_times.PublicRoute, get_times.MakePublicHandler(services.GetScheduleTimesSrv, log))
+	teachersRouter.Get(get_reviews.Route, get_reviews.MakeHandler(services.GetReviewsSrv, log))
 	apiRouter.Mount(teachersRoute, teachersRouter)
 
 	// lessons route

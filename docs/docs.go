@@ -53,19 +53,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -105,13 +105,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "413": {
@@ -120,7 +120,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -146,7 +146,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -181,19 +181,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -235,25 +235,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -288,19 +288,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -337,25 +337,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -392,25 +392,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -447,25 +447,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -505,25 +505,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -558,19 +558,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -610,25 +610,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -670,37 +670,37 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -731,19 +731,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -774,19 +774,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -812,19 +812,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -855,25 +855,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -904,19 +904,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -956,31 +956,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1022,25 +1022,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1085,13 +1085,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1126,13 +1126,60 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/{id}/reviews": {
+            "get": {
+                "description": "Get all reviews by teacher's ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Get reviews by teacher's ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Teacher's ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1167,13 +1214,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1204,13 +1251,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1250,13 +1297,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "413": {
@@ -1265,7 +1312,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1300,13 +1347,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/jsonutils.ErrorStruct"
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     }
                 }
@@ -1943,20 +1990,20 @@ const docTemplate = `{
                 }
             }
         },
+        "httputils.ErrorStruct": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "join_lesson.response": {
             "type": "object",
             "properties": {
                 "token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                }
-            }
-        },
-        "jsonutils.ErrorStruct": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
                 }
             }
         },

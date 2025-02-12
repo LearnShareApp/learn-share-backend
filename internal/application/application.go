@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/get_reviews"
 	"os"
 	"time"
 
@@ -106,6 +107,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		joinLessonSrv           = join_lesson.NewService(repo, leveKitService)
 		getImagSrv              = get_image.NewService(minioService)
 		addReviewSrv            = add_review.NewService(repo)
+		getReviewsSrv           = get_reviews.NewService(repo)
 	)
 
 	services := rest.NewServices(jwtService,
@@ -132,6 +134,7 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 		joinLessonSrv,
 		getImagSrv,
 		addReviewSrv,
+		getReviewsSrv,
 	)
 
 	restServer := rest.NewServer(services, config.Server, log)

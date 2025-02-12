@@ -2,7 +2,7 @@ package get_teachers
 
 import (
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
 	"net/http"
@@ -21,8 +21,8 @@ const (
 // @Param is_mine query boolean false "Filter my teachers"
 // @Param category query string false "Filter category"
 // @Success 200 {object} response
-// @Failure 401 {object} jsonutils.ErrorStruct
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 401 {object} httputils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /teachers [get]
 // @Security     BearerAuth
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
@@ -31,7 +31,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		id := r.Context().Value(jwt.UserIDKey).(int)
 		if id == 0 {
 			log.Error("id was missed in context")
-			if err := jsonutils.RespondWith500(w); err != nil {
+			if err := httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -54,7 +54,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		if err != nil {
 			log.Error(err.Error())
-			if err = jsonutils.RespondWith500(w); err != nil {
+			if err = httputils.RespondWith500(w); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -62,7 +62,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		resp := mappingResponse(teachers)
 
-		respondErr := jsonutils.SuccessRespondWith200(w, resp)
+		respondErr := httputils.SuccessRespondWith200(w, resp)
 		if respondErr != nil {
 			log.Error("failed to send response", zap.Error(respondErr))
 		}

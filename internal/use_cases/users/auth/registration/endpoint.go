@@ -6,8 +6,8 @@ import (
 	"errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/imgutils"
-	"github.com/LearnShareApp/learn-share-backend/internal/jsonutils"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
@@ -24,31 +24,31 @@ const Route = "/signup"
 // @Produce json
 // @Param request body request true "Registration Info"
 // @Success 201 {object} response
-// @Failure 400 {object} jsonutils.ErrorStruct
-// @Failure 409 {object} jsonutils.ErrorStruct
+// @Failure 400 {object} httputils.ErrorStruct
+// @Failure 409 {object} httputils.ErrorStruct
 // @Failure 413
-// @Failure 500 {object} jsonutils.ErrorStruct
+// @Failure 500 {object} httputils.ErrorStruct
 // @Router /auth/signup [post]
 func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req request
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = jsonutils.RespondWith400(w, "failed to decode body"); err != nil {
+			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
 		}
 
 		if req.Email == "" || req.Password == "" || req.Name == "" || req.Surname == "" {
-			if err := jsonutils.RespondWith400(w, "email, name, surname or password is empty"); err != nil {
+			if err := httputils.RespondWith400(w, "email, name, surname or password is empty"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
 		}
 
 		if req.Birthdate.Before(time.Date(1900, 01, 01, 0, 0, 0, 0, time.UTC)) {
-			if err := jsonutils.RespondWith400(w, "birthdate is missed or too old"); err != nil {
+			if err := httputils.RespondWith400(w, "birthdate is missed or too old"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
 			return
@@ -62,7 +62,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			imageBytes, err := imgutils.DecodeImage(req.Avatar)
 
 			if err != nil {
-				if err = jsonutils.RespondWith400(w, err.Error()); err != nil {
+				if err = httputils.RespondWith400(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
@@ -71,14 +71,14 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			width, height, err := imgutils.GetImageDimensions(imageBytes)
 			if err != nil {
 				log.Error("failed to get image dimension", zap.Error(err))
-				if err = jsonutils.RespondWith500(w); err != nil {
+				if err = httputils.RespondWith500(w); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
 			}
 
 			if err = imgutils.CheckDimension(1, 1, width, height); err != nil {
-				if err = jsonutils.RespondWith400(w, err.Error()); err != nil {
+				if err = httputils.RespondWith400(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
@@ -106,20 +106,20 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 
 		if err != nil {
 			if errors.Is(err, serviceErrors.ErrorUserExists) {
-				if err = jsonutils.RespondWithError(w, http.StatusConflict, err.Error()); err != nil {
+				if err = httputils.RespondWithError(w, http.StatusConflict, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
 
 			} else if errors.Is(err, serviceErrors.ErrorPasswordTooShort) {
-				if err = jsonutils.RespondWith400(w, err.Error()); err != nil {
+				if err = httputils.RespondWith400(w, err.Error()); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
 
 			} else {
 				log.Error(err.Error())
-				if err = jsonutils.RespondWith500(w); err != nil {
+				if err = httputils.RespondWith500(w); err != nil {
 					log.Error("failed to send response", zap.Error(err))
 				}
 				return
@@ -129,7 +129,7 @@ func MakeHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 		var resp response
 		resp.Token = token
 
-		respondErr := jsonutils.SuccessRespondWith201(w, resp)
+		respondErr := httputils.SuccessRespondWith201(w, resp)
 		if respondErr != nil {
 			log.Error("failed to send response", zap.Error(respondErr))
 		}
