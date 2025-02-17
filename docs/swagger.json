@@ -1156,7 +1156,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get_reviews.response"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1593,6 +1596,66 @@
                     "example": 1
                 },
                 "teacher_user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "get_reviews.response": {
+            "type": "object",
+            "properties": {
+                "reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/get_reviews.review"
+                    }
+                }
+            }
+        },
+        "get_reviews.review": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "comment": {
+                    "type": "string",
+                    "example": "This is a comment"
+                },
+                "rate": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "review_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "skill_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "student_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
+                "student_email": {
+                    "type": "string",
+                    "example": "qwerty@example.com"
+                },
+                "student_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "student_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "student_surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "teacher_id": {
                     "type": "integer",
                     "example": 1
                 }

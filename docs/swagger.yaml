@@ -172,6 +172,49 @@ definitions:
         example: 1
         type: integer
     type: object
+  get_reviews.response:
+    properties:
+      reviews:
+        items:
+          $ref: '#/definitions/get_reviews.review'
+        type: array
+    type: object
+  get_reviews.review:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      comment:
+        example: This is a comment
+        type: string
+      rate:
+        example: 5
+        type: integer
+      review_id:
+        example: 1
+        type: integer
+      skill_id:
+        example: 1
+        type: integer
+      student_avatar:
+        example: uuid.png
+        type: string
+      student_email:
+        example: qwerty@example.com
+        type: string
+      student_id:
+        example: 1
+        type: integer
+      student_name:
+        example: John
+        type: string
+      student_surname:
+        example: Smith
+        type: string
+      teacher_id:
+        example: 1
+        type: integer
+    type: object
   get_student_lessons.respLessons:
     properties:
       category_id:
@@ -1276,6 +1319,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/get_reviews.response'
         "400":
           description: Bad Request
           schema:

@@ -19,7 +19,7 @@ const (
 // @Accept json
 // @Produce json
 // @Param id path int true "Teacher's ID"
-// @Success 200
+// @Success 200 {object} response
 // @Failure 400 {object} httputils.ErrorStruct
 // @Failure 404 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct

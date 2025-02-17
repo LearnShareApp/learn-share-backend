@@ -32,7 +32,7 @@ After starting the project, you can open Swagger and try the API: http://adoe.ru
 You can see all handlers in my swagger: http://adoe.ru:81/swagger/index.html
 (or http://localhost:81/swagger/index.html for local start)
 But for shure i describe handlers also here:
-Here’s a concise tree-structured description of the API handlers:
+Here's a concise tree-structured description of the API handlers:
 
 ``` go
 API Handlers
@@ -136,6 +136,24 @@ Every use case has 4 files (some of them have 3 files)
 * `minio` - object storage
 * `nginx` - reverse proxy
 * `app-1` - backend application
+
+## Storing data
+
+* The project utilizes PostgreSQL as the database management system.
+* The repository handles table initialization and establishes relationships between entities, including tables for users, teachers, categories, skills, schedules, statuses, lessons, and reviews.
+* Triggers are implemented to automatically update teacher and skill ratings when new reviews are added.
+* The database is pre-populated with essential seeding data for categories and statuses to ensure proper functionality from the start.
+
+* All methods for data operations are split into files by logical parts and use entity structs:
+    * category
+    * lesson
+    * review
+    * schedule
+    * skill
+    * status
+    * teacher
+    * user
+
 ## Contact
 
 for questions contact with me in [telegram](https://t.me/Ruslan20007) or by email: ruslanrbb8@gmail.com
