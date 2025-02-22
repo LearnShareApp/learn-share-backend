@@ -8,8 +8,8 @@ import (
 	"github.com/livekit/protocol/auth"
 )
 
-// ApiConfig contains LiveKit API credentials
-type ApiConfig struct {
+// LiveKitConfig contains LiveKit API credentials
+type LiveKitConfig struct {
 	ApiKey    string
 	ApiSecret string
 }
@@ -32,7 +32,7 @@ func WithDuration(duration time.Duration) Option {
 }
 
 // NewService creates a new LiveKit service instance
-func NewService(config ApiConfig, opts ...Option) *Service {
+func NewService(config LiveKitConfig, opts ...Option) *Service {
 	s := &Service{
 		ApiKey:    config.ApiKey,
 		ApiSecret: config.ApiSecret,

@@ -1,0 +1,86 @@
+linters:
+  enable-all: true
+  disable:
+    - depguard
+    - gochecknoinits
+    - gochecknoglobals
+    - prealloc
+    - tenv
+
+run:
+  timeout: 1m
+  allow-parallel-runners: true
+  tests: false
+
+issues:
+  fix: false
+  exclude-dirs:
+    - vendor/
+    - docs/
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+    - path: doc\.go
+      linters:
+        - golint
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+linters-settings:
+  version: 1.64.5
+  gci:
+    skip-generated: true
+    custom-order: true
+    sections:
+      - standard
+      - localmodule
+      - blank
+      - default
+  golint:
+    min-confidence: 0
+  gocyclo:
+    min-complexity: 15
+  cyclop:
+    max-complexity: 15
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 25
+  goconst:
+    min-len: 1
+    min-occurrences: 2
+  misspell:
+    locale: US
+  lll:
+    line-length: 140
+  goimports:
+    local-prefixes: github.com/org/project
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - wrapperFunc
+      - dupImport
+      - ifElseChain
+      - octalLiteral
+  funlen:
+    lines: 100
+    statements: 50
+  wsl:
+    force-case-trailing-whitespace: 1
+    allow-trailing-comment: true
+    allow-separated-leading-comment: true
+    allow-cuddle-declarations: true
+    allow-cuddle-assignments: true
+    allow-cuddle-returns: true
+    allow-cuddle-calls: true
+    allow-cuddle-ranges: true

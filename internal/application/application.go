@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/get_reviews"
 	"os"
-	"time"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
@@ -26,6 +24,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/join_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/add_review"
+	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/get_reviews"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
@@ -38,48 +37,48 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
 	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
 	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
+
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
 type Application struct {
-	context context.Context
-	db      *sqlx.DB
-	server  *rest.Server
-	log     *zap.Logger
+	db     *sqlx.DB
+	server *rest.Server
+	log    *zap.Logger
 }
 
-func New(ctx context.Context, config config.Config, log *zap.Logger) (*Application, error) {
-
-	// db connection
-	db, err := postgres.New(ctx, &config.Db)
+func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Application, error) {
+	// database connection
+	database, err := postgres.New(ctx, &config.DB)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to postgres: %v", err)
+		return nil, fmt.Errorf("failed to connect to postgres: %w", err)
 	}
+
 	log.Info("connected to database successfully")
 
 	minioClient, err := minio.NewClient(&config.Minio)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to minio: %v", err)
+		return nil, fmt.Errorf("failed to connect to minio: %w", err)
 	}
+
 	if err = minio.CreateBucket(ctx, minioClient, config.Minio.Bucket); err != nil {
-		return nil, fmt.Errorf("failed to create minio bucket: %v", err)
+		return nil, fmt.Errorf("failed to create minio bucket: %w", err)
 	}
 
 	log.Info("connected to minio successfully")
 
-	// TODO: repo, services, rest-server
-
-	repo := repository.New(db)
+	repo := repository.New(database)
 	if config.IsInitDb {
 		err = repo.CreateTables(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create tables: %v", err)
+			return nil, fmt.Errorf("failed to create tables: %w", err)
 		}
+
 		log.Info("successfully created tables (if they not existed)")
 	}
 
-	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
+	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"))
 	leveKitService := livekit.NewService(config.LiveKit)
 	minioService := minio.NewService(minioClient, config.Minio.Bucket)
 
@@ -140,25 +139,29 @@ func New(ctx context.Context, config config.Config, log *zap.Logger) (*Applicati
 	restServer := rest.NewServer(services, config.Server, log)
 
 	return &Application{
-		context: ctx,
-		db:      db,
-		server:  restServer,
-		log:     log,
+		db:     database,
+		server: restServer,
+		log:    log,
 	}, nil
 }
 
-// Run запускает приложение
+// Run start application.
 func (app *Application) Run() error {
-	return app.server.Start()
+	err := app.server.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start server: %w", err)
+	}
+
+	return nil
 }
 
-// Shutdown gracefully останавливает приложение
+// Shutdown gracefully stop application.
 func (app *Application) Shutdown(ctx context.Context) error {
-
 	app.log.Info("shutting down application...")
 
 	go func() {
 		<-ctx.Done()
+
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			app.log.Error("graceful shutdown timed out... forcing exit")
 			os.Exit(1)
@@ -166,7 +169,7 @@ func (app *Application) Shutdown(ctx context.Context) error {
 	}()
 
 	if err := app.server.GracefulStop(ctx); err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	if err := app.db.Close(); err != nil {

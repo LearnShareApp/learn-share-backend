@@ -9,6 +9,7 @@ import (
 )
 
 const UserIDKey = "user_id"
+const defaultTTL = time.Hour * 24 * 7
 
 var (
 	ErrorTokenExpired = errors.New("token is expired")
@@ -37,7 +38,7 @@ func WithIssuer(issuer string) Option {
 func NewService(secretKey string, opts ...Option) *Service {
 	s := &Service{
 		secretKey: []byte(secretKey),
-		duration:  24 * time.Hour,
+		duration:  defaultTTL,
 		issuer:    "default",
 	}
 

@@ -7,7 +7,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type DbConfig struct {
+type DBConfig struct {
 	Host     string
 	Port     int
 	DbName   string
@@ -15,7 +15,7 @@ type DbConfig struct {
 	Password string
 }
 
-func New(ctx context.Context, config *DbConfig) (*sqlx.DB, error) {
+func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
 	var dsn string = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%d",
 		config.User,
 		config.Password,

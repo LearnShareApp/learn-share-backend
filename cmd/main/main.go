@@ -10,6 +10,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/application"
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/pkg/logger"
+
 	"go.uber.org/zap"
 )
 
@@ -32,7 +33,11 @@ func main() {
 	defer ctxClose()
 
 	log := logger.NewDevelopment()
-	defer log.Sync()
+	defer func() {
+		if err := log.Sync(); err != nil {
+			log.Error("failed to sync logger", zap.Error(err))
+		}
+	}()
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -40,41 +45,51 @@ func main() {
 		panic("failed to load config")
 	}
 
-	log.Info(cfg.LogConfig())
+	marshaledCfg, err := cfg.LogConfig()
+	if err != nil {
+		log.Error("failed to marshal config to log", zap.Error(err))
+	} else {
+		log.Info(marshaledCfg)
+	}
 
-	app, err := application.New(ctx, *cfg, log)
+	app, err := application.New(ctx, cfg, log)
 	if err != nil {
 		log.Error("failed to create application", zap.Error(err))
+
 		return
 	}
 
 	graceCh := make(chan os.Signal, 1)
 	errCh := make(chan error, 1)
+
 	signal.Notify(graceCh, syscall.SIGINT, syscall.SIGTERM)
-	defer signal.Stop(graceCh) // Очищаем подписку на сигналы
-	defer close(graceCh)       // Закрываем канал
-	defer close(errCh)         // Закрываем канал с ошибками
+
+	defer signal.Stop(graceCh) // clear subscribe to signal
+	defer close(graceCh)       // close channel
+	defer close(errCh)         // close error channel
 
 	go func() {
 		if err := app.Run(); err != nil {
 			select {
-			case errCh <- err: // Неблокирующая отправка ошибки
+			case errCh <- err: // Non blocked sending error to channel
 			default:
 				log.Error("failed to send error to channel", zap.Error(err))
 			}
 		}
 	}()
 
-	// Ожидаем либо сигнал завершения, либо ошибку
+	// waiting or signal to close or error
 	select {
 	case <-graceCh:
 		log.Info("Received shutdown signal")
+
 	case err := <-errCh:
 		log.Error("Application error", zap.Error(err))
 	}
 
-	// Создаем контекст с таймаутом для graceful shutdown
+	// create context with timeout to close
 	const timeout = 10 * time.Second
+
 	shutdownCtx, shutdownCancel := context.WithTimeout(ctx, timeout)
 	defer shutdownCancel()
 

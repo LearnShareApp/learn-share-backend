@@ -75,9 +75,9 @@ func (r *Repository) GetReviewsByTeacherId(ctx context.Context, id int) ([]*enti
 	reviewsMap := make(map[int]*entities.Review)
 
 	for _, row := range rows {
-		review, exists := reviewsMap[row.Review.Id]
+		_, exists := reviewsMap[row.Review.Id]
 		if !exists {
-			review = &row.Review
+			review := &row.Review
 			if review.StudentData == nil {
 				review.StudentData = &row.User
 			}
