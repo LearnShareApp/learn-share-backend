@@ -3,11 +3,13 @@ package middlewares
 import (
 	"context"
 	"errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
-	"github.com/golang-jwt/jwt/v5"
-	"go.uber.org/zap"
 	"net/http"
 	"strings"
+
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+
+	"github.com/golang-jwt/jwt/v5"
+	"go.uber.org/zap"
 )
 
 type TokenValidator interface {

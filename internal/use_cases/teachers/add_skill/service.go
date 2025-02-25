@@ -2,9 +2,11 @@ package add_skill
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
-	"github.com/LearnShareApp/learn-share-backend/internal/errors"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
 type Service struct {
@@ -17,45 +19,46 @@ func NewService(repo repo) *Service {
 	}
 }
 
-func (s *Service) Do(ctx context.Context, userId int, categoryId int, videoCardLink string, about string) error {
-	// TODO: check whether user is teacher, check is he not already teach this and add skill to db
-
+func (s *Service) Do(ctx context.Context, userID, categoryID int, videoCardLink string, about string) error {
 	// is user exists
-	exists, err := s.repo.IsUserExistsById(ctx, userId)
+	exists, err := s.repo.IsUserExistsById(ctx, userID)
 	if err != nil {
 		return fmt.Errorf("failed to find user by id: %w", err)
 	}
+
 	if !exists {
-		return errors.ErrorUserNotFound
+		return internalErrs.ErrorUserNotFound
 	}
 
 	// is teacher exists by user id
-	teacherId, err := s.repo.CreateTeacherIfNotExists(ctx, userId)
+	teacherID, err := s.repo.CreateTeacherIfNotExists(ctx, userID)
 	if err != nil {
 		return fmt.Errorf("failed to create teacher: %w", err)
 	}
 
 	// is category exists
-	exists, err = s.repo.IsCategoryExistsById(ctx, categoryId)
+	exists, err = s.repo.IsCategoryExistsById(ctx, categoryID)
 	if err != nil {
 		return fmt.Errorf("failed to find category by id: %w", err)
 	}
+
 	if !exists {
-		return errors.ErrorCategoryNotFound
+		return internalErrs.ErrorCategoryNotFound
 	}
 
 	// create skill
 	skill := &entities.Skill{
-		TeacherId:     teacherId,
-		CategoryId:    categoryId,
+		TeacherId:     teacherID,
+		CategoryId:    categoryID,
 		VideoCardLink: videoCardLink,
 		About:         about,
 	}
 
 	if err = s.repo.CreateSkill(ctx, skill); err != nil {
-		if err == errors.ErrorNonUniqueData {
-			return errors.ErrorSkillRegistered
+		if errors.Is(err, internalErrs.ErrorNonUniqueData) {
+			return internalErrs.ErrorSkillRegistered
 		}
+
 		return fmt.Errorf("failed to create skill: %w", err)
 	}
 

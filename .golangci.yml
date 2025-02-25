@@ -75,6 +75,24 @@ linters-settings:
   funlen:
     lines: 100
     statements: 50
+  tagalign:
+    sort: false
+    order:
+      - json
+      - yaml
+      - yml
+      - toml
+      - example
+      - binding
+      - validate
+
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+        env: upperSnake
+        envconfig: upperSnake
+
   wsl:
     force-case-trailing-whitespace: 1
     allow-trailing-comment: true

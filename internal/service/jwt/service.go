@@ -8,12 +8,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const UserIDKey = "user_id"
-const defaultTTL = time.Hour * 24 * 7
-
-var (
-	ErrorTokenExpired = errors.New("token is expired")
+const (
+	UserIDKey  = "user_id"
+	defaultTTL = time.Hour * 24 * 7
 )
+
+var ErrorTokenExpired = errors.New("token is expired")
 
 type Service struct {
 	secretKey []byte
@@ -49,7 +49,7 @@ func NewService(secretKey string, opts ...Option) *Service {
 	return s
 }
 
-// GenerateJWTToken creates a JWT token for a user
+// GenerateJWTToken creates a JWT token for a user.
 func (s *Service) GenerateJWTToken(userId int) (string, error) {
 	// Set token expiration time
 	expirationTime := time.Now().Add(s.duration)
@@ -74,22 +74,22 @@ func (s *Service) GenerateJWTToken(userId int) (string, error) {
 	return tokenString, nil
 }
 
-// ValidateJWTToken validates the JWT token
+// ValidateJWTToken validates the JWT token.
 func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+
 		return s.secretKey, nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return nil, fmt.Errorf("invalid token")
+		return nil, errors.New("invalid token")
 	}
 
 	// Additional expiration time check
@@ -102,12 +102,13 @@ func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-// ExtractUserID extracts user ID from claims
+// ExtractUserID extracts user ID from claims.
 func (s *Service) ExtractUserID(claims jwt.MapClaims) (int, error) {
 	userID, ok := claims[UserIDKey].(float64)
 	if !ok {
-		return 0, fmt.Errorf("invalid or missing user ID in claims")
+		return 0, errors.New("invalid or missing user ID in claims")
 	}
+
 	return int(userID), nil
 }
 

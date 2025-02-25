@@ -35,8 +35,8 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/edit_user"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
-	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
-	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/db/postgres"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object/minio"
 
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -169,7 +169,7 @@ func (app *Application) Shutdown(ctx context.Context) error {
 	}()
 
 	if err := app.server.GracefulStop(ctx); err != nil {
-		return err //nolint:wrapcheck
+		return err // nolint:wrapcheck
 	}
 
 	if err := app.db.Close(); err != nil {

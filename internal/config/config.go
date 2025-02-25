@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/db/postgres"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object/minio"
 	"os"
 	"strconv"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
-	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
-	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
-
 	"github.com/joho/godotenv"
 )
 

@@ -3,12 +3,14 @@ package imgutils
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"image"
-	_ "image/jpeg"
-	_ "image/png"
 	"net/http"
 	"strings"
+
+	_ "image/jpeg"
+	_ "image/png"
 )
 
 const MaxSize = 3 << 20
@@ -16,18 +18,18 @@ const MaxSize = 3 << 20
 func DecodeImage(base64Img string) ([]byte, error) {
 	imgBytes, err := base64.StdEncoding.DecodeString(base64Img)
 	if err != nil {
-		return nil, fmt.Errorf("invalid image format")
+		return nil, errors.New("invalid image format")
 	}
 
 	// check for weight
 	if len(imgBytes) > MaxSize {
-		return nil, fmt.Errorf("file too large")
+		return nil, errors.New("file too large")
 	}
 
 	// check is MIME-type (image)
 	mimeType := http.DetectContentType(imgBytes)
 	if !strings.HasPrefix(mimeType, "image/") {
-		return nil, fmt.Errorf("file is not an image")
+		return nil, errors.New("file is not an image")
 	}
 
 	return imgBytes, nil
@@ -51,5 +53,6 @@ func CheckDimension(xRatio, yRatio, width, height int) error {
 	if ratio != (float64(xRatio) / float64(yRatio)) {
 		return fmt.Errorf("invalid image ratiom, must be %dx%d ", xRatio, yRatio)
 	}
+
 	return nil
 }

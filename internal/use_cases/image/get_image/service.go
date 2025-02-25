@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	serviceErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object"
 	"io"
 	"slices"
 )
@@ -13,7 +13,7 @@ var SupportedExtension = []string{"png", "jpg", "jpeg"}
 
 type ObjectStorageService interface {
 	IsFileExists(ctx context.Context, fileName string) (bool, error)
-	GetFile(ctx context.Context, fileName string) (*object_storage.File, error)
+	GetFile(ctx context.Context, fileName string) (*object.File, error)
 }
 
 type Service struct {

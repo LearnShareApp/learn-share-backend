@@ -15,9 +15,9 @@ func GetIntParamFromRequestPath(r *http.Request, paramName string) (int, error) 
 	}
 
 	number, err := strconv.Atoi(param)
-
 	if err != nil {
 		return 0, err
 	}
+
 	return number, nil
 }

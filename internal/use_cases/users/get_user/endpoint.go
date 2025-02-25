@@ -2,13 +2,15 @@ package get_user
 
 import (
 	"errors"
+
+	"net/http"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
+
 	"go.uber.org/zap"
-	"net/http"
-	"strconv"
 )
 
 const (
@@ -28,7 +30,6 @@ const (
 // @Security     BearerAuth
 func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		id := r.Context().Value(jwt.UserIDKey).(int)
 		if id == 0 {
 			log.Error("id was missed in context")
@@ -43,6 +44,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
 				err = httputils.RespondWith401(w, err.Error())
+
 			default:
 				log.Error(err.Error())
 				err = httputils.RespondWith500(w)
@@ -51,6 +53,7 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			if err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
+
 			return
 		}
 
@@ -74,32 +77,23 @@ func MakeProtectedHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 // @Router /users/{id}/profile [get]
 func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var id int
-
-		paramId := r.PathValue("id")
-		if paramId == "" {
-			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
-				log.Error("failed to send response", zap.Error(err))
-			}
-			return
-		}
-
-		id, err := strconv.Atoi(paramId)
+		id, err := httputils.GetIntParamFromRequestPath(r, "id")
 
 		if err != nil {
 			log.Error("failed to parse id from URL path", zap.Error(err))
-			if err := httputils.RespondWith500(w); err != nil {
+			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
+
 			return
 		}
 
 		user, err := s.Do(r.Context(), id)
-
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
 				err = httputils.RespondWith404(w, err.Error())
+
 			default:
 				log.Error(err.Error())
 				err = httputils.RespondWith500(w)
@@ -108,6 +102,7 @@ func MakePublicHandler(s *Service, log *zap.Logger) http.HandlerFunc {
 			if err != nil {
 				log.Error("failed to send response", zap.Error(err))
 			}
+
 			return
 		}
 

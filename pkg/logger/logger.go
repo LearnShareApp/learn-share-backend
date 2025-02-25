@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// New creates a new logger instance
+// New creates a new logger instance.
 func New(level string, development bool) (*zap.Logger, error) {
 	var config zap.Config
 
@@ -28,19 +28,22 @@ func New(level string, development bool) (*zap.Logger, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	config.Level = zap.NewAtomicLevelAt(logLevel)
 
 	return config.Build()
 }
 
-// NewDefault creates a default production logger
+// NewDefault creates a default production logger.
 func NewDefault() *zap.Logger {
 	logger, _ := New("info", false)
+
 	return logger
 }
 
-// NewDevelopment creates a default development logger with pretty console output
+// NewDevelopment creates a default development logger with pretty console output.
 func NewDevelopment() *zap.Logger {
 	logger, _ := New("debug", true)
+
 	return logger
 }

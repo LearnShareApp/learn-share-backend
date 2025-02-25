@@ -7,7 +7,9 @@ import (
 	"path"
 	"time"
 
+	_ "github.com/LearnShareApp/learn-share-backend/docs"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/middlewares"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
@@ -32,13 +34,10 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/registration"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/edit_user"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
-	httpSwagger "github.com/swaggo/http-swagger"
 
-	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/middlewares"
 	"github.com/go-chi/chi/v5"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
-
-	_ "github.com/LearnShareApp/learn-share-backend/docs"
 )
 
 const (
@@ -118,7 +117,8 @@ func NewServices(jwtSrv *jwt.Service,
 	joinLesson *join_lesson.Service,
 	getImageSrv *get_image.Service,
 	addReviewSrv *add_review.Service,
-	getReviewsSrv *get_reviews.Service) *Services {
+	getReviewsSrv *get_reviews.Service,
+) *Services {
 	return &Services{
 		JwtSrv: jwtSrv,
 		RegSrv: reg,
@@ -236,17 +236,18 @@ func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server
 }
 
 func (s *Server) Start() error {
-	//eg := errgroup.Group{}
+	// eg := errgroup.Group{}
 	//
 	//eg.Go(func() error {
 	//	s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
 	//	return s.server.ListenAndServe()
 	//})
 	s.logger.Info("starting Rest server", zap.String("address", s.server.Addr))
+
 	return s.server.ListenAndServe()
 }
 
-// GracefulStop корректная остановка сервера
+// GracefulStop корректная остановка сервера.
 func (s *Server) GracefulStop(ctx context.Context) error {
 	// Создаем контекст с таймаутом
 	shutdownCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -257,9 +258,11 @@ func (s *Server) GracefulStop(ctx context.Context) error {
 	// Остановка сервера
 	if err := s.server.Shutdown(shutdownCtx); err != nil {
 		err = fmt.Errorf("failed to shutdown rest server: %w", err)
+
 		return err
 	}
 
 	s.logger.Info("rest server stopped")
+
 	return nil
 }

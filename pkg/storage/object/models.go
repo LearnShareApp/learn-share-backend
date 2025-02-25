@@ -1,4 +1,4 @@
-package object_storage
+package object
 
 import "io"
 

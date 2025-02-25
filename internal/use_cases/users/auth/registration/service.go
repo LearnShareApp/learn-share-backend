@@ -6,7 +6,7 @@ import (
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	"github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/pkg/hasher"
-	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object"
 	"github.com/google/uuid"
 	"io"
 )
@@ -16,7 +16,7 @@ type JwtService interface {
 }
 
 type ObjectStorageService interface {
-	UploadFile(ctx context.Context, file *object_storage.File) error
+	UploadFile(ctx context.Context, file *object.File) error
 }
 
 type Service struct {
@@ -56,7 +56,7 @@ func (s *Service) Do(ctx context.Context, user *entities.User, avatarReader io.R
 	var avatarName string
 	if avatarReader != nil {
 		avatarName = fmt.Sprintf("%s.png", uuid.New().String())
-		file := object_storage.File{
+		file := object.File{
 			Name:       avatarName,
 			Size:       avatarSize,
 			FileReader: avatarReader,

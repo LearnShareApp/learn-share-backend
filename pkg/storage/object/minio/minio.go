@@ -3,9 +3,10 @@ package minio
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"time"
 )
 
 type MinioConfig struct {
@@ -39,11 +40,13 @@ func CreateBucket(ctx context.Context, client *minio.Client, bucketName string) 
 	if err != nil {
 		return fmt.Errorf("failed to check if bucket exists: %w", err)
 	}
+
 	if !exists {
 		err = client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to create bucket: %w", err)
 		}
 	}
+
 	return nil
 }

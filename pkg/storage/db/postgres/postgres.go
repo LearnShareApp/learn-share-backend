@@ -3,8 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/jmoiron/sqlx"
+
 	_ "github.com/lib/pq"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type DBConfig struct {
@@ -16,7 +18,7 @@ type DBConfig struct {
 }
 
 func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
-	var dsn string = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%d",
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%d",
 		config.User,
 		config.Password,
 		config.DbName,
@@ -25,7 +27,6 @@ func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
 	)
 
 	db, err := sqlx.ConnectContext(ctx, "postgres", dsn)
-
 	if err != nil {
 		return nil, err
 	}
