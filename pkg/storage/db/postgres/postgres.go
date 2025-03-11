@@ -10,30 +10,30 @@ import (
 )
 
 type DBConfig struct {
-	Host     string
-	Port     int
-	DbName   string
-	User     string
-	Password string
+	Host     string `env:"DB_HOST"     env-required:"true"`
+	Port     int    `env:"DB_PORT"     env-required:"true"`
+	DBName   string `env:"DB_NAME"     env-required:"true"`
+	User     string `env:"DB_USER"     env-required:"true"`
+	Password string `env:"DB_PASSWORD" env-required:"true"`
 }
 
 func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%d",
 		config.User,
 		config.Password,
-		config.DbName,
+		config.DBName,
 		config.Host,
 		config.Port,
 	)
 
-	db, err := sqlx.ConnectContext(ctx, "postgres", dsn)
+	databaseConn, err := sqlx.ConnectContext(ctx, "postgres", dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := db.Ping(); err != nil {
+	if err := databaseConn.Ping(); err != nil {
 		return nil, err
 	}
 
-	return db, nil
+	return databaseConn, nil
 }

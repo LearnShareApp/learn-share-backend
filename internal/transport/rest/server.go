@@ -57,7 +57,7 @@ const (
 )
 
 type ServerConfig struct {
-	Port int
+	Port int `env:"SERVER_PORT" env-required:"true"`
 }
 
 type Services struct {

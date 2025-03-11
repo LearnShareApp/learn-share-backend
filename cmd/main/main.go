@@ -42,7 +42,7 @@ func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Error("failed to load config", zap.Error(err))
-		panic("failed to load config")
+		return
 	}
 
 	marshaledCfg, err := cfg.LogConfig()
