@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/migrator"
 	"os"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
@@ -69,13 +70,14 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 	log.Info("connected to minio successfully")
 
 	repo := repository.New(database)
+
 	if config.IsInitDb {
-		err = repo.CreateTables(ctx)
+		err = migrator.RunMigrations(&config.Migrator, log)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create tables: %w", err)
+			return nil, err //nolint:wrapcheck
 		}
 
-		log.Info("successfully created tables (if they not existed)")
+		log.Info("successfully up migrations")
 	}
 
 	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"))

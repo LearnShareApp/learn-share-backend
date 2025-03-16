@@ -7,6 +7,7 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
+	"github.com/LearnShareApp/learn-share-backend/pkg/migrator"
 	"github.com/LearnShareApp/learn-share-backend/pkg/storage/db/postgres"
 	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object/minio"
 	"github.com/ilyakaznacheev/cleanenv"
@@ -19,6 +20,7 @@ const (
 
 type Config struct {
 	DB           postgres.DBConfig
+	Migrator     migrator.MigrationConfig
 	Server       rest.ServerConfig
 	LiveKit      livekit.LiveKitConfig
 	Minio        minio.MinioConfig
@@ -26,17 +28,11 @@ type Config struct {
 	JwtSecretKey string `env:"SECRET_KEY" env-required:"true"`
 }
 
-func LoadConfig() (*Config, error) {
+func LoadConfig(paths []string) (*Config, error) {
 	// Looking for .env file in different directories
-	envPaths := []string{
-		".env",
-		"./config/.env",
-		"./internal/config/.env",
-	}
-
 	var envPath string
 
-	for _, path := range envPaths {
+	for _, path := range paths {
 		if _, err := os.Stat(path); err == nil {
 			envPath = path
 
@@ -45,7 +41,7 @@ func LoadConfig() (*Config, error) {
 	}
 
 	if envPath == "" {
-		return nil, fmt.Errorf(".env file not found in any of the search paths: %v", envPaths)
+		return nil, fmt.Errorf(".env file not found in any of the search paths: %v", paths) //nolint:err113
 	}
 
 	var config Config
@@ -66,15 +62,19 @@ func LoadConfig() (*Config, error) {
 // Validate config validation.
 func (c *Config) Validate() error {
 	if !checkPortValidation(c.Server.Port) {
-		return fmt.Errorf("invalid server port: %d", c.Server.Port)
+		return fmt.Errorf("invalid server port: %d", c.Server.Port) //nolint:err113
 	}
 
 	if !checkPortValidation(c.DB.Port) {
-		return fmt.Errorf("invalid database port: %d", c.DB.Port)
+		return fmt.Errorf("invalid database port: %d", c.DB.Port) //nolint:err113
+	}
+
+	if !checkPortValidation(c.Migrator.Port) {
+		return fmt.Errorf("invalid database (migrator) port: %d", c.DB.Port) //nolint:err113
 	}
 
 	if !checkPortValidation(c.Minio.Port) {
-		return fmt.Errorf("invalid minio port: %d", c.Minio.Port)
+		return fmt.Errorf("invalid minio port: %d", c.Minio.Port) //nolint:err113
 	}
 
 	return nil
@@ -89,6 +89,10 @@ func (c *Config) LogConfig() (string, error) {
 
 	if logConfig.DB.Password != "" {
 		logConfig.DB.Password = maskedString
+	}
+
+	if logConfig.Migrator.Password != "" {
+		logConfig.Migrator.Password = maskedString
 	}
 
 	if logConfig.JwtSecretKey != "" {

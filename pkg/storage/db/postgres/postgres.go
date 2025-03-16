@@ -10,11 +10,11 @@ import (
 )
 
 type DBConfig struct {
-	Host     string `env:"DB_HOST"     env-required:"true"`
-	Port     int    `env:"DB_PORT"     env-required:"true"`
-	DBName   string `env:"DB_NAME"     env-required:"true"`
-	User     string `env:"DB_USER"     env-required:"true"`
-	Password string `env:"DB_PASSWORD" env-required:"true"`
+	Host     string `env:"POSTGRES_HOST"     env-required:"true"`
+	Port     int    `env:"POSTGRES_PORT"     env-required:"true"`
+	DBName   string `env:"POSTGRES_DB"       env-required:"true"`
+	User     string `env:"POSTGRES_USER"     env-required:"true"`
+	Password string `env:"POSTGRES_PASSWORD" env-required:"true"`
 }
 
 func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
@@ -28,11 +28,11 @@ func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
 
 	databaseConn, err := sqlx.ConnectContext(ctx, "postgres", dsn)
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck
 	}
 
 	if err := databaseConn.Ping(); err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck
 	}
 
 	return databaseConn, nil

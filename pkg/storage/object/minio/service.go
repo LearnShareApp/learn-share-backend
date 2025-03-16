@@ -3,9 +3,10 @@ package minio
 import (
 	"context"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object"
 	"path/filepath"
 	"strings"
+
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object"
 
 	"github.com/minio/minio-go/v7"
 )
