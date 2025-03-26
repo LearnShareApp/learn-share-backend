@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
-	serviceErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
 type MeetService interface {
-	GenerateMeetingToken(roomName string) (string, error)
-	NameRoomByLessonId(lessonId int) string
+	GenerateMeetingToken(roomName string, userName string) (string, error)
+	NameRoomByLessonID(lessonId int) string
+	GetUserIdentityString(userName, userSurname string, id int) string
 }
 
 type Service struct {
@@ -27,20 +28,21 @@ func NewService(repo repo, meetService MeetService) *Service {
 
 func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, error) {
 
-	// is user exists
-	exists, err := s.repo.IsUserExistsById(ctx, userId)
+	// get user
+	user, err := s.repo.GetUserById(ctx, userId)
 	if err != nil {
+		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
+			return "", internalErrs.ErrorUserNotFound
+		}
+
 		return "", fmt.Errorf("failed to check user existstance by id: %w", err)
-	}
-	if !exists {
-		return "", serviceErrs.ErrorUserNotFound
 	}
 
 	// get lesson
 	lesson, err := s.repo.GetLessonById(ctx, lessonId)
 	if err != nil {
-		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
-			return "", serviceErrs.ErrorLessonNotFound
+		if errors.Is(err, internalErrs.ErrorSelectEmpty) {
+			return "", internalErrs.ErrorLessonNotFound
 		}
 		return "", fmt.Errorf("failed to get lesson by id: %w", err)
 	}
@@ -51,13 +53,13 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, err
 		// if it's not the teacher for this lesson either => error
 		teacher, err := s.repo.GetTeacherByUserId(ctx, userId)
 		if err != nil {
-			if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
-				return "", serviceErrs.ErrorNotRelatedUserToLesson
+			if errors.Is(err, internalErrs.ErrorSelectEmpty) {
+				return "", internalErrs.ErrorNotRelatedUserToLesson
 			}
 			return "", fmt.Errorf("failed to get teacher by userId: %w", err)
 		}
 		if lesson.TeacherId != teacher.Id {
-			return "", serviceErrs.ErrorNotRelatedUserToLesson
+			return "", internalErrs.ErrorNotRelatedUserToLesson
 		}
 	}
 
@@ -69,10 +71,11 @@ func (s *Service) Do(ctx context.Context, userId int, lessonId int) (string, err
 
 	// may join lesson if only was ongoing status
 	if lesson.StatusId != ongoingStatusId {
-		return "", serviceErrs.ErrorStatusNonOngoing
+		return "", internalErrs.ErrorStatusNonOngoing
 	}
 
-	token, err := s.meetService.GenerateMeetingToken(s.meetService.NameRoomByLessonId(lessonId))
+	token, err := s.meetService.GenerateMeetingToken(s.meetService.NameRoomByLessonID(lessonId),
+		s.meetService.GetUserIdentityString(user.Name, user.Surname, user.Id))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate meeting token: %w", err)
 	}

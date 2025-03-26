@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/livekit"
 	"github.com/LearnShareApp/learn-share-backend/pkg/migrator"
 	"os"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
@@ -72,12 +72,12 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 	repo := repository.New(database)
 
 	if config.IsInitDb {
-		err = migrator.RunMigrations(&config.Migrator, log)
+		err = migrator.RunMigrations(&config.Migrator)
 		if err != nil {
 			return nil, err //nolint:wrapcheck
 		}
 
-		log.Info("successfully up migrations")
+		log.Info("up migrations successfully")
 	}
 
 	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"))

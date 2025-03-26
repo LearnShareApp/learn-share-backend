@@ -9,7 +9,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-type MinioConfig struct {
+type Config struct {
 	Host      string `env:"MINIO_HOST"       env-required:"true"`
 	Port      int    `env:"MINIO_PORT"       env-required:"true"`
 	AccessKey string `env:"MINIO_ACCESS_KEY" env-required:"true"`
@@ -18,7 +18,7 @@ type MinioConfig struct {
 	IsSSL     bool   `env:"IS_MINIO_SSL"     env-required:"true"`
 }
 
-func NewClient(config *MinioConfig) (*minio.Client, error) {
+func NewClient(config *Config) (*minio.Client, error) {
 	minioClient, err := minio.New(
 		fmt.Sprintf("%s:%d", config.Host, config.Port),
 		&minio.Options{

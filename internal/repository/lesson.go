@@ -13,29 +13,31 @@ import (
 )
 
 func (r *Repository) CreateUnconfirmedLesson(ctx context.Context, lesson *entities.Lesson) error {
-	tx, err := r.db.BeginTxx(ctx, nil)
+	var tx, err = r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("error beginning transaction: %w", err)
 	}
 	defer tx.Rollback()
 
-	const query = `
-	INSERT INTO lessons (student_id, teacher_id, category_id, schedule_time_id) 
-	VALUES ($1, $2, $3, $4)
-	`
+	query, args, err := r.sqlBuilder.
+		Insert("lessons").
+		Columns("student_id", "teacher_id", "category_id", "schedule_time_id").
+		Values(lesson.StudentId, lesson.TeacherId, lesson.CategoryId, lesson.ScheduleTimeId).
+		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("failed to build insert query: %w", err)
+	}
 
 	// insert lesson
-	if _, err := tx.ExecContext(ctx, query,
-		lesson.StudentId,
-		lesson.TeacherId,
-		lesson.CategoryId,
-		lesson.ScheduleTimeId); err != nil {
+	if _, err := tx.ExecContext(ctx, query, args...); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			// error code 23505 mean unique_violation
 			if pqErr.Code == "23505" {
 				return internalErrs.ErrorNonUniqueData
 			}
 		}
+
 		return fmt.Errorf("failed to insert lesson: %w", err)
 	}
 

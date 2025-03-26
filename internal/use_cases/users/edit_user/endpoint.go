@@ -8,7 +8,7 @@ import (
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/imgutils"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 	"io"
 	"net/http"

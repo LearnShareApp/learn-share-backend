@@ -50,13 +50,13 @@ func NewService(secretKey string, opts ...Option) *Service {
 }
 
 // GenerateJWTToken creates a JWT token for a user.
-func (s *Service) GenerateJWTToken(userId int) (string, error) {
+func (s *Service) GenerateJWTToken(userID int) (string, error) {
 	// Set token expiration time
 	expirationTime := time.Now().Add(s.duration)
 
 	// Create claims
 	claims := jwt.MapClaims{
-		UserIDKey: userId,
+		UserIDKey: userID,
 		"exp":     expirationTime.Unix(),
 		"iat":     time.Now().Unix(),
 		"iss":     s.issuer,

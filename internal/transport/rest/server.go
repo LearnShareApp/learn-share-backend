@@ -3,12 +3,12 @@ package rest
 import (
 	"context"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"net/http"
 	"path"
 	"time"
 
 	_ "github.com/LearnShareApp/learn-share-backend/docs"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/middlewares"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
 	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
@@ -56,7 +56,7 @@ const (
 	reviewRoute   = "/review"
 )
 
-type ServerConfig struct {
+type Config struct {
 	Port int `env:"SERVER_PORT" env-required:"true"`
 }
 
@@ -149,7 +149,7 @@ func NewServices(jwtSrv *jwt.Service,
 	}
 }
 
-func NewServer(services *Services, config ServerConfig, log *zap.Logger) *Server {
+func NewServer(services *Services, config Config, log *zap.Logger) *Server {
 	router := chi.NewRouter()
 
 	router.Use(middlewares.LoggerMiddleware(log.Named("log_middleware")))

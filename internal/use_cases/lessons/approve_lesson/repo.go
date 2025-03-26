@@ -10,5 +10,5 @@ type repo interface {
 	GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error)
 	GetLessonById(ctx context.Context, id int) (*entities.Lesson, error)
 	GetStatusIdByStatusName(ctx context.Context, name string) (int, error)
-	ChangeLessonStatus(ctx context.Context, lessonId int, statusId int) error
+	ChangeLessonStatus(ctx context.Context, lessonID int, statusID int) error
 }

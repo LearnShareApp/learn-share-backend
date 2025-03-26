@@ -23,6 +23,7 @@ require (
 	buf.build/go/protoyaml v0.2.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/Masterminds/squirrel v1.5.4 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/bufbuild/protovalidate-go v0.6.3 // indirect
@@ -48,6 +49,8 @@ require (
 	github.com/jxskiss/base62 v1.1.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
+	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
+	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lithammer/shortuuid/v4 v4.0.0 // indirect
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1 // indirect
 	github.com/livekit/psrpc v0.6.1-0.20241018124827-1efff3d113a8 // indirect

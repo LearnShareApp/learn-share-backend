@@ -2,12 +2,12 @@ package join_lesson
 
 import (
 	"errors"
+	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"net/http"
 	"strconv"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
 	"go.uber.org/zap"
 )
 

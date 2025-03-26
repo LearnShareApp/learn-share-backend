@@ -7,7 +7,7 @@ import (
 )
 
 type repo interface {
-	GetTeacherById(ctx context.Context, teacherId int) (*entities.Teacher, error)
-	GetTeacherByUserId(ctx context.Context, userId int) (*entities.Teacher, error)
-	GetScheduleTimesByTeacherId(ctx context.Context, Id int) ([]*entities.ScheduleTime, error)
+	GetTeacherById(ctx context.Context, teacherID int) (*entities.Teacher, error)
+	GetTeacherByUserId(ctx context.Context, userID int) (*entities.Teacher, error)
+	GetScheduleTimesByTeacherId(ctx context.Context, id int) ([]*entities.ScheduleTime, error)
 }

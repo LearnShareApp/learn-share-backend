@@ -3,9 +3,9 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/livekit"
 	"os"
 
-	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
 	"github.com/LearnShareApp/learn-share-backend/pkg/migrator"
 	"github.com/LearnShareApp/learn-share-backend/pkg/storage/db/postgres"
@@ -19,11 +19,11 @@ const (
 )
 
 type Config struct {
-	DB           postgres.DBConfig
-	Migrator     migrator.MigrationConfig
-	Server       rest.ServerConfig
-	LiveKit      livekit.LiveKitConfig
-	Minio        minio.MinioConfig
+	DB           postgres.Config
+	Migrator     migrator.Config
+	Server       rest.Config
+	LiveKit      livekit.Config
+	Minio        minio.Config
 	IsInitDb     bool   `env:"IS_INIT_DB" env-required:"true"`
 	JwtSecretKey string `env:"SECRET_KEY" env-required:"true"`
 }
@@ -99,12 +99,12 @@ func (c *Config) LogConfig() (string, error) {
 		logConfig.JwtSecretKey = maskedString
 	}
 
-	if logConfig.LiveKit.ApiKey != "" {
-		logConfig.LiveKit.ApiKey = maskedString
+	if logConfig.LiveKit.APIKey != "" {
+		logConfig.LiveKit.APIKey = maskedString
 	}
 
-	if logConfig.LiveKit.ApiSecret != "" {
-		logConfig.LiveKit.ApiSecret = maskedString
+	if logConfig.LiveKit.APISecret != "" {
+		logConfig.LiveKit.APISecret = maskedString
 	}
 
 	if logConfig.Minio.AccessKey != "" {

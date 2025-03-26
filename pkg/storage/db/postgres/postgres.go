@@ -9,7 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type DBConfig struct {
+type Config struct {
 	Host     string `env:"POSTGRES_HOST"     env-required:"true"`
 	Port     int    `env:"POSTGRES_PORT"     env-required:"true"`
 	DBName   string `env:"POSTGRES_DB"       env-required:"true"`
@@ -17,7 +17,7 @@ type DBConfig struct {
 	Password string `env:"POSTGRES_PASSWORD" env-required:"true"`
 }
 
-func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
+func New(ctx context.Context, config *Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%d",
 		config.User,
 		config.Password,
