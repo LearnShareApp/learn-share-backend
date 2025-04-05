@@ -9,31 +9,31 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type DBConfig struct {
-	Host     string
-	Port     int
-	DbName   string
-	User     string
-	Password string
+type Config struct {
+	Host     string `env:"POSTGRES_HOST"     env-required:"true"`
+	Port     int    `env:"POSTGRES_PORT"     env-required:"true"`
+	DBName   string `env:"POSTGRES_DB"       env-required:"true"`
+	User     string `env:"POSTGRES_USER"     env-required:"true"`
+	Password string `env:"POSTGRES_PASSWORD" env-required:"true"`
 }
 
-func New(ctx context.Context, config *DBConfig) (*sqlx.DB, error) {
+func New(ctx context.Context, config *Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%d",
 		config.User,
 		config.Password,
-		config.DbName,
+		config.DBName,
 		config.Host,
 		config.Port,
 	)
 
-	db, err := sqlx.ConnectContext(ctx, "postgres", dsn)
+	databaseConn, err := sqlx.ConnectContext(ctx, "postgres", dsn)
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck
 	}
 
-	if err := db.Ping(); err != nil {
-		return nil, err
+	if err := databaseConn.Ping(); err != nil {
+		return nil, err //nolint:wrapcheck
 	}
 
-	return db, nil
+	return databaseConn, nil
 }

@@ -1,49 +1,33 @@
 basePath: /api
 definitions:
-  add_review.request:
+  category.getCategoriesResponse:
+    description: get categories getCategoriesResponse.
     properties:
-      category_id:
-        example: 1
-        type: integer
-      comment:
-        example: some comment
-        type: string
-      rate:
-        example: 1
-        type: integer
-      teacher_id:
-        example: 1
-        type: integer
-    required:
-    - category_id
-    - comment
-    - rate
-    - teacher_id
+      categories:
+        items:
+          $ref: '#/definitions/category.respCategory'
+        type: array
     type: object
-  add_skill.request:
+  category.respCategory:
+    description: data of respCategory.
     properties:
-      about:
-        example: I am Groot
-        type: string
-      category_id:
+      id:
         example: 1
         type: integer
-      video_card_link:
-        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
+      min_age:
+        example: 12
+        type: integer
+      name:
+        example: Programing
         type: string
-    required:
-    - category_id
     type: object
-  add_time.request:
+  httputils.ErrorStruct:
     properties:
-      datetime:
-        example: "2025-02-01T00:00:00Z"
+      error:
         type: string
-    required:
-    - datetime
     type: object
-  book_lesson.request:
-    description: book lesson body request
+  lesson.bookLessonRequest:
+    description: book lesson body bookLessonRequest.
     properties:
       category_id:
         example: 1
@@ -60,47 +44,14 @@ definitions:
     - schedule_time_id
     - teacher_id
     type: object
-  edit_user.request:
-    description: User registration request
+  lesson.connectLessonResponse:
     properties:
-      avatar:
-        example: base64 encoded image
-        type: string
-      birthdate:
-        example: "2000-01-01T00:00:00Z"
-        type: string
-      name:
-        example: John
-        type: string
-      password:
-        example: strongpass123
-        type: string
-      surname:
-        example: Smith
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
     type: object
-  get_categories.category:
-    description: data of category
-    properties:
-      id:
-        example: 1
-        type: integer
-      min_age:
-        example: 12
-        type: integer
-      name:
-        example: Programing
-        type: string
-    type: object
-  get_categories.response:
-    description: get categories response
-    properties:
-      categories:
-        items:
-          $ref: '#/definitions/get_categories.category'
-        type: array
-    type: object
-  get_lesson.response:
+  lesson.getLessonResponse:
+    description: data about lesson getLessonResponse.
     properties:
       category_id:
         example: 1
@@ -151,7 +102,7 @@ definitions:
         example: 1
         type: integer
     type: object
-  get_lesson_shortdata.response:
+  lesson.getLessonShortDataResponse:
     properties:
       category_id:
         example: 1
@@ -172,14 +123,117 @@ definitions:
         example: 1
         type: integer
     type: object
-  get_reviews.response:
+  lesson.getStudentLessonsResponse:
+    properties:
+      lessons:
+        items:
+          $ref: '#/definitions/lesson.respStudentLessons'
+        type: array
+    type: object
+  lesson.getTeacherLessonsResponse:
+    properties:
+      lessons:
+        items:
+          $ref: '#/definitions/lesson.respTeacherLessons'
+        type: array
+    type: object
+  lesson.respStudentLessons:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      category_name:
+        example: Programming
+        type: string
+      datetime:
+        example: "2025-02-01T09:00:00Z"
+        type: string
+      lesson_id:
+        example: 1
+        type: integer
+      status:
+        example: verification
+        type: string
+      teacher_avatar:
+        example: uuid.png
+        type: string
+      teacher_email:
+        example: test@test.com
+        type: string
+      teacher_id:
+        example: 1
+        type: integer
+      teacher_name:
+        example: John
+        type: string
+      teacher_surname:
+        example: Smith
+        type: string
+      teacher_user_id:
+        example: 1
+        type: integer
+    type: object
+  lesson.respTeacherLessons:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      category_name:
+        example: Programming
+        type: string
+      datetime:
+        example: "2025-02-01T09:00:00Z"
+        type: string
+      lesson_id:
+        example: 1
+        type: integer
+      status:
+        example: verification
+        type: string
+      student_avatar:
+        example: uuid.png
+        type: string
+      student_email:
+        example: test@test.com
+        type: string
+      student_id:
+        example: 1
+        type: integer
+      student_name:
+        example: John
+        type: string
+      student_surname:
+        example: Smith
+        type: string
+    type: object
+  review.addReviewRequest:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      comment:
+        example: some comment
+        type: string
+      rate:
+        example: 1
+        type: integer
+      teacher_id:
+        example: 1
+        type: integer
+    required:
+    - category_id
+    - comment
+    - rate
+    - teacher_id
+    type: object
+  review.getReviewResponse:
     properties:
       reviews:
         items:
-          $ref: '#/definitions/get_reviews.review'
+          $ref: '#/definitions/review.respReview'
         type: array
     type: object
-  get_reviews.review:
+  review.respReview:
     properties:
       category_id:
         example: 1
@@ -215,238 +269,22 @@ definitions:
         example: 1
         type: integer
     type: object
-  get_student_lessons.respLessons:
+  schedule.addTimeRequest:
     properties:
-      category_id:
-        example: 1
-        type: integer
-      category_name:
-        example: Programming
-        type: string
       datetime:
-        example: "2025-02-01T09:00:00Z"
+        example: "2025-02-01T00:00:00Z"
         type: string
-      lesson_id:
-        example: 1
-        type: integer
-      status:
-        example: verification
-        type: string
-      teacher_avatar:
-        example: uuid.png
-        type: string
-      teacher_email:
-        example: test@test.com
-        type: string
-      teacher_id:
-        example: 1
-        type: integer
-      teacher_name:
-        example: John
-        type: string
-      teacher_surname:
-        example: Smith
-        type: string
-      teacher_user_id:
-        example: 1
-        type: integer
+    required:
+    - datetime
     type: object
-  get_student_lessons.response:
-    properties:
-      lessons:
-        items:
-          $ref: '#/definitions/get_student_lessons.respLessons'
-        type: array
-    type: object
-  get_teacher.response:
-    properties:
-      avatar:
-        example: uuid.png
-        type: string
-      birthdate:
-        example: "2002-09-09T10:10:10+09:00"
-        type: string
-      common_rate:
-        example: 0
-        type: number
-      common_reviews_count:
-        example: 0
-        type: integer
-      count_of_students:
-        example: 0
-        type: integer
-      email:
-        example: qwerty@example.com
-        type: string
-      finished_lessons:
-        example: 0
-        type: integer
-      name:
-        example: John
-        type: string
-      registration_date:
-        example: "2022-09-09T10:10:10+09:00"
-        type: string
-      skills:
-        items:
-          $ref: '#/definitions/get_teacher.skill'
-        type: array
-      surname:
-        example: Smith
-        type: string
-      teacher_id:
-        example: 1
-        type: integer
-      user_id:
-        example: 1
-        type: integer
-    type: object
-  get_teacher.skill:
-    properties:
-      about:
-        example: about me...
-        type: string
-      category_id:
-        example: 1
-        type: integer
-      category_name:
-        example: Category
-        type: string
-      rate:
-        example: 5
-        type: number
-      reviews_count:
-        example: 1
-        type: integer
-      skill_id:
-        example: 1
-        type: integer
-      video_card_link:
-        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
-        type: string
-    type: object
-  get_teacher_lessons.respLessons:
-    properties:
-      category_id:
-        example: 1
-        type: integer
-      category_name:
-        example: Programming
-        type: string
-      datetime:
-        example: "2025-02-01T09:00:00Z"
-        type: string
-      lesson_id:
-        example: 1
-        type: integer
-      status:
-        example: verification
-        type: string
-      student_avatar:
-        example: uuid.png
-        type: string
-      student_email:
-        example: test@test.com
-        type: string
-      student_id:
-        example: 1
-        type: integer
-      student_name:
-        example: John
-        type: string
-      student_surname:
-        example: Smith
-        type: string
-    type: object
-  get_teacher_lessons.response:
-    properties:
-      lessons:
-        items:
-          $ref: '#/definitions/get_teacher_lessons.respLessons'
-        type: array
-    type: object
-  get_teachers.response:
-    properties:
-      teachers:
-        items:
-          $ref: '#/definitions/get_teachers.teacher'
-        type: array
-    type: object
-  get_teachers.skill:
-    properties:
-      about:
-        example: about me...
-        type: string
-      category_id:
-        example: 1
-        type: integer
-      category_name:
-        example: Category
-        type: string
-      rate:
-        example: 5
-        type: number
-      reviews_count:
-        example: 1
-        type: integer
-      skill_id:
-        example: 1
-        type: integer
-      video_card_link:
-        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
-        type: string
-    type: object
-  get_teachers.teacher:
-    properties:
-      avatar:
-        example: uuid.png
-        type: string
-      birthdate:
-        example: "2002-09-09T10:10:10+09:00"
-        type: string
-      common_rate:
-        example: 0
-        type: number
-      common_reviews_count:
-        example: 0
-        type: integer
-      count_of_students:
-        example: 0
-        type: integer
-      email:
-        example: qwerty@example.com
-        type: string
-      finished_lessons:
-        example: 0
-        type: integer
-      name:
-        example: John
-        type: string
-      registration_date:
-        example: "2022-09-09T10:10:10+09:00"
-        type: string
-      skills:
-        items:
-          $ref: '#/definitions/get_teachers.skill'
-        type: array
-      surname:
-        example: Smith
-        type: string
-      teacher_id:
-        example: 1
-        type: integer
-      user_id:
-        example: 1
-        type: integer
-    type: object
-  get_times.response:
+  schedule.getTimesResponse:
     properties:
       datetimes:
         items:
-          $ref: '#/definitions/get_times.times'
+          $ref: '#/definitions/schedule.respTimes'
         type: array
     type: object
-  get_times.times:
+  schedule.respTimes:
     properties:
       datetime:
         example: "0001-01-01T00:00:00Z"
@@ -458,7 +296,118 @@ definitions:
         example: 1
         type: integer
     type: object
-  get_user.response:
+  teacher.addSkillRequest:
+    properties:
+      about:
+        example: I am Groot
+        type: string
+      category_id:
+        example: 1
+        type: integer
+      video_card_link:
+        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
+        type: string
+    required:
+    - category_id
+    type: object
+  teacher.getTeacherResponse:
+    properties:
+      avatar:
+        example: uuid.png
+        type: string
+      birthdate:
+        example: "2002-09-09T10:10:10+09:00"
+        type: string
+      common_rate:
+        example: 0
+        type: number
+      common_reviews_count:
+        example: 0
+        type: integer
+      count_of_students:
+        example: 0
+        type: integer
+      email:
+        example: qwerty@example.com
+        type: string
+      finished_lessons:
+        example: 0
+        type: integer
+      name:
+        example: John
+        type: string
+      registration_date:
+        example: "2022-09-09T10:10:10+09:00"
+        type: string
+      skills:
+        items:
+          $ref: '#/definitions/teacher.respSkill'
+        type: array
+      surname:
+        example: Smith
+        type: string
+      teacher_id:
+        example: 1
+        type: integer
+      user_id:
+        example: 1
+        type: integer
+    type: object
+  teacher.getTeachersResponse:
+    properties:
+      teachers:
+        items:
+          $ref: '#/definitions/teacher.getTeacherResponse'
+        type: array
+    type: object
+  teacher.respSkill:
+    properties:
+      about:
+        example: about me...
+        type: string
+      category_id:
+        example: 1
+        type: integer
+      category_name:
+        example: Category
+        type: string
+      rate:
+        example: 5
+        type: number
+      reviews_count:
+        example: 1
+        type: integer
+      skill_id:
+        example: 1
+        type: integer
+      video_card_link:
+        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
+        type: string
+    type: object
+  user.authResponse:
+    description: User registration authResponse.
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  user.editUserRequest:
+    description: User registration editUserRequest.
+    properties:
+      avatar:
+        example: base64 encoded image
+        type: string
+      birthdate:
+        example: "2000-01-01T00:00:00Z"
+        type: string
+      name:
+        example: John
+        type: string
+      surname:
+        example: Smith
+        type: string
+    type: object
+  user.getUserResponse:
     properties:
       avatar:
         example: uuid.png
@@ -497,18 +446,7 @@ definitions:
         example: 0
         type: integer
     type: object
-  httputils.ErrorStruct:
-    properties:
-      error:
-        type: string
-    type: object
-  join_lesson.response:
-    properties:
-      token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type: string
-    type: object
-  login.request:
+  user.loginRequest:
     properties:
       email:
         example: john@gmail.com
@@ -520,14 +458,8 @@ definitions:
     - email
     - password
     type: object
-  login.response:
-    properties:
-      token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type: string
-    type: object
-  registration.request:
-    description: User registration request
+  user.registrationRequest:
+    description: User registration registrationRequest.
     properties:
       avatar:
         example: base64 encoded image
@@ -554,19 +486,6 @@ definitions:
     - password
     - surname
     type: object
-  registration.response:
-    description: User registration response
-    properties:
-      token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type: string
-    type: object
-  start_lesson.response:
-    properties:
-      token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type: string
-    type: object
 host: localhost:81
 info:
   contact:
@@ -585,17 +504,17 @@ paths:
       parameters:
       - description: Login Credentials
         in: body
-        name: request
+        name: loginRequest
         required: true
         schema:
-          $ref: '#/definitions/login.request'
+          $ref: '#/definitions/user.loginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/login.response'
+            $ref: '#/definitions/user.authResponse'
         "400":
           description: Bad Request
           schema:
@@ -619,17 +538,17 @@ paths:
       parameters:
       - description: Registration Info
         in: body
-        name: request
+        name: registrationRequest
         required: true
         schema:
-          $ref: '#/definitions/registration.request'
+          $ref: '#/definitions/user.registrationRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/registration.response'
+            $ref: '#/definitions/user.authResponse'
         "400":
           description: Bad Request
           schema:
@@ -656,7 +575,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_categories.response'
+            $ref: '#/definitions/category.getCategoriesResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -704,10 +623,10 @@ paths:
       parameters:
       - description: LessonData
         in: body
-        name: request
+        name: bookLessonRequest
         required: true
         schema:
-          $ref: '#/definitions/book_lesson.request'
+          $ref: '#/definitions/lesson.bookLessonRequest'
       produces:
       - application/json
       responses:
@@ -719,6 +638,10 @@ paths:
             $ref: '#/definitions/httputils.ErrorStruct'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
         "409":
@@ -749,7 +672,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_lesson.response'
+            $ref: '#/definitions/lesson.getLessonResponse'
         "400":
           description: Bad Request
           schema:
@@ -888,7 +811,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/join_lesson.response'
+            $ref: '#/definitions/lesson.connectLessonResponse'
         "400":
           description: Bad Request
           schema:
@@ -925,7 +848,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_lesson_shortdata.response'
+            $ref: '#/definitions/lesson.getLessonShortDataResponse'
         "400":
           description: Bad Request
           schema:
@@ -956,7 +879,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/start_lesson.response'
+            $ref: '#/definitions/lesson.connectLessonResponse'
         "400":
           description: Bad Request
           schema:
@@ -987,10 +910,10 @@ paths:
       parameters:
       - description: Review data
         in: body
-        name: request
+        name: addReviewRequest
         required: true
         schema:
-          $ref: '#/definitions/add_review.request'
+          $ref: '#/definitions/review.addReviewRequest'
       produces:
       - application/json
       responses:
@@ -1034,7 +957,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_student_lessons.response'
+            $ref: '#/definitions/lesson.getStudentLessonsResponse'
         "400":
           description: Bad Request
           schema:
@@ -1062,13 +985,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_teacher.response'
+            $ref: '#/definitions/teacher.getTeacherResponse'
         "403":
           description: Forbidden
-          schema:
-            $ref: '#/definitions/httputils.ErrorStruct'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
         "500":
@@ -1114,7 +1033,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_teacher_lessons.response'
+            $ref: '#/definitions/lesson.getTeacherLessonsResponse'
         "400":
           description: Bad Request
           schema:
@@ -1145,7 +1064,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_times.response'
+            $ref: '#/definitions/schedule.getTimesResponse'
         "401":
           description: Unauthorized
           schema:
@@ -1170,10 +1089,10 @@ paths:
       parameters:
       - description: datetime
         in: body
-        name: request
+        name: addTimeRequest
         required: true
         schema:
-          $ref: '#/definitions/add_time.request'
+          $ref: '#/definitions/schedule.addTimeRequest'
       produces:
       - application/json
       responses:
@@ -1213,10 +1132,10 @@ paths:
       parameters:
       - description: Skill data
         in: body
-        name: request
+        name: addSkillRequest
         required: true
         schema:
-          $ref: '#/definitions/add_skill.request'
+          $ref: '#/definitions/teacher.addSkillRequest'
       produces:
       - application/json
       responses:
@@ -1261,7 +1180,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_teachers.response'
+            $ref: '#/definitions/teacher.getTeachersResponse'
         "401":
           description: Unauthorized
           schema:
@@ -1291,7 +1210,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_teacher.response'
+            $ref: '#/definitions/teacher.getTeacherResponse'
         "404":
           description: Not Found
           schema:
@@ -1305,11 +1224,9 @@ paths:
       - teachers
   /teachers/{id}/reviews:
     get:
-      consumes:
-      - application/json
-      description: Get all reviews by teacher's ID
+      description: Get all reviews about teacher
       parameters:
-      - description: Teacher's ID
+      - description: Teacher ID
         in: path
         name: id
         required: true
@@ -1320,7 +1237,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_reviews.response'
+            $ref: '#/definitions/review.getReviewResponse'
         "400":
           description: Bad Request
           schema:
@@ -1333,7 +1250,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
-      summary: Get reviews by teacher's ID
+      summary: Get reviews
       tags:
       - teachers
   /teachers/{id}/schedule:
@@ -1351,7 +1268,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_times.response'
+            $ref: '#/definitions/schedule.getTimesResponse'
         "403":
           description: Forbidden
           schema:
@@ -1377,7 +1294,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_user.response'
+            $ref: '#/definitions/user.getUserResponse'
         "401":
           description: Unauthorized
           schema:
@@ -1398,10 +1315,10 @@ paths:
       parameters:
       - description: Update Info
         in: body
-        name: request
+        name: editUserRequest
         required: true
         schema:
-          $ref: '#/definitions/edit_user.request'
+          $ref: '#/definitions/user.editUserRequest'
       produces:
       - application/json
       responses:
@@ -1441,7 +1358,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get_user.response'
+            $ref: '#/definitions/user.getUserResponse'
         "404":
           description: Not Found
           schema:

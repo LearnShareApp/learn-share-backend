@@ -39,10 +39,17 @@ func main() {
 		}
 	}()
 
-	cfg, err := config.LoadConfig()
+	envPaths := []string{
+		".env",
+		"./config/.env",
+		"./internal/config/.env",
+	}
+
+	cfg, err := config.LoadConfig(envPaths)
 	if err != nil {
 		log.Error("failed to load config", zap.Error(err))
-		panic("failed to load config")
+
+		return
 	}
 
 	marshaledCfg, err := cfg.LogConfig()

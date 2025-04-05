@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (r *Repository) GetStatusIdByStatusName(ctx context.Context, name string) (int, error) {
+func (r *Repository) GetStatusIDByStatusName(ctx context.Context, name string) (int, error) {
 	const query = `
 	SELECT status_id FROM statuses WHERE name = $1
 	`

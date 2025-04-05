@@ -6,6 +6,9 @@ linters:
     - gochecknoglobals
     - prealloc
     - tenv
+    - varnamelen
+    - err113
+    - nosprintfhostport
 
 run:
   timeout: 1m

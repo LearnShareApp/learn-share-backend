@@ -1,7 +1,7 @@
 package entities
 
 const (
-	CancelStatusName       = "cancelled"
+	CancelStatusName       = "cancel"
 	WaitingStatusName      = "waiting"
 	VerificationStatusName = "verification"
 	OngoingStatusName      = "ongoing"
