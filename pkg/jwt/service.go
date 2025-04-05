@@ -15,28 +15,28 @@ const (
 
 var ErrorTokenExpired = errors.New("token is expired")
 
-type Service struct {
+type JWTService struct {
 	secretKey []byte
 	issuer    string
 	duration  time.Duration
 }
 
-type Option func(*Service)
+type Option func(*JWTService)
 
 func WithDuration(duration time.Duration) Option {
-	return func(s *Service) {
+	return func(s *JWTService) {
 		s.duration = duration
 	}
 }
 
 func WithIssuer(issuer string) Option {
-	return func(s *Service) {
+	return func(s *JWTService) {
 		s.issuer = issuer
 	}
 }
 
-func NewService(secretKey string, opts ...Option) *Service {
-	s := &Service{
+func NewService(secretKey string, opts ...Option) *JWTService {
+	s := &JWTService{
 		secretKey: []byte(secretKey),
 		duration:  defaultTTL,
 		issuer:    "default",
@@ -50,7 +50,7 @@ func NewService(secretKey string, opts ...Option) *Service {
 }
 
 // GenerateJWTToken creates a JWT token for a user.
-func (s *Service) GenerateJWTToken(userID int) (string, error) {
+func (s *JWTService) GenerateJWTToken(userID int) (string, error) {
 	// Set token expiration time
 	expirationTime := time.Now().Add(s.duration)
 
@@ -75,7 +75,7 @@ func (s *Service) GenerateJWTToken(userID int) (string, error) {
 }
 
 // ValidateJWTToken validates the JWT token.
-func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
+func (s *JWTService) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -103,7 +103,7 @@ func (s *Service) ValidateJWTToken(tokenString string) (jwt.MapClaims, error) {
 }
 
 // ExtractUserID extracts user ID from claims.
-func (s *Service) ExtractUserID(claims jwt.MapClaims) (int, error) {
+func (s *JWTService) ExtractUserID(claims jwt.MapClaims) (int, error) {
 	userID, ok := claims[UserIDKey].(float64)
 	if !ok {
 		return 0, errors.New("invalid or missing user ID in claims")
@@ -112,10 +112,10 @@ func (s *Service) ExtractUserID(claims jwt.MapClaims) (int, error) {
 	return int(userID), nil
 }
 
-func (s *Service) GetUserKey() string {
+func (s *JWTService) GetUserKey() string {
 	return UserIDKey
 }
 
-func (s *Service) GetExpiredError() error {
+func (s *JWTService) GetExpiredError() error {
 	return ErrorTokenExpired
 }

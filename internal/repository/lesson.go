@@ -9,11 +9,12 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+
 	"github.com/lib/pq"
 )
 
 func (r *Repository) CreateUnconfirmedLesson(ctx context.Context, lesson *entities.Lesson) error {
-	var tx, err = r.db.BeginTxx(ctx, nil)
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("error beginning transaction: %w", err)
 	}
@@ -22,9 +23,8 @@ func (r *Repository) CreateUnconfirmedLesson(ctx context.Context, lesson *entiti
 	query, args, err := r.sqlBuilder.
 		Insert("lessons").
 		Columns("student_id", "teacher_id", "category_id", "schedule_time_id").
-		Values(lesson.StudentId, lesson.TeacherId, lesson.CategoryId, lesson.ScheduleTimeId).
+		Values(lesson.StudentID, lesson.TeacherID, lesson.CategoryID, lesson.ScheduleTimeID).
 		ToSql()
-
 	if err != nil {
 		return fmt.Errorf("failed to build insert query: %w", err)
 	}
@@ -42,7 +42,7 @@ func (r *Repository) CreateUnconfirmedLesson(ctx context.Context, lesson *entiti
 	}
 
 	// book time
-	if err = bookScheduleTime(ctx, tx, lesson.ScheduleTimeId); err != nil {
+	if err = bookScheduleTime(ctx, tx, lesson.ScheduleTimeID); err != nil {
 		return fmt.Errorf("failed to book schedule time: %w", err)
 	}
 
@@ -57,8 +57,8 @@ func (r *Repository) IsLessonExistsById(ctx context.Context, id int) (bool, erro
 	const query = `SELECT EXISTS(SELECT 1 FROM lessons WHERE lesson_id = $1)`
 
 	var exists bool
-	err := r.db.GetContext(ctx, &exists, query, id)
 
+	err := r.db.GetContext(ctx, &exists, query, id)
 	if err != nil {
 		return false, fmt.Errorf("failed to check lesson existence by lesson id: %w", err)
 	}
@@ -66,7 +66,7 @@ func (r *Repository) IsLessonExistsById(ctx context.Context, id int) (bool, erro
 	return exists, nil
 }
 
-func (r *Repository) GetLessonById(ctx context.Context, id int) (*entities.Lesson, error) {
+func (r *Repository) GetLessonByID(ctx context.Context, id int) (*entities.Lesson, error) {
 	const query = `
 	SELECT
 		lessons.lesson_id,
@@ -123,12 +123,13 @@ func (r *Repository) IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(
 	`
 
 	var exists bool
+
 	err := r.db.GetContext(ctx, &exists, query, teacherId, studentId, categoryId, entities.FinishedStatusName)
 	if err != nil {
 		return false, fmt.Errorf("failed to check finished lesson existence by teacher id, student id and category id: %w", err)
 	}
-	return exists, nil
 
+	return exists, nil
 }
 
 func (r *Repository) ChangeLessonStatus(ctx context.Context, lessonId int, statusId int) error {
@@ -139,10 +140,11 @@ func (r *Repository) ChangeLessonStatus(ctx context.Context, lessonId int, statu
 	if _, err := r.db.ExecContext(ctx, query, lessonId, statusId); err != nil {
 		return fmt.Errorf("failed to update lesson status: %w", err)
 	}
+
 	return nil
 }
 
-func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) ([]*entities.Lesson, error) {
+func (r *Repository) GetTeacherLessonsByTeacherID(ctx context.Context, id int) ([]*entities.Lesson, error) {
 	const query = `
     SELECT
 		lessons.lesson_id,
@@ -177,11 +179,13 @@ func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) (
 	}
 
 	var rows []result
+
 	err := r.db.SelectContext(ctx, &rows, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, internalErrs.ErrorSelectEmpty
 		}
+
 		return nil, err
 	}
 
@@ -213,7 +217,7 @@ func (r *Repository) GetTeacherLessonsByTeacherId(ctx context.Context, id int) (
 	return lessons, nil
 }
 
-func (r *Repository) GetStudentLessonsByUserId(ctx context.Context, id int) ([]*entities.Lesson, error) {
+func (r *Repository) GetStudentLessonsByUserID(ctx context.Context, id int) ([]*entities.Lesson, error) {
 	const query = `
 	   SELECT
 		lessons.lesson_id,
@@ -249,11 +253,13 @@ func (r *Repository) GetStudentLessonsByUserId(ctx context.Context, id int) ([]*
 	}
 
 	var rows []result
+
 	err := r.db.SelectContext(ctx, &rows, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, internalErrs.ErrorSelectEmpty
 		}
+
 		return nil, err
 	}
 

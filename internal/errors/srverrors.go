@@ -20,7 +20,7 @@ var (
 
 	ErrorScheduleTimeExists            = errors.New("schedule time already exists")
 	ErrorScheduleTimeNotFound          = errors.New("schedule time not found")
-	ErrorScheduleTimeForAnotherTeacher = errors.New("schedule time for another teacher")
+	ErrorScheduleTimeForAnotherTeacher = errors.New("schedule time belongs to another teacher")
 	ErrorScheduleTimeUnavailable       = errors.New("schedule time unavailable anymore")
 
 	ErrorStudentAndTeacherSame     = errors.New("student and teacher the same person")

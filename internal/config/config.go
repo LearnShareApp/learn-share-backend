@@ -3,13 +3,14 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/pkg/livekit"
 	"os"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
+	"github.com/LearnShareApp/learn-share-backend/pkg/livekit"
 	"github.com/LearnShareApp/learn-share-backend/pkg/migrator"
 	"github.com/LearnShareApp/learn-share-backend/pkg/storage/db/postgres"
 	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object/minio"
+
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -47,7 +48,6 @@ func LoadConfig(paths []string) (*Config, error) {
 	var config Config
 
 	err := cleanenv.ReadConfig(envPath, &config)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config: %w", err)
 	}
