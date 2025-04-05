@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+
 	"github.com/lib/pq"
 )
 
@@ -26,15 +28,16 @@ func (r *Repository) CreateSkill(ctx context.Context, skill *entities.Skill) err
 
 		return fmt.Errorf("failed to insert skill: %w", err)
 	}
+
 	return nil
 }
 
-func (r *Repository) IsSkillExistsByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (bool, error) {
+func (r *Repository) IsSkillExistsByTeacherIDAndCategoryID(ctx context.Context, teacherId int, categoryId int) (bool, error) {
 	const query = `SELECT EXISTS(SELECT 1 FROM skills WHERE teacher_id = $1 AND category_id = $2)`
 
 	var exists bool
-	err := r.db.GetContext(ctx, &exists, query, teacherId, categoryId)
 
+	err := r.db.GetContext(ctx, &exists, query, teacherId, categoryId)
 	if err != nil {
 		return false, fmt.Errorf("failed to check skill existence by teacher id and category id: %w", err)
 	}
@@ -60,7 +63,7 @@ func (r *Repository) GetSkillIdByTeacherIdAndCategoryId(ctx context.Context, tea
 	return id, nil
 }
 
-func (r *Repository) GetSkillsByTeacherId(ctx context.Context, id int) ([]*entities.Skill, error) {
+func (r *Repository) GetSkillsByTeacherID(ctx context.Context, id int) ([]*entities.Skill, error) {
 	const query = `
 	SELECT 
 		s.skill_id, 

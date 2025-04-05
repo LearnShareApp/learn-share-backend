@@ -1,9 +1,27 @@
-.PHONY: generate-swagger
+GOPATH := $(shell go env GOPATH)
+export PATH := $(PATH):$(GOPATH)/bin
 
+LINT_VERSION = 1.64.5
+GOLANGCI_LINT_PATH = $(GOPATH)/bin/golangci-lint
+
+
+.PHONY: generate-swagger
 generate-swagger:
-	@echo "Getting GOPATH..."
-	@GOPATH=$$(go env GOPATH); \
-	echo "GOPATH is: $$GOPATH"; \
-	echo "Adding $$GOPATH/bin to PATH"; \
-	export PATH=$$PATH:$$GOPATH/bin; \
-	swag init -g ./cmd/main/main.go
+	@echo "Generating Swagger docs..."
+	@swag init -g ./cmd/main/main.go
+
+.PHONY: start-linters
+start-linters: ensure-golangci-lint
+	golangci-lint run
+
+.PHONY: ensure-golangci-lint
+ensure-golangci-lint:
+	@if  ! test -f $(GOLANGCI_LINT_PATH); then \
+		echo "golangci-lint doesn't installed. installing version $(LINT_VERSION)..."; \
+		go install github.com/golangci/golangci-lint/cmd/golangci-lint@v$(LINT_VERSION); \
+	elif ! golangci-lint --version | grep -q $(LINT_VERSION); then \
+		echo "golangci-lint installed, but not version $(LINT_VERSION). installing version $(LINT_VERSION)..."; \
+		go install github.com/golangci/golangci-lint/cmd/golangci-lint@v$(LINT_VERSION); \
+	else \
+		echo "golangci-lint version $(LINT_VERSION) installed"; \
+	fi

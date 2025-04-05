@@ -31,7 +31,7 @@ After starting the project, you can open Swagger and try the API: http://adoe.ru
 
 You can see all handlers in my swagger: http://adoe.ru:81/swagger/index.html
 (or http://localhost:81/swagger/index.html for local start)
-But for shure i describe handlers also here:
+But for sure I describe handlers also here:
 Here's a concise tree-structured description of the API handlers:
 
 ``` go
@@ -80,7 +80,7 @@ API Handlers
 
 
 
-## The main technologies which i use in this project
+## The main technologies which I use in this project
 
 * [Go](https://go.dev/) - programming language
 * [postgresql](https://www.postgresql.org/) - database
@@ -98,7 +98,7 @@ API Handlers
 
 ### Code
 #### Main structure
-```go
+```
 cmd/
 ├── main/main.go               // start project, load config, graceful shutdown
 internal/

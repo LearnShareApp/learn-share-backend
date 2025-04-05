@@ -5,19 +5,20 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 	"time"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
+	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+
 	"github.com/jmoiron/sqlx"
 )
 
-func (r *Repository) IsScheduleTimeExistsByTeacherIdAndDatetime(ctx context.Context, id int, datetime time.Time) (bool, error) {
+func (r *Repository) IsScheduleTimeExistsByTeacherIDAndDatetime(ctx context.Context, id int, datetime time.Time) (bool, error) {
 	const query = `SELECT EXISTS(SELECT 1 FROM schedule_times WHERE teacher_id = $1 AND datetime = $2)`
 
 	var exists bool
-	err := r.db.GetContext(ctx, &exists, query, id, datetime)
 
+	err := r.db.GetContext(ctx, &exists, query, id, datetime)
 	if err != nil {
 		return false, fmt.Errorf("failed to check schadule_time existence by teacherID and time: %w", err)
 	}
@@ -29,8 +30,8 @@ func (r *Repository) IsScheduleTimeExistsById(ctx context.Context, id int) (bool
 	const query = `SELECT EXISTS(SELECT 1 FROM schedule_times WHERE schedule_time_id = $1)`
 
 	var exists bool
-	err := r.db.GetContext(ctx, &exists, query, id)
 
+	err := r.db.GetContext(ctx, &exists, query, id)
 	if err != nil {
 		return false, fmt.Errorf("failed to check schadule_time existence by scheduleTimeID: %w", err)
 	}
@@ -47,26 +48,28 @@ func (r *Repository) CreateScheduleTime(ctx context.Context, teacherId int, date
 	if _, err := r.db.ExecContext(ctx, query, teacherId, datetime); err != nil {
 		return fmt.Errorf("failed to insert schedule time: %w", err)
 	}
+
 	return nil
 }
 
-func (r *Repository) GetScheduleTimeById(ctx context.Context, id int) (*entities.ScheduleTime, error) {
+func (r *Repository) GetScheduleTimeByID(ctx context.Context, id int) (*entities.ScheduleTime, error) {
 	const query = `SELECT schedule_time_id, teacher_id, datetime, is_available FROM schedule_times WHERE schedule_time_id = $1`
 
 	var scheduleTime entities.ScheduleTime
-	err := r.db.GetContext(ctx, &scheduleTime, query, id)
 
+	err := r.db.GetContext(ctx, &scheduleTime, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, internalErrs.ErrorSelectEmpty
 		}
+
 		return nil, fmt.Errorf("failed to get schadule_time existence by scheduleTimeID: %w", err)
 	}
 
 	return &scheduleTime, nil
 }
 
-func (r *Repository) GetScheduleTimesByTeacherId(ctx context.Context, id int) ([]*entities.ScheduleTime, error) {
+func (r *Repository) GetScheduleTimesByTeacherID(ctx context.Context, id int) ([]*entities.ScheduleTime, error) {
 	const query = `
 		SELECT schedule_time_id, teacher_id, datetime, is_available FROM schedule_times 
 		WHERE teacher_id = $1 AND 
@@ -74,12 +77,14 @@ func (r *Repository) GetScheduleTimesByTeacherId(ctx context.Context, id int) ([
 		`
 
 	var times []*entities.ScheduleTime
+
 	err := r.db.SelectContext(ctx, &times, query, id)
 	if err != nil {
 		// empty times isn't error
 		if errors.Is(err, sql.ErrNoRows) {
 			return times, nil
 		}
+
 		return nil, fmt.Errorf("failed to find schedule times: %w", err)
 	}
 
@@ -95,5 +100,6 @@ func bookScheduleTime(ctx context.Context, tx *sqlx.Tx, id int) error {
 	if err != nil {
 		return fmt.Errorf("failed to update schedule_times table: %w", err)
 	}
+
 	return nil
 }

@@ -9,15 +9,16 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+
 	"github.com/jmoiron/sqlx"
 )
 
-func (r *Repository) IsTeacherExistsByUserId(ctx context.Context, id int) (bool, error) {
+func (r *Repository) IsTeacherExistsByUserID(ctx context.Context, id int) (bool, error) {
 	const query = `SELECT EXISTS(SELECT 1 FROM teachers WHERE user_id = $1)`
 
 	var exists bool
-	err := r.db.GetContext(ctx, &exists, query, id)
 
+	err := r.db.GetContext(ctx, &exists, query, id)
 	if err != nil {
 		return false, fmt.Errorf("failed to check teacher existence by user id: %w", err)
 	}
@@ -29,8 +30,8 @@ func (r *Repository) IsTeacherExistsById(ctx context.Context, id int) (bool, err
 	const query = `SELECT EXISTS(SELECT 1 FROM teachers WHERE teacher_id = $1)`
 
 	var exists bool
-	err := r.db.GetContext(ctx, &exists, query, id)
 
+	err := r.db.GetContext(ctx, &exists, query, id)
 	if err != nil {
 		return false, fmt.Errorf("failed to check teacher existence by teacher id: %w", err)
 	}
@@ -47,10 +48,11 @@ func (r *Repository) CreateTeacher(ctx context.Context, userId int) error {
 	if _, err := r.db.ExecContext(ctx, query, userId); err != nil {
 		return fmt.Errorf("failed to insert teacher: %w", err)
 	}
+
 	return nil
 }
 
-// CreateTeacherIfNotExists check is teacher exists in db, create if not and return teacher_id
+// CreateTeacherIfNotExists check is teacher exists in db, create if not and return teacher_id.
 func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (int, error) {
 	const (
 		selectQuery = `
@@ -76,6 +78,7 @@ func (r *Repository) CreateTeacherIfNotExists(ctx context.Context, userId int) (
 	if err := r.db.QueryRowContext(ctx, insertQuery, userId).Scan(&teacherId); err != nil {
 		return 0, fmt.Errorf("failed to insert teacher: %w", err)
 	}
+
 	return teacherId, nil
 }
 
@@ -100,7 +103,7 @@ func (r *Repository) GetTeacherIdByUserId(ctx context.Context, id int) (int, err
 	return teacherId, nil
 }
 
-func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.Teacher, error) {
+func (r *Repository) GetTeacherByUserID(ctx context.Context, id int) (*entities.Teacher, error) {
 	const query = `
 		SELECT 
 		    teacher_id, 
@@ -124,7 +127,7 @@ func (r *Repository) GetTeacherByUserId(ctx context.Context, id int) (*entities.
 	return &teacher, nil
 }
 
-func (r *Repository) GetTeacherById(ctx context.Context, id int) (*entities.Teacher, error) {
+func (r *Repository) GetTeacherByID(ctx context.Context, id int) (*entities.Teacher, error) {
 	const query = `
 		SELECT 
     		teacher_id, 
@@ -147,7 +150,7 @@ func (r *Repository) GetTeacherById(ctx context.Context, id int) (*entities.Teac
 	return &teacher, nil
 }
 
-func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int) (*entities.TeacherStatistic, error) {
+func (r *Repository) GetShortStatTeacherByID(ctx context.Context, teacherId int) (*entities.TeacherStatistic, error) {
 	const query = `
     SELECT 
         COUNT(DISTINCT l.lesson_id) FILTER (WHERE st.name = $1) as count_of_finished_lesson,
@@ -158,15 +161,16 @@ func (r *Repository) GetShortStatTeacherById(ctx context.Context, teacherId int)
     `
 
 	var stat entities.TeacherStatistic
+
 	err := r.db.GetContext(ctx, &stat, query,
 		entities.FinishedStatusName, // $1
 		teacherId,                   // $2
 	)
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("teacher statistic not found: %w", err)
 		}
+
 		return nil, fmt.Errorf("failed to calculate teacher's statistic by teacherId: %w", err)
 	}
 
@@ -257,11 +261,13 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 	}
 
 	var rows []result
+
 	err = r.db.SelectContext(ctx, &rows, query, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return []entities.User{}, nil
 		}
+
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 
@@ -280,7 +286,7 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 			user.IsTeacher = true
 			user.TeacherData = &entities.Teacher{
 				Id:          row.Teacher.Id,
-				UserId:      row.Teacher.UserId,
+				UserID:      row.Teacher.UserID,
 				Skills:      make([]*entities.Skill, 0),
 				TeacherStat: row.TeacherStatistic,
 			}
@@ -305,5 +311,6 @@ func hasSkill(skills []*entities.Skill, skillId int) bool {
 			return true
 		}
 	}
+
 	return false
 }

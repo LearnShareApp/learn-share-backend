@@ -3,11 +3,13 @@ package middlewares
 import (
 	"context"
 	"errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
-	"github.com/golang-jwt/jwt/v5"
-	"go.uber.org/zap"
 	"net/http"
 	"strings"
+
+	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+
+	"github.com/golang-jwt/jwt/v5"
+	"go.uber.org/zap"
 )
 
 type TokenValidator interface {
@@ -17,11 +19,11 @@ type TokenValidator interface {
 	GetExpiredError() error
 }
 
-// JWTMiddleware middleware для проверки JWT токена
+// JWTMiddleware middleware for JWT token validation
 func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Получаем заголовок Authorization
+			// get authorization header
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
 				if err := httputils.RespondWith401(w, "missed Authorization header (required)"); err != nil {
@@ -30,7 +32,7 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 				return
 			}
 
-			// Проверяем формат заголовка (Bearer Token)
+			// check header format (Bearer Token)
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || parts[0] != "Bearer" {
 				if err := httputils.RespondWith401(w, "Invalid token format"); err != nil {
@@ -39,10 +41,10 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 				return
 			}
 
-			// Извлекаем токен
+			// extract token
 			tokenString := parts[1]
 
-			// Валидируем токен с помощью переданного валидатора
+			// validate token using provided validator
 			claims, err := validator.ValidateJWTToken(tokenString)
 			if err != nil {
 				if errors.Is(err, validator.GetExpiredError()) {
@@ -60,7 +62,7 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 				return
 			}
 
-			// Извлекаем ID из токена
+			// extract ID from token
 			userID, err := validator.ExtractUserID(claims)
 			if err != nil {
 				log.Error("failed to extract user ID", zap.Error(err))

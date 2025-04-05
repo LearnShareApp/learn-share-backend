@@ -20,14 +20,17 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) error
 		if respondErr != nil {
 			return err
 		}
+
 		return fmt.Errorf("failed to marshall payload: %w", err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
+
 	if _, err = w.Write(response); err != nil {
 		return fmt.Errorf("failed to write response: %w", err)
 	}
+
 	return nil
 }
 
@@ -39,6 +42,7 @@ func RespondWithImage(w http.ResponseWriter, code int, reader io.Reader, imgExte
 		if respondErr != nil {
 			return respondErr
 		}
+
 		return fmt.Errorf("unsupported image extension: %s", imgExtension)
 	}
 
@@ -49,6 +53,7 @@ func RespondWithImage(w http.ResponseWriter, code int, reader io.Reader, imgExte
 	if _, err := io.Copy(w, reader); err != nil {
 		return fmt.Errorf("failed to write response: %w", err)
 	}
+
 	return nil
 }
 

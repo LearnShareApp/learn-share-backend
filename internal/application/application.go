@@ -4,161 +4,156 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/get_reviews"
 	"os"
-	"time"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/jwt"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/livekit"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/category"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/common"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/image"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/lesson"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/review"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/schedule"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/teacher"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/user"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/categories/get_categories"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/image/get_image"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/approve_lesson"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/book_lesson"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/cancel_lesson"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/finish_lesson"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_lesson"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_lesson_shortdata"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_student_lessons"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/get_teacher_lessons"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/join_lesson"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/lessons/start_lesson"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/reviews/add_review"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/add_time"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/schedules/get_times"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/add_skill"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/become_teacher"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teacher"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/teachers/get_teachers"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/login"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/auth/registration"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/edit_user"
-	"github.com/LearnShareApp/learn-share-backend/internal/use_cases/users/get_user"
-	"github.com/LearnShareApp/learn-share-backend/pkg/db/postgres"
-	"github.com/LearnShareApp/learn-share-backend/pkg/object_storage/minio"
+	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
+	"github.com/LearnShareApp/learn-share-backend/pkg/livekit"
+	"github.com/LearnShareApp/learn-share-backend/pkg/migrator"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/db/postgres"
+	"github.com/LearnShareApp/learn-share-backend/pkg/storage/object/minio"
+
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
 type Application struct {
-	context context.Context
-	db      *sqlx.DB
-	server  *rest.Server
-	log     *zap.Logger
+	db     *sqlx.DB
+	server *rest.Server
+	log    *zap.Logger
 }
 
-func New(ctx context.Context, config config.Config, log *zap.Logger) (*Application, error) {
+type Services struct {
+	jwt.JWTService
+	user.UserService
+	teacher.TeacherService
+	schedule.ScheduleService
+	review.ReviewService
+	lesson.LessonService
+	image.ImageService
+	category.CategoryService
+	common.CommonService
+}
 
-	// db connection
-	db, err := postgres.New(ctx, &config.Db)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to postgres: %v", err)
+func NewServices(
+	jwtService *jwt.JWTService,
+	userService *user.UserService,
+	teacherService *teacher.TeacherService,
+	scheduleService *schedule.ScheduleService,
+	reviewService *review.ReviewService,
+	lessonService *lesson.LessonService,
+	imageService *image.ImageService,
+	categoryService *category.CategoryService,
+	commonService *common.CommonService,
+) *Services {
+	return &Services{
+		JWTService:      *jwtService,
+		UserService:     *userService,
+		TeacherService:  *teacherService,
+		ScheduleService: *scheduleService,
+		ReviewService:   *reviewService,
+		LessonService:   *lessonService,
+		ImageService:    *imageService,
+		CategoryService: *categoryService,
+		CommonService:   *commonService,
 	}
+}
+
+func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Application, error) {
+	// database connection
+	database, err := postgres.New(ctx, &config.DB)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to postgres: %w", err)
+	}
+
 	log.Info("connected to database successfully")
 
 	minioClient, err := minio.NewClient(&config.Minio)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to minio: %v", err)
+		return nil, fmt.Errorf("failed to connect to minio: %w", err)
 	}
+
 	if err = minio.CreateBucket(ctx, minioClient, config.Minio.Bucket); err != nil {
-		return nil, fmt.Errorf("failed to create minio bucket: %v", err)
+		return nil, fmt.Errorf("failed to create minio bucket: %w", err)
 	}
 
 	log.Info("connected to minio successfully")
 
-	// TODO: repo, services, rest-server
+	repo := repository.New(database)
 
-	repo := repository.New(db)
 	if config.IsInitDb {
-		err = repo.CreateTables(ctx)
+		err = migrator.RunMigrations(&config.Migrator)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create tables: %v", err)
+			return nil, err
 		}
-		log.Info("successfully created tables (if they not existed)")
+
+		log.Info("up migrations successfully")
 	}
 
-	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"), jwt.WithDuration(time.Hour*24*7))
-	leveKitService := livekit.NewService(config.LiveKit)
+	/*----------------------------------------------------------*/
+
+	// services
+	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"))
+	liveKitService := livekit.NewService(config.LiveKit)
 	minioService := minio.NewService(minioClient, config.Minio.Bucket)
 
-	var (
-		registrationSrv         = registration.NewService(repo, jwtService, minioService)
-		loginSrv                = login.NewService(repo, jwtService)
-		getCategoriesSrv        = get_categories.NewService(repo)
-		getProfileSrv           = get_user.NewService(repo)
-		editUserSrv             = edit_user.NewService(repo, minioService)
-		becomeTeacherSrv        = become_teacher.NewService(repo)
-		addSkillSrv             = add_skill.NewService(repo)
-		getTeacherSrv           = get_teacher.NewService(repo)
-		getTeachersSrv          = get_teachers.NewService(repo)
-		addScheduleTimeSrv      = add_time.NewService(repo)
-		getScheduleTimesSrv     = get_times.NewService(repo)
-		bookLessonSrv           = book_lesson.NewService(repo)
-		getLessonsForTeacherSrv = get_teacher_lessons.NewService(repo)
-		getLessonsForStudentSrv = get_student_lessons.NewService(repo)
-		getLessonSrv            = get_lesson.NewService(repo)
-		getLessonShortDataSrv   = get_lesson_shortdata.NewService(repo)
-		cancelLessonSrv         = cancel_lesson.NewService(repo)
-		approveLessonSrv        = approve_lesson.NewService(repo)
-		startLessonSrv          = start_lesson.NewService(repo, leveKitService)
-		finishLessonSrv         = finish_lesson.NewService(repo)
-		joinLessonSrv           = join_lesson.NewService(repo, leveKitService)
-		getImagSrv              = get_image.NewService(minioService)
-		addReviewSrv            = add_review.NewService(repo)
-		getReviewsSrv           = get_reviews.NewService(repo)
-	)
+	userService := user.NewService(repo, minioService)
+	teacherService := teacher.NewService(repo)
+	scheduleService := schedule.NewService(repo)
+	reviewService := review.NewService(repo)
+	lessonService := lesson.NewService(repo, liveKitService)
+	imageService := image.NewService(minioService)
+	commonService := common.NewService(repo)
+	categoryService := category.NewService(repo)
 
-	services := rest.NewServices(jwtService,
-		registrationSrv,
-		loginSrv,
-		getCategoriesSrv,
-		getProfileSrv,
-		editUserSrv,
-		becomeTeacherSrv,
-		addSkillSrv,
-		getTeacherSrv,
-		getTeachersSrv,
-		addScheduleTimeSrv,
-		getScheduleTimesSrv,
-		bookLessonSrv,
-		getLessonsForTeacherSrv,
-		getLessonsForStudentSrv,
-		getLessonSrv,
-		getLessonShortDataSrv,
-		cancelLessonSrv,
-		approveLessonSrv,
-		startLessonSrv,
-		finishLessonSrv,
-		joinLessonSrv,
-		getImagSrv,
-		addReviewSrv,
-		getReviewsSrv,
+	services := NewServices(
+		jwtService,
+		userService,
+		teacherService,
+		scheduleService,
+		reviewService,
+		lessonService,
+		imageService,
+		categoryService,
+		commonService,
 	)
 
 	restServer := rest.NewServer(services, config.Server, log)
 
 	return &Application{
-		context: ctx,
-		db:      db,
-		server:  restServer,
-		log:     log,
+		db:     database,
+		server: restServer,
+		log:    log,
 	}, nil
 }
 
-// Run запускает приложение
+// Run start application.
 func (app *Application) Run() error {
-	return app.server.Start()
+	err := app.server.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start server: %w", err)
+	}
+
+	return nil
 }
 
-// Shutdown gracefully останавливает приложение
+// Shutdown gracefully stop application.
 func (app *Application) Shutdown(ctx context.Context) error {
-
 	app.log.Info("shutting down application...")
 
 	go func() {
 		<-ctx.Done()
+
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			app.log.Error("graceful shutdown timed out... forcing exit")
 			os.Exit(1)

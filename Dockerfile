@@ -22,6 +22,7 @@ RUN apk --no-cache add ca-certificates
 
 # Copy the binary and configs
 COPY --from=builder /app/app-binary .
+COPY ./migrations /app/migrations/
 COPY .env /app/.env
 
 # Run the binary

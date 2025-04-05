@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+
 	"github.com/lib/pq"
 )
 
@@ -32,6 +34,7 @@ func (r *Repository) CreateReview(ctx context.Context, review *entities.Review) 
 
 		return fmt.Errorf("failed to insert review: %w", err)
 	}
+
 	return nil
 }
 
@@ -62,12 +65,14 @@ func (r *Repository) GetReviewsByTeacherId(ctx context.Context, id int) ([]*enti
 	}
 
 	var rows []result
+
 	err := r.db.SelectContext(ctx, &rows, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// not an error
 			return make([]*entities.Review, 0), nil
 		}
+
 		return nil, fmt.Errorf("failed to extract reviews: %w", err)
 	}
 
@@ -75,12 +80,13 @@ func (r *Repository) GetReviewsByTeacherId(ctx context.Context, id int) ([]*enti
 	reviewsMap := make(map[int]*entities.Review)
 
 	for _, row := range rows {
-		review, exists := reviewsMap[row.Review.Id]
+		_, exists := reviewsMap[row.Review.Id]
 		if !exists {
-			review = &row.Review
+			review := &row.Review
 			if review.StudentData == nil {
 				review.StudentData = &row.User
 			}
+
 			reviewsMap[row.Review.Id] = review
 		}
 	}

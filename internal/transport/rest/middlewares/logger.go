@@ -18,7 +18,7 @@ const (
 	truncatedValue = "[TRUNCATED]"
 )
 
-// Список чувствительных полей, которые нужно маскировать
+// list of sensitive fields, which should be mascked
 var sensitiveFields = []string{
 	"password",
 	"token",
@@ -54,12 +54,12 @@ func (rw *responseWriter) Write(body []byte) (int, error) {
 	return rw.ResponseWriter.Write(body)
 }
 
-// maskSensitiveAndBigData маскирует чувствительные данные в JSON
+// maskSensitiveAndBigData mask sensitive data in JSON
 func maskSensitiveAndBigData(data []byte) string {
-	// Пробуем распарсить как JSON
+	// try parse JSON
 	var jsonMap map[string]interface{}
 	if err := json.Unmarshal(data, &jsonMap); err != nil {
-		// Если это не JSON, просто проверяем наличие чувствительных полей
+		// if it is not JSON, just check on sensitive fields
 		bodyStr := string(data)
 		for _, field := range sensitiveFields {
 			if strings.Contains(strings.ToLower(bodyStr), field) {
@@ -69,10 +69,8 @@ func maskSensitiveAndBigData(data []byte) string {
 		return bodyStr
 	}
 
-	// Рекурсивно маскируем чувствительные поля
 	maskJSONFields(jsonMap)
 
-	// Преобразуем обратно в JSON
 	maskedJSON, err := json.Marshal(jsonMap)
 	if err != nil {
 		return filteredValue
@@ -80,12 +78,12 @@ func maskSensitiveAndBigData(data []byte) string {
 	return string(maskedJSON)
 }
 
-// maskJSONFields рекурсивно маскирует чувствительные и длинные поля в JSON-структуре
+// maskJSONFields recursively masks sensitive and long fields in JSON structure
 func maskJSONFields(data map[string]interface{}) {
 	for key, value := range data {
 		lowerKey := strings.ToLower(key)
 
-		// Проверяем, является ли поле чувствительным
+		// check if field is sensitive
 		for _, sensitive := range sensitiveFields {
 			if strings.Contains(lowerKey, sensitive) {
 				data[key] = filteredValue
@@ -93,12 +91,12 @@ func maskJSONFields(data map[string]interface{}) {
 			}
 		}
 
-		// Маскируем большие строки
+		// mask long strings
 		if str, ok := value.(string); ok && len(str) > maxLogLenValue {
 			data[key] = truncatedValue
 		}
 
-		// Рекурсивно обрабатываем вложенные объекты
+		// recursively process nested objects
 		switch v := value.(type) {
 		case map[string]interface{}:
 			maskJSONFields(v)
@@ -119,7 +117,7 @@ func LoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 
-			// Маскируем чувствительные заголовки
+			// mask sensitive headers
 			headers := make(map[string]string)
 			for key, values := range r.Header {
 				lowerKey := strings.ToLower(key)
@@ -135,7 +133,7 @@ func LoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
 				zap.String("path", r.URL.Path),
 			)
 
-			// Читаем и маскируем тело запроса
+			// read and mask request body
 			var requestBody []byte
 			if r.Body != nil {
 				requestBody, _ = io.ReadAll(r.Body)
@@ -147,13 +145,13 @@ func LoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
 
 			duration := time.Since(start)
 
-			// Формируем лог с маскированными данными
+			// form log with masked data
 			logFields := []zap.Field{
 				zap.Duration("duration", duration),
 				zap.Int("status", rw.status),
 			}
 
-			// логируем request body / response body только в случае ошибки
+			// log request body / response body only in case of error
 			if rw.status >= 400 {
 				maskedRequest := maskSensitiveAndBigData(requestBody)
 				logFields = append(logFields,
@@ -161,7 +159,7 @@ func LoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
 					zap.String("request_body", maskedRequest),
 				)
 
-				// Маскируем тело ответа
+				// mask response body
 				if rw.body.Len() > 0 {
 					maskedResponse := maskSensitiveAndBigData(rw.body.Bytes())
 					logFields = append(logFields, zap.String("response_body", maskedResponse))
