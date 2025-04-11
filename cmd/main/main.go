@@ -22,7 +22,7 @@ import (
 // @contact.url    https://t.me/Ruslan20007
 // @contact.email  ruslanrbb8@gmail.com
 
-// @host         localhost:81
+// @host         adoe.ru:81
 // @BasePath     /api
 // @securityDefinitions.apikey BearerAuth
 // @in header
