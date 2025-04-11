@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS public.skills (
         rate FLOAT NOT NULL DEFAULT 0,
         total_rate_score INTEGER NOT NULL DEFAULT 0,
         reviews_count INTEGER NOT NULL DEFAULT 0,
-        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        is_active BOOLEAN NOT NULL DEFAULT FALSE,
         CONSTRAINT unique_teacher_category UNIQUE (teacher_id, category_id)
 );

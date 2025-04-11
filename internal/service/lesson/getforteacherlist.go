@@ -32,7 +32,7 @@ func (s *LessonService) GetTeacherLessonList(ctx context.Context, userID int) ([
 	}
 
 	// get lessons
-	lessons, err := s.repo.GetTeacherLessonsByTeacherID(ctx, teacher.Id)
+	lessons, err := s.repo.GetTeacherLessonsByTeacherID(ctx, teacher.ID)
 	if err != nil {
 		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
 			return nil, nil

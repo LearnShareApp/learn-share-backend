@@ -43,7 +43,7 @@ func (s *LessonService) JoinLesson(ctx context.Context, userID int, lessonID int
 			return "", fmt.Errorf("failed to get teacher by userID: %w", err)
 		}
 
-		if lesson.TeacherID != teacher.Id {
+		if lesson.TeacherID != teacher.ID {
 			return "", serviceErrs.ErrorNotRelatedUserToLesson
 		}
 	}
@@ -55,12 +55,12 @@ func (s *LessonService) JoinLesson(ctx context.Context, userID int, lessonID int
 	}
 
 	// may join lesson if only was ongoing status
-	if lesson.StatusId != ongoingStatusId {
+	if lesson.StatusID != ongoingStatusId {
 		return "", serviceErrs.ErrorStatusNonOngoing
 	}
 
 	token, err := s.meetCreator.GenerateMeetingToken(s.meetCreator.NameRoomByLessonID(lessonID),
-		s.meetCreator.GetUserIdentityString(user.Name, user.Surname, user.Id))
+		s.meetCreator.GetUserIdentityString(user.Name, user.Surname, user.ID))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate meeting token: %w", err)
 	}

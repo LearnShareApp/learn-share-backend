@@ -39,7 +39,7 @@ func (s *LessonService) StartLesson(ctx context.Context, userID, lessonID int) (
 		return "", fmt.Errorf("failed to get lesson by id: %w", err)
 	}
 
-	if lesson.TeacherID != teacher.Id {
+	if lesson.TeacherID != teacher.ID {
 		return "", serviceErrs.ErrorNotRelatedTeacherToLesson
 	}
 
@@ -50,7 +50,7 @@ func (s *LessonService) StartLesson(ctx context.Context, userID, lessonID int) (
 	}
 
 	// may start lesson if only was waiting status
-	if lesson.StatusId != waitingStatusId {
+	if lesson.StatusID != waitingStatusId {
 		return "", serviceErrs.ErrorStatusNonWaiting
 	}
 
@@ -61,7 +61,7 @@ func (s *LessonService) StartLesson(ctx context.Context, userID, lessonID int) (
 	}
 
 	token, err := s.meetCreator.GenerateMeetingToken(s.meetCreator.NameRoomByLessonID(lessonID),
-		s.meetCreator.GetUserIdentityString(user.Name, user.Surname, user.Id))
+		s.meetCreator.GetUserIdentityString(user.Name, user.Surname, user.ID))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate meeting token: %w", err)
 	}

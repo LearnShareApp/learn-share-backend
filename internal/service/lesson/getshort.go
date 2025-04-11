@@ -26,7 +26,7 @@ func (s *LessonService) GetLessonShortData(ctx context.Context, lessonID int) (*
 	}
 
 	lesson.TeacherUserData = &entities.User{
-		Id: teacher.UserID,
+		ID: teacher.UserID,
 	}
 
 	return lesson, nil

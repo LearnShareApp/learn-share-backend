@@ -30,12 +30,16 @@ var (
 	ErrorNotRelatedTeacherToLesson = errors.New("teacher no related to this lesson")
 	ErrorFinishedLessonNotFound    = errors.New("finished lesson not found")
 
-	ErrorStatusNonVerification = errors.New("non-verification status")
-	ErrorStatusNonWaiting      = errors.New("non-waiting status")
-	ErrorStatusNonOngoing      = errors.New("non-ongoing status")
+	ErrorStatusNonVerification        = errors.New("non-verification status")
+	ErrorStatusNonWaiting             = errors.New("non-waiting status")
+	ErrorStatusNonOngoing             = errors.New("non-ongoing status")
+	ErrorFinishedLessonCanNotBeCancel = errors.New("finished lesson can not be cancel")
+	ErrorLessonAlreadyCanceled        = errors.New("lesson is already canceled")
 
 	ErrorImageNotFound       = errors.New("image not found")
 	ErrorIncorrectFileFormat = errors.New("incorrect file format")
 
 	ErrorReviewExists = errors.New("review already exists")
+
+	ErrorNotAdmin = errors.New("you are not admin")
 )

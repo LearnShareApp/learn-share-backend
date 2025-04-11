@@ -80,8 +80,8 @@ func mappingResponse(users []entities.User) *getTeachersResponse {
 		// Transform skills slice in one go
 		for j, sk := range users[i].TeacherData.Skills {
 			skills[j] = respSkill{
-				SkillID:       sk.Id,
-				CategoryID:    sk.CategoryId,
+				SkillID:       sk.ID,
+				CategoryID:    sk.CategoryID,
 				CategoryName:  sk.CategoryName,
 				VideoCardLink: sk.VideoCardLink,
 				About:         sk.About,
@@ -91,8 +91,8 @@ func mappingResponse(users []entities.User) *getTeachersResponse {
 		}
 
 		resp.Teachers = append(resp.Teachers, getTeacherResponse{
-			TeacherID:          users[i].TeacherData.Id,
-			UserID:             users[i].Id,
+			TeacherID:          users[i].TeacherData.ID,
+			UserID:             users[i].ID,
 			Email:              users[i].Email,
 			Name:               users[i].Name,
 			Surname:            users[i].Surname,

@@ -1,9 +1,9 @@
 package entities
 
 type Skill struct {
-	Id             int     `db:"skill_id"`
-	TeacherId      int     `db:"teacher_id"`
-	CategoryId     int     `db:"category_id"`
+	ID             int     `db:"skill_id"`
+	TeacherID      int     `db:"teacher_id"`
+	CategoryID     int     `db:"category_id"`
 	CategoryName   string  `db:"category_name"`
 	VideoCardLink  string  `db:"video_card_link"`
 	About          string  `db:"about"`

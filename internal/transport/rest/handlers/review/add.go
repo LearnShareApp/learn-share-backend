@@ -67,9 +67,9 @@ func (h *ReviewHandlers) AddReview() http.HandlerFunc {
 		}
 
 		review := &entities.Review{
-			TeacherId:  req.TeacherID,
-			StudentId:  userID,
-			CategoryId: req.CategoryID,
+			TeacherID:  req.TeacherID,
+			StudentID:  userID,
+			CategoryID: req.CategoryID,
 			Rate:       req.Rate,
 			Comment:    req.Comment,
 		}

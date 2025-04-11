@@ -42,20 +42,35 @@ func (s *LessonService) CancelLesson(ctx context.Context, userID int, lessonID i
 			return fmt.Errorf("failed to get teacher by userID: %w", err)
 		}
 
-		if lesson.TeacherID != teacher.Id {
+		if lesson.TeacherID != teacher.ID {
 			return serviceErrs.ErrorNotRelatedUserToLesson
 		}
 	}
 
 	// if we here => related user to lesson
-	// get cancel statusId
-	statusId, err := s.repo.GetStatusIDByStatusName(ctx, entities.CancelStatusName)
+
+	//can cancel only if lesson isn't already canceled or finished
+	finishStatusID, err := s.repo.GetStatusIDByStatusName(ctx, entities.FinishedStatusName)
 	if err != nil {
 		return fmt.Errorf("failed to get status by status name: %w", err)
 	}
 
+	if lesson.StatusID == finishStatusID {
+		return serviceErrs.ErrorFinishedLessonCanNotBeCancel
+	}
+
+	// get cancel cancelStatusID
+	cancelStatusID, err := s.repo.GetStatusIDByStatusName(ctx, entities.CancelStatusName)
+	if err != nil {
+		return fmt.Errorf("failed to get status by status name: %w", err)
+	}
+
+	if lesson.StatusID == cancelStatusID {
+		return serviceErrs.ErrorLessonAlreadyCanceled
+	}
+
 	// change lesson status
-	if err = s.repo.ChangeLessonStatus(ctx, lessonID, statusId); err != nil {
+	if err = s.repo.ChangeLessonStatus(ctx, lessonID, cancelStatusID); err != nil {
 		return fmt.Errorf("failed to change lesson status: %w", err)
 	}
 

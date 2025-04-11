@@ -56,7 +56,7 @@ func (h *LessonHandlers) GetLessonShortData() http.HandlerFunc {
 			LessonID: lessonID,
 
 			TeacherID:     lesson.TeacherID,
-			TeacherUserID: lesson.TeacherUserData.Id,
+			TeacherUserID: lesson.TeacherUserData.ID,
 
 			StudentID: lesson.StudentID,
 

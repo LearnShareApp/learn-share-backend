@@ -54,7 +54,7 @@ func (s *ScheduleService) AddTime(ctx context.Context, userID int, datetime time
 		return fmt.Errorf("failed to get teacher by user id: %w", err)
 	}
 
-	exists, err = s.repo.IsScheduleTimeExistsByTeacherIDAndDatetime(ctx, teacher.Id, datetime)
+	exists, err = s.repo.IsScheduleTimeExistsByTeacherIDAndDatetime(ctx, teacher.ID, datetime)
 	if err != nil {
 		return fmt.Errorf("failed to check time existstance by user id: %w", err)
 	}
@@ -63,7 +63,7 @@ func (s *ScheduleService) AddTime(ctx context.Context, userID int, datetime time
 		return serviceErrs.ErrorScheduleTimeExists
 	}
 
-	if err = s.repo.CreateScheduleTime(ctx, teacher.Id, datetime); err != nil {
+	if err = s.repo.CreateScheduleTime(ctx, teacher.ID, datetime); err != nil {
 		return fmt.Errorf("failed to create teacher time: %w", err)
 	}
 
@@ -72,7 +72,7 @@ func (s *ScheduleService) AddTime(ctx context.Context, userID int, datetime time
 
 // GetTimes returns teacher's schedule times.
 func (s *ScheduleService) GetTimes(ctx context.Context, teacher *entities.Teacher) ([]*entities.ScheduleTime, error) {
-	times, err := s.repo.GetScheduleTimesByTeacherID(ctx, teacher.Id)
+	times, err := s.repo.GetScheduleTimesByTeacherID(ctx, teacher.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get available schedule times by teacher id: %w", err)
 	}

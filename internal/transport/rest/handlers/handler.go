@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/handlers/admin"
 	"net/http"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/handlers/category"
@@ -23,6 +24,7 @@ type Services interface {
 	lesson.LessonService
 	image.ImageService
 	category.CategoryService
+	admin.AdminService
 }
 
 type Handlers struct {
@@ -68,4 +70,8 @@ func (h *Handlers) SetupRoutes(router *chi.Mux, authMiddleware func(http.Handler
 	var categoryService category.CategoryService = h.services
 	categoryHandlers := category.NewCategoryHandlers(categoryService, h.log)
 	categoryHandlers.SetupCategoryRoutes(router)
+
+	var adminService admin.AdminService = h.services
+	adminHandlers := admin.NewAdminHandlers(adminService, h.log)
+	adminHandlers.SetupAdminRoutes(router, authMiddleware)
 }

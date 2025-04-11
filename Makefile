@@ -25,3 +25,5 @@ ensure-golangci-lint:
 	else \
 		echo "golangci-lint version $(LINT_VERSION) installed"; \
 	fi
+
+# migrate create -ext sql -dir migrations -seq create_teachers_table

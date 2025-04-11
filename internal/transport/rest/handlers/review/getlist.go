@@ -57,13 +57,13 @@ func (h *ReviewHandlers) GetReviewList() http.HandlerFunc {
 
 		for _, review := range reviews {
 			resp.Reviews = append(resp.Reviews, respReview{
-				ReviewID:       review.Id,
-				TeacherID:      review.TeacherId,
-				SkillID:        review.SkillId,
-				CategoryID:     review.CategoryId,
+				ReviewID:       review.ID,
+				TeacherID:      review.TeacherID,
+				SkillID:        review.SkillID,
+				CategoryID:     review.CategoryID,
 				Rate:           review.Rate,
 				Comment:        review.Comment,
-				StudentID:      review.StudentId,
+				StudentID:      review.StudentID,
 				StudentEmail:   review.StudentData.Email,
 				StudentName:    review.StudentData.Name,
 				StudentSurname: review.StudentData.Surname,

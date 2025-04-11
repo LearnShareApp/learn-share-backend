@@ -133,8 +133,8 @@ func coveringErrors(w http.ResponseWriter, log *zap.Logger, err error) {
 
 func mappingToResponse(user *entities.User) *getTeacherResponse {
 	resp := getTeacherResponse{
-		TeacherID:          user.TeacherData.Id,
-		UserID:             user.Id,
+		TeacherID:          user.TeacherData.ID,
+		UserID:             user.ID,
 		Email:              user.Email,
 		Name:               user.Name,
 		Surname:            user.Surname,
@@ -152,8 +152,8 @@ func mappingToResponse(user *entities.User) *getTeacherResponse {
 	// remap entity respSkill to getTeacherResponse respSkill-type
 	for _, sk := range user.TeacherData.Skills {
 		resp.Skills = append(resp.Skills, respSkill{
-			SkillID:       sk.Id,
-			CategoryID:    sk.CategoryId,
+			SkillID:       sk.ID,
+			CategoryID:    sk.CategoryID,
 			CategoryName:  sk.CategoryName,
 			VideoCardLink: sk.VideoCardLink,
 			About:         sk.About,

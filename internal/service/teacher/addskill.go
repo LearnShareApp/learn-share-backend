@@ -38,8 +38,8 @@ func (s *TeacherService) AddSkill(ctx context.Context, userID, categoryID int, v
 
 	// create skill
 	skill := &entities.Skill{
-		TeacherId:     teacherID,
-		CategoryId:    categoryID,
+		TeacherID:     teacherID,
+		CategoryID:    categoryID,
 		VideoCardLink: videoCardLink,
 		About:         about,
 	}

@@ -41,7 +41,7 @@ func (s *LessonService) ApproveLesson(ctx context.Context, userID int, lessonID 
 		return fmt.Errorf("failed to get lesson by id: %w", err)
 	}
 
-	if lesson.TeacherID != teacher.Id {
+	if lesson.TeacherID != teacher.ID {
 		return serviceErrs.ErrorNotRelatedTeacherToLesson
 	}
 
@@ -52,7 +52,7 @@ func (s *LessonService) ApproveLesson(ctx context.Context, userID int, lessonID 
 	}
 
 	// may approve lesson if only was verification status
-	if lesson.StatusId != verificationStatusId {
+	if lesson.StatusID != verificationStatusId {
 		return serviceErrs.ErrorStatusNonVerification
 	}
 

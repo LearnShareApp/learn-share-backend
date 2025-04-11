@@ -66,7 +66,7 @@ func (h *LessonHandlers) GetForTeacherList() http.HandlerFunc {
 
 			for i := range lessons {
 				resp.Lessons[i] = respTeacherLessons{
-					LessonID:       lessons[i].Id,
+					LessonID:       lessons[i].ID,
 					StudentID:      lessons[i].StudentID,
 					StudentEmail:   lessons[i].StudentUserData.Email,
 					StudentName:    lessons[i].StudentUserData.Name,

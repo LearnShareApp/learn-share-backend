@@ -1,5 +1,10 @@
 basePath: /api
 definitions:
+  admin.BoolResponse:
+    properties:
+      is_admin:
+        type: boolean
+    type: object
   category.getCategoriesResponse:
     description: get categories getCategoriesResponse.
     properties:
@@ -486,7 +491,7 @@ definitions:
     - password
     - surname
     type: object
-host: adoe.ru:81
+host: localhost:81
 info:
   contact:
     email: ruslanrbb8@gmail.com
@@ -496,6 +501,25 @@ info:
   title: Learn-Share API
   version: "1.0"
 paths:
+  /admin:
+    get:
+      description: Return boolean value is user an admin or not
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/admin.BoolResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Return boolean value is user an admin
+      tags:
+      - admin
   /auth/login:
     post:
       consumes:

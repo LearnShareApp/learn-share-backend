@@ -40,7 +40,7 @@ func (s *LessonService) FinishLesson(ctx context.Context, userID int, lessonID i
 		return fmt.Errorf("failed to get teacher by userId: %w", err)
 	}
 
-	if lesson.TeacherID != teacher.Id {
+	if lesson.TeacherID != teacher.ID {
 		return serviceErrs.ErrorNotRelatedTeacherToLesson
 	}
 
@@ -51,7 +51,7 @@ func (s *LessonService) FinishLesson(ctx context.Context, userID int, lessonID i
 	}
 
 	// may finish lesson if only was ongoing status
-	if lesson.StatusId != ongoingStatusId {
+	if lesson.StatusID != ongoingStatusId {
 		return serviceErrs.ErrorStatusNonOngoing
 	}
 

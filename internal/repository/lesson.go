@@ -194,14 +194,14 @@ func (r *Repository) GetTeacherLessonsByTeacherID(ctx context.Context, id int) (
 
 	// Обработка результатов
 	for _, row := range rows {
-		lesson, exists := lessonsMap[row.Lesson.Id]
+		lesson, exists := lessonsMap[row.Lesson.ID]
 		if !exists {
 			lesson = &row.Lesson
 			lesson.StatusName = row.StatusName
 			lesson.CategoryName = row.CategoryName
 			lesson.ScheduleTimeDatetime = row.ScheduleTimeDatetime
 
-			lessonsMap[row.Lesson.Id] = lesson
+			lessonsMap[row.Lesson.ID] = lesson
 		}
 
 		if lesson.StudentUserData == nil {
@@ -268,14 +268,14 @@ func (r *Repository) GetStudentLessonsByUserID(ctx context.Context, id int) ([]*
 
 	// Обработка результатов
 	for _, row := range rows {
-		lesson, exists := lessonsMap[row.Lesson.Id]
+		lesson, exists := lessonsMap[row.Lesson.ID]
 		if !exists {
 			lesson = &row.Lesson
 			lesson.StatusName = row.StatusName
 			lesson.CategoryName = row.CategoryName
 			lesson.ScheduleTimeDatetime = row.ScheduleTimeDatetime
 
-			lessonsMap[row.Lesson.Id] = lesson
+			lessonsMap[row.Lesson.ID] = lesson
 		}
 
 		if lesson.TeacherUserData == nil {

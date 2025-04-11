@@ -25,5 +25,5 @@ func (s *UserService) CheckUser(ctx context.Context, reqUser *entities.User) (in
 		return 0, serviceErrs.ErrorPasswordIncorrect
 	}
 
-	return realUser.Id, nil
+	return realUser.ID, nil
 }

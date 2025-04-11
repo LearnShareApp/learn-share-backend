@@ -141,7 +141,7 @@ func mappingToResponse(scheduleTimes []*entities.ScheduleTime) getTimesResponse 
 
 	for i := range scheduleTimes {
 		resp.Datetimes[i] = respTimes{
-			ScheduleTimeID: scheduleTimes[i].Id,
+			ScheduleTimeID: scheduleTimes[i].ID,
 			Datetime:       scheduleTimes[i].Datetime,
 			IsAvailable:    scheduleTimes[i].IsAvailable,
 		}

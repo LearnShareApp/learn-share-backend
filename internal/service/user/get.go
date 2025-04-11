@@ -28,7 +28,7 @@ func (s *UserService) GetUser(ctx context.Context, id int) (*entities.User, erro
 		user.Stat = *stat
 	}
 
-	user.IsTeacher, err = s.repo.IsTeacherExistsByUserID(ctx, user.Id)
+	user.IsTeacher, err = s.repo.IsTeacherExistsByUserID(ctx, user.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check whether the user is a teacher: %w", err)
 	}
