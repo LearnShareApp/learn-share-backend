@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/admin"
 	"os"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
@@ -42,6 +43,7 @@ type Services struct {
 	lesson.LessonService
 	image.ImageService
 	category.CategoryService
+	admin.AdminService
 	common.CommonService
 }
 
@@ -54,6 +56,7 @@ func NewServices(
 	lessonService *lesson.LessonService,
 	imageService *image.ImageService,
 	categoryService *category.CategoryService,
+	adminService *admin.AdminService,
 	commonService *common.CommonService,
 ) *Services {
 	return &Services{
@@ -65,6 +68,7 @@ func NewServices(
 		LessonService:   *lessonService,
 		ImageService:    *imageService,
 		CategoryService: *categoryService,
+		AdminService:    *adminService,
 		CommonService:   *commonService,
 	}
 }
@@ -115,6 +119,7 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 	imageService := image.NewService(minioService)
 	commonService := common.NewService(repo)
 	categoryService := category.NewService(repo)
+	adminService := admin.NewService(repo)
 
 	services := NewServices(
 		jwtService,
@@ -125,6 +130,7 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 		lessonService,
 		imageService,
 		categoryService,
+		adminService,
 		commonService,
 	)
 

@@ -9,6 +9,6 @@ const (
 )
 
 type Status struct {
-	StatusId int    `db:"status_id"`
-	Name     string `db:"name"`
+	ID   int    `db:"status_id"`
+	Name string `db:"name"`
 }

@@ -33,7 +33,7 @@ func (h *CategoryHandlers) GetCategoryList() http.HandlerFunc {
 		}
 		for _, c := range categories {
 			resp.Categories = append(resp.Categories, respCategory{
-				ID:     c.Id,
+				ID:     c.ID,
 				Name:   c.Name,
 				MinAge: c.MinAge,
 			})

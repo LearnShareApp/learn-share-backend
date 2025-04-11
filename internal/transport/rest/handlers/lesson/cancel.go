@@ -58,6 +58,10 @@ func (h *LessonHandlers) CancelLesson() http.HandlerFunc {
 				err = httputils.RespondWith404(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorNotRelatedUserToLesson):
 				err = httputils.RespondWith403(w, err.Error())
+			case errors.Is(err, serviceErrors.ErrorFinishedLessonCanNotBeCancel):
+				err = httputils.RespondWith403(w, err.Error())
+			case errors.Is(err, serviceErrors.ErrorLessonAlreadyCanceled):
+				err = httputils.RespondWith403(w, err.Error())
 			default:
 				h.log.Error(err.Error())
 				err = httputils.RespondWith500(w)

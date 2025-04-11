@@ -19,10 +19,10 @@ func (r *Repository) CreateReview(ctx context.Context, review *entities.Review) 
 	`
 
 	if _, err := r.db.ExecContext(ctx, query,
-		review.TeacherId,
-		review.StudentId,
-		review.CategoryId,
-		review.SkillId,
+		review.TeacherID,
+		review.StudentID,
+		review.CategoryID,
+		review.SkillID,
 		review.Rate,
 		review.Comment); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
@@ -80,14 +80,14 @@ func (r *Repository) GetReviewsByTeacherId(ctx context.Context, id int) ([]*enti
 	reviewsMap := make(map[int]*entities.Review)
 
 	for _, row := range rows {
-		_, exists := reviewsMap[row.Review.Id]
+		_, exists := reviewsMap[row.Review.ID]
 		if !exists {
 			review := &row.Review
 			if review.StudentData == nil {
 				review.StudentData = &row.User
 			}
 
-			reviewsMap[row.Review.Id] = review
+			reviewsMap[row.Review.ID] = review
 		}
 	}
 

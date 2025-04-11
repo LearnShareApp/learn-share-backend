@@ -18,7 +18,7 @@ func (r *Repository) CreateSkill(ctx context.Context, skill *entities.Skill) err
 	VALUES ($1, $2, $3, $4)
 	`
 
-	if _, err := r.db.ExecContext(ctx, query, skill.TeacherId, skill.CategoryId, skill.VideoCardLink, skill.About); err != nil {
+	if _, err := r.db.ExecContext(ctx, query, skill.TeacherID, skill.CategoryID, skill.VideoCardLink, skill.About); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			// Код ошибки 23505 означает unique_violation
 			if pqErr.Code == "23505" {

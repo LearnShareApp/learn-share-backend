@@ -40,7 +40,7 @@ func NewService(repo Repository) *ReviewService {
 // - is user (student) have had finished lesson with this teacher on this category
 func (s *ReviewService) AddReview(ctx context.Context, review *entities.Review) error {
 	// is user exists
-	exists, err := s.repo.IsUserExistsByID(ctx, review.StudentId)
+	exists, err := s.repo.IsUserExistsByID(ctx, review.StudentID)
 	if err != nil {
 		return fmt.Errorf("failed to check user existstance by id: %w", err)
 	}
@@ -50,7 +50,7 @@ func (s *ReviewService) AddReview(ctx context.Context, review *entities.Review) 
 	}
 
 	// get teacher
-	teacher, err := s.repo.GetTeacherByID(ctx, review.TeacherId)
+	teacher, err := s.repo.GetTeacherByID(ctx, review.TeacherID)
 	if err != nil {
 		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
 			return serviceErrs.ErrorTeacherNotFound
@@ -60,12 +60,12 @@ func (s *ReviewService) AddReview(ctx context.Context, review *entities.Review) 
 	}
 
 	// is teacher != student
-	if teacher.UserID == review.StudentId {
+	if teacher.UserID == review.StudentID {
 		return serviceErrs.ErrorStudentAndTeacherSame
 	}
 
 	// is category exists
-	exists, err = s.repo.IsCategoryExistsByID(ctx, review.CategoryId)
+	exists, err = s.repo.IsCategoryExistsByID(ctx, review.CategoryID)
 	if err != nil {
 		return fmt.Errorf("failed to check category existstance by id: %w", err)
 	}
@@ -75,7 +75,7 @@ func (s *ReviewService) AddReview(ctx context.Context, review *entities.Review) 
 	}
 
 	// get skill id
-	skillId, err := s.repo.GetSkillIdByTeacherIdAndCategoryId(ctx, review.TeacherId, review.CategoryId)
+	skillId, err := s.repo.GetSkillIdByTeacherIdAndCategoryId(ctx, review.TeacherID, review.CategoryID)
 	if err != nil {
 		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
 			return serviceErrs.ErrorSkillUnregistered
@@ -84,10 +84,10 @@ func (s *ReviewService) AddReview(ctx context.Context, review *entities.Review) 
 		return fmt.Errorf("failed to get skill id by teacher id and category id: %w", err)
 	}
 
-	review.SkillId = skillId
+	review.SkillID = skillId
 
 	// is student has finished lesson with this teacher and this category
-	exists, err = s.repo.IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx, review.TeacherId, review.StudentId, review.CategoryId)
+	exists, err = s.repo.IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx, review.TeacherID, review.StudentID, review.CategoryID)
 	if err != nil {
 		return fmt.Errorf("failed to check finished lesson existence by teacher id, student id and category id: %w", err)
 	}

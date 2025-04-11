@@ -64,7 +64,7 @@ func (s *LessonService) BookLesson(ctx context.Context, lesson *entities.Lesson)
 		return fmt.Errorf("failed to get schedules time by id: %w", err)
 	}
 
-	if scheduleTime.TeacherId != lesson.TeacherID {
+	if scheduleTime.TeacherID != lesson.TeacherID {
 		return serviceErrs.ErrorScheduleTimeForAnotherTeacher
 	}
 

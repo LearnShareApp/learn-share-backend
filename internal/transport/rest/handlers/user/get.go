@@ -119,7 +119,7 @@ func (h *UserHandlers) GetUserProtected() http.HandlerFunc {
 
 func mappingToUserResp(user *entities.User) *getUserResponse {
 	resp := getUserResponse{
-		ID:                  user.Id,
+		ID:                  user.ID,
 		Email:               user.Email,
 		Name:                user.Name,
 		Surname:             user.Surname,

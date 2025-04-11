@@ -10,9 +10,40 @@
         },
         "version": "1.0"
     },
-    "host": "adoe.ru:81",
+    "host": "localhost:81",
     "basePath": "/api",
     "paths": {
+        "/admin": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Return boolean value is user an admin or not",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Return boolean value is user an admin",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/admin.BoolResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Login with email and password",
@@ -1361,6 +1392,14 @@
         }
     },
     "definitions": {
+        "admin.BoolResponse": {
+            "type": "object",
+            "properties": {
+                "is_admin": {
+                    "type": "boolean"
+                }
+            }
+        },
         "category.getCategoriesResponse": {
             "description": "get categories getCategoriesResponse.",
             "type": "object",

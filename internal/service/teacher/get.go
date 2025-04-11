@@ -16,7 +16,7 @@ func (s *TeacherService) GetTeacher(ctx context.Context, teacher *entities.Teach
 		return nil, fmt.Errorf("failed to get teacher's user data: %w", err)
 	}
 
-	stat, err := s.repo.GetShortStatTeacherByID(ctx, teacher.Id)
+	stat, err := s.repo.GetShortStatTeacherByID(ctx, teacher.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stat teacher: %w", err)
 	}
@@ -25,7 +25,7 @@ func (s *TeacherService) GetTeacher(ctx context.Context, teacher *entities.Teach
 
 	user.TeacherData = teacher
 
-	teacher.Skills, err = s.repo.GetSkillsByTeacherID(ctx, teacher.Id)
+	teacher.Skills, err = s.repo.GetSkillsByTeacherID(ctx, teacher.ID)
 	if err != nil {
 		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
 			return user, nil
