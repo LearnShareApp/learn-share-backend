@@ -511,6 +511,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/admin.BoolResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
@@ -518,6 +522,41 @@ paths:
       security:
       - BearerAuth: []
       summary: Return boolean value is user an admin
+      tags:
+      - admin
+  /admin/skills/{id}/approve:
+    put:
+      description: handler for approving teacher's skill
+      parameters:
+      - description: skillID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: approve teacher'skill
       tags:
       - admin
   /auth/login:
@@ -737,6 +776,10 @@ paths:
             $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
         "500":

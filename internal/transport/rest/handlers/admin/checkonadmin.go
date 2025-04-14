@@ -1,13 +1,14 @@
 package admin
 
 import (
+	"net/http"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
-	"net/http"
 )
 
-const CheckRoute = "/"
+const checkRoute = "/"
 
 // CheckOnAdmin returns http.HandlerFunc
 // @Summary Return boolean value is user an admin
@@ -15,6 +16,7 @@ const CheckRoute = "/"
 // @Tags admin
 // @Produce json
 // @Success 200 {object} BoolResponse
+// @Failure 401 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
 // @Router /admin [get]
 // @Security     BearerAuth
@@ -38,7 +40,7 @@ func (h *AdminHandlers) CheckOnAdmin() http.HandlerFunc {
 				err = httputils.RespondWith500(w)
 			}
 
-			if err := httputils.RespondWith500(w); err != nil {
+			if err != nil {
 				h.log.Error("failed to send response", zap.Error(err))
 			}
 

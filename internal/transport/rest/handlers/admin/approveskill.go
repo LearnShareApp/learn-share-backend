@@ -1,4 +1,4 @@
-package lesson
+package admin
 
 import (
 	"errors"
@@ -10,27 +10,23 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	approveRoute = "/{id}/approve"
-)
+const approveSkillRoute = "/skills/{id}/approve"
 
-// ApproveLesson returns http.HandlerFunc
-// @Summary Approve lesson
-// @Description Set lesson status "waiting" if this user is a teacher to lesson and lesson hasn't been cancelled (was verification)
-// @Tags lessons
+// ApproveSkill returns http.HandlerFunc
+// @Summary approve teacher'skill
+// @Description handler for approving teacher's skill
+// @Tags admin
 // @Produce json
-// @Param id path int true "LessonID"
+// @Param id path int true "skillID"
 // @Success 200
-// @Failure 400 {object} httputils.ErrorStruct
 // @Failure 401 {object} httputils.ErrorStruct
 // @Failure 403 {object} httputils.ErrorStruct
 // @Failure 404 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
-// @Router /lessons/{id}/approve [put]
+// @Router /admin/skills/{id}/approve [put]
 // @Security     BearerAuth
-func (h *LessonHandlers) ApproveLesson() http.HandlerFunc {
+func (h *AdminHandlers) ApproveSkill() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// get userID from token
 		userIDValue := r.Context().Value(jwt.UserIDKey)
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
@@ -38,11 +34,12 @@ func (h *LessonHandlers) ApproveLesson() http.HandlerFunc {
 			if err := httputils.RespondWith500(w); err != nil {
 				h.log.Error("failed to send response", zap.Error(err))
 			}
+
 			return
 		}
 
-		// get lesson id from path
-		lessonID, err := httputils.GetIntParamFromRequestPath(r, "id")
+		// get skill id from path
+		skillID, err := httputils.GetIntParamFromRequestPath(r, "id")
 
 		if err != nil {
 			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
@@ -51,19 +48,33 @@ func (h *LessonHandlers) ApproveLesson() http.HandlerFunc {
 			return
 		}
 
-		err = h.lessonService.ApproveLesson(r.Context(), userID, lessonID)
+		isAdmin, err := h.service.CheckUserOnAdminByID(r.Context(), userID)
+
+		if err != nil {
+			h.log.Error("failed to check user on admin", zap.Error(err))
+			if err := httputils.RespondWith500(w); err != nil {
+				h.log.Error("failed to send response", zap.Error(err))
+			}
+
+			return
+		}
+
+		if !isAdmin {
+			if err := httputils.RespondWith403(w, serviceErrors.ErrorNotAdmin.Error()); err != nil {
+				h.log.Error("failed to send response", zap.Error(err))
+			}
+
+			return
+		}
+
+		err = h.service.ApproveTeacherSkill(r.Context(), skillID)
+
 		if err != nil {
 			switch {
-			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorLessonNotFound):
+			case errors.Is(err, serviceErrors.ErrorSkillNotFound):
 				err = httputils.RespondWith404(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorUserIsNotTeacher):
-				err = httputils.RespondWith403(w, "unavailable operation for students")
-			case errors.Is(err, serviceErrors.ErrorNotRelatedTeacherToLesson):
-				err = httputils.RespondWith403(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorStatusNonVerification):
-				err = httputils.RespondWith403(w, "can approve a lesson if only the lesson had a verification status")
+			case errors.Is(err, serviceErrors.ErrorSkillAlreadyApproved):
+				err = httputils.RespondWith409(w, err.Error())
 			default:
 				h.log.Error(err.Error())
 				err = httputils.RespondWith500(w)

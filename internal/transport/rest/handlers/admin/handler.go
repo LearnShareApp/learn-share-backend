@@ -15,6 +15,7 @@ const (
 
 type AdminService interface {
 	CheckUserOnAdminByID(ctx context.Context, id int) (bool, error)
+	ApproveTeacherSkill(ctx context.Context, skillID int) error
 }
 
 type AdminHandlers struct {
@@ -35,7 +36,8 @@ func (h *AdminHandlers) SetupAdminRoutes(router *chi.Mux, authMiddleware func(ht
 	adminRouter.Group(func(r chi.Router) {
 		r.Use(authMiddleware)
 
-		r.Get(CheckRoute, h.CheckOnAdmin())
+		r.Get(checkRoute, h.CheckOnAdmin())
+		r.Put(approveSkillRoute, h.ApproveSkill())
 	})
 
 	router.Mount(adminRoute, adminRouter)
