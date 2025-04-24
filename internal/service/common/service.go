@@ -10,6 +10,7 @@ import (
 )
 
 type Repository interface {
+	IsUserAdminByID(ctx context.Context, id int) (bool, error)
 	GetTeacherByUserID(ctx context.Context, userID int) (*entities.Teacher, error)
 	GetTeacherByID(ctx context.Context, teacherID int) (*entities.Teacher, error)
 }
@@ -51,4 +52,17 @@ func (s *CommonService) GetTeacherByUserID(ctx context.Context, userID int) (*en
 	}
 
 	return teacher, nil
+}
+
+func (s *CommonService) CheckUserOnAdminByID(ctx context.Context, id int) (bool, error) {
+	isAdmin, err := s.repo.IsUserAdminByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return false, serviceErrs.ErrorUserNotFound
+		}
+
+		return false, fmt.Errorf("failed to check is user an admin: %w", err)
+	}
+
+	return isAdmin, nil
 }

@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/LearnShareApp/learn-share-backend/internal/service/admin"
 	"os"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/config"
 	"github.com/LearnShareApp/learn-share-backend/internal/repository"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/category"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/common"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/complaint"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/image"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/lesson"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/review"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/schedule"
+	"github.com/LearnShareApp/learn-share-backend/internal/service/skill"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/teacher"
 	"github.com/LearnShareApp/learn-share-backend/internal/service/user"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest"
@@ -43,7 +44,8 @@ type Services struct {
 	lesson.LessonService
 	image.ImageService
 	category.CategoryService
-	admin.AdminService
+	skill.SkillService
+	complaint.ComplaintService
 	common.CommonService
 }
 
@@ -56,20 +58,22 @@ func NewServices(
 	lessonService *lesson.LessonService,
 	imageService *image.ImageService,
 	categoryService *category.CategoryService,
-	adminService *admin.AdminService,
+	skillService *skill.SkillService,
+	complaintService *complaint.ComplaintService,
 	commonService *common.CommonService,
 ) *Services {
 	return &Services{
-		JWTService:      *jwtService,
-		UserService:     *userService,
-		TeacherService:  *teacherService,
-		ScheduleService: *scheduleService,
-		ReviewService:   *reviewService,
-		LessonService:   *lessonService,
-		ImageService:    *imageService,
-		CategoryService: *categoryService,
-		AdminService:    *adminService,
-		CommonService:   *commonService,
+		JWTService:       *jwtService,
+		UserService:      *userService,
+		TeacherService:   *teacherService,
+		ScheduleService:  *scheduleService,
+		ReviewService:    *reviewService,
+		LessonService:    *lessonService,
+		ImageService:     *imageService,
+		CategoryService:  *categoryService,
+		SkillService:     *skillService,
+		ComplaintService: *complaintService,
+		CommonService:    *commonService,
 	}
 }
 
@@ -117,9 +121,10 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 	reviewService := review.NewService(repo)
 	lessonService := lesson.NewService(repo, liveKitService)
 	imageService := image.NewService(minioService)
-	commonService := common.NewService(repo)
 	categoryService := category.NewService(repo)
-	adminService := admin.NewService(repo)
+	skillService := skill.NewService(repo)
+	complaintService := complaint.NewService(repo)
+	commonService := common.NewService(repo)
 
 	services := NewServices(
 		jwtService,
@@ -130,7 +135,8 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 		lessonService,
 		imageService,
 		categoryService,
-		adminService,
+		skillService,
+		complaintService,
 		commonService,
 	)
 

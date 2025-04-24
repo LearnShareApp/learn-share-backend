@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	EditRoute = "/profile"
+	editRoute = "/profile"
 )
 
 // EditUser returns http.HandlerFunc

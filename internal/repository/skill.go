@@ -152,11 +152,10 @@ func (r *Repository) GetSkillsByTeacherID(ctx context.Context, teacherID int) ([
 	var skills []*entities.Skill
 	err = r.db.SelectContext(ctx, &skills, query, args...)
 
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, internalErrs.ErrorSelectEmpty
-	}
-
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
 		return nil, fmt.Errorf("failed to find skills: %w", err)
 	}
 

@@ -41,7 +41,9 @@ var (
 	ErrorImageNotFound       = errors.New("image not found")
 	ErrorIncorrectFileFormat = errors.New("incorrect file format")
 
-	ErrorReviewExists = errors.New("review already exists")
+	ErrorReviewExists              = errors.New("review already exists")
+	ErrorReportedUserNotFound      = errors.New("reported user is not found")
+	ErrorComplainerAndReportedSame = errors.New("complainer and reported are the same person")
 
 	ErrorNotAdmin = errors.New("you are not an admin")
 )

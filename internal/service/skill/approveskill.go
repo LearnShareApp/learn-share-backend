@@ -1,4 +1,4 @@
-package admin
+package skill
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	serviceErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
-func (s *AdminService) ApproveTeacherSkill(ctx context.Context, skillID int) error {
+func (s *SkillService) ApproveTeacherSkill(ctx context.Context, skillID int) error {
 	skill, err := s.repo.GetSkillByID(ctx, skillID)
 	if err != nil {
 		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {

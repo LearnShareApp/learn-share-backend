@@ -1,9 +1,56 @@
 basePath: /api
 definitions:
-  admin.BoolResponse:
+  admin.getComplaintListResponse:
     properties:
-      is_admin:
-        type: boolean
+      complaints:
+        items:
+          $ref: '#/definitions/admin.respComplaint'
+        type: array
+    type: object
+  admin.respComplaint:
+    properties:
+      complainer_avatar:
+        example: uuid.png
+        type: string
+      complainer_email:
+        example: test@test.com
+        type: string
+      complainer_id:
+        example: 1
+        type: integer
+      complainer_name:
+        example: John
+        type: string
+      complainer_surname:
+        example: Smith
+        type: string
+      complaint_id:
+        example: 1
+        type: integer
+      date:
+        example: "2025-01-09T10:10:10+09:00"
+        type: string
+      description:
+        example: description
+        type: string
+      reason:
+        example: reason
+        type: string
+      reported_avatar:
+        example: uuid.png
+        type: string
+      reported_email:
+        example: test@test.com
+        type: string
+      reported_id:
+        example: 1
+        type: integer
+      reported_name:
+        example: John
+        type: string
+      reported_surname:
+        example: Smith
+        type: string
     type: object
   category.getCategoriesResponse:
     description: get categories getCategoriesResponse.
@@ -25,6 +72,22 @@ definitions:
       name:
         example: Programing
         type: string
+    type: object
+  complaint.createComplaintRequest:
+    properties:
+      description:
+        example: your description...
+        type: string
+      reason:
+        example: Rude attitude
+        type: string
+      reported_id:
+        example: 1
+        type: integer
+    required:
+    - description
+    - reason
+    - reported_id
     type: object
   httputils.ErrorStruct:
     properties:
@@ -389,6 +452,11 @@ definitions:
         example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
         type: string
     type: object
+  user.BoolResponse:
+    properties:
+      is_admin:
+        type: boolean
+    type: object
   user.authResponse:
     description: User registration authResponse.
     properties:
@@ -501,18 +569,22 @@ info:
   title: Learn-Share API
   version: "1.0"
 paths:
-  /admin:
+  /admin/complaints:
     get:
-      description: Return boolean value is user an admin or not
+      description: returns the list of complaints
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/admin.BoolResponse'
+            $ref: '#/definitions/admin.getComplaintListResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
         "500":
@@ -521,7 +593,7 @@ paths:
             $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
-      summary: Return boolean value is user an admin
+      summary: get complaint's list
       tags:
       - admin
   /admin/skills/{id}/approve:
@@ -646,6 +718,45 @@ paths:
       summary: Get categories
       tags:
       - categories
+  /complaint:
+    post:
+      consumes:
+      - application/json
+      description: Creating a new complaint to user (reported_id => user_id which
+        you would like to report)
+      parameters:
+      - description: ComplaintData
+        in: body
+        name: createComplaintRequest
+        required: true
+        schema:
+          $ref: '#/definitions/complaint.createComplaintRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Create a new complaint
+      tags:
+      - complaint
   /image:
     get:
       description: Get image by filename
@@ -1351,6 +1462,29 @@ paths:
       summary: Get times from schedule
       tags:
       - teachers
+  /user/is-admin:
+    get:
+      description: Return boolean value is user an admin or not
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.BoolResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: Return boolean value is user an admin
+      tags:
+      - users
   /user/profile:
     get:
       description: 'Get info about user by jwt token (in Authorization enter: Bearer

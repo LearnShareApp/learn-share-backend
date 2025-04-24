@@ -19,30 +19,36 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin": {
+        "/admin/complaints": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Return boolean value is user an admin or not",
+                "description": "returns the list of complaints",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "admin"
                 ],
-                "summary": "Return boolean value is user an admin",
+                "summary": "get complaint's list",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/admin.BoolResponse"
+                            "$ref": "#/definitions/admin.getComplaintListResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/httputils.ErrorStruct"
                         }
@@ -233,6 +239,66 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/category.getCategoriesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/complaint": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creating a new complaint to user (reported_id =\u003e user_id which you would like to report)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "Create a new complaint",
+                "parameters": [
+                    {
+                        "description": "ComplaintData",
+                        "name": "createComplaintRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/complaint.createComplaintRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
                     "500": {
@@ -1330,6 +1396,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/is-admin": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Return boolean value is user an admin or not",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Return boolean value is user an admin",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.BoolResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/user/profile": {
             "get": {
                 "security": [
@@ -1465,11 +1568,75 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "admin.BoolResponse": {
+        "admin.getComplaintListResponse": {
             "type": "object",
             "properties": {
-                "is_admin": {
-                    "type": "boolean"
+                "complaints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/admin.respComplaint"
+                    }
+                }
+            }
+        },
+        "admin.respComplaint": {
+            "type": "object",
+            "properties": {
+                "complainer_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
+                "complainer_email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                },
+                "complainer_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "complainer_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "complainer_surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "complaint_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2025-01-09T10:10:10+09:00"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "description"
+                },
+                "reason": {
+                    "type": "string",
+                    "example": "reason"
+                },
+                "reported_avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
+                "reported_email": {
+                    "type": "string",
+                    "example": "test@test.com"
+                },
+                "reported_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "reported_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "reported_surname": {
+                    "type": "string",
+                    "example": "Smith"
                 }
             }
         },
@@ -1500,6 +1667,28 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Programing"
+                }
+            }
+        },
+        "complaint.createComplaintRequest": {
+            "type": "object",
+            "required": [
+                "description",
+                "reason",
+                "reported_id"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "your description..."
+                },
+                "reason": {
+                    "type": "string",
+                    "example": "Rude attitude"
+                },
+                "reported_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -2006,6 +2195,14 @@ const docTemplate = `{
                 "video_card_link": {
                     "type": "string",
                     "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
+                }
+            }
+        },
+        "user.BoolResponse": {
+            "type": "object",
+            "properties": {
+                "is_admin": {
+                    "type": "boolean"
                 }
             }
         },
