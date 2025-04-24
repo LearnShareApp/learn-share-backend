@@ -10,11 +10,13 @@ var (
 	ErrorUserNotFound     = errors.New("user not found")
 	ErrorUserIsNotTeacher = errors.New("user is not a teacher")
 
-	ErrorTeacherExists     = errors.New("teacher already exists")
-	ErrorTeacherNotFound   = errors.New("teacher not found")
-	ErrorSkillUnregistered = errors.New("teacher has not this skill")
+	ErrorTeacherExists   = errors.New("teacher already exists")
+	ErrorTeacherNotFound = errors.New("teacher not found")
 
-	ErrorSkillRegistered = errors.New("skill already registered")
+	ErrorSkillUnregistered    = errors.New("teacher has not this skill")
+	ErrorSkillRegistered      = errors.New("skill already registered")
+	ErrorSkillNotFound        = errors.New("skill not found")
+	ErrorSkillAlreadyApproved = errors.New("skill already has been approved")
 
 	ErrorCategoryNotFound = errors.New("category not found")
 
@@ -39,7 +41,9 @@ var (
 	ErrorImageNotFound       = errors.New("image not found")
 	ErrorIncorrectFileFormat = errors.New("incorrect file format")
 
-	ErrorReviewExists = errors.New("review already exists")
+	ErrorReviewExists              = errors.New("review already exists")
+	ErrorReportedUserNotFound      = errors.New("reported user is not found")
+	ErrorComplainerAndReportedSame = errors.New("complainer and reported are the same person")
 
-	ErrorNotAdmin = errors.New("you are not admin")
+	ErrorNotAdmin = errors.New("you are not an admin")
 )

@@ -1,4 +1,4 @@
-package teacher
+package skill
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	serviceErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
-func (s *TeacherService) AddSkill(ctx context.Context, userID, categoryID int, videoCardLink string, about string) error {
+func (s *SkillService) AddSkill(ctx context.Context, userID, categoryID int, videoCardLink string, about string) error {
 	// is user exists
 	exists, err := s.repo.IsUserExistsByID(ctx, userID)
 	if err != nil {

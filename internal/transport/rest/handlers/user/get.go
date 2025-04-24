@@ -15,7 +15,7 @@ import (
 
 const (
 	GetPublicRoute    = "/{id}/profile"
-	GetProtectedRoute = "/profile"
+	getProtectedRoute = "/profile"
 )
 
 // GetUserPublic returns http.HandlerFunc

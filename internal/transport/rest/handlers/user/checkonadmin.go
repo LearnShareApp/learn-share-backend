@@ -1,24 +1,26 @@
-package admin
+package user
 
 import (
+	"net/http"
+
 	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
-	"net/http"
 )
 
-const CheckRoute = "/"
+const checkOnAdminRoute = "/is-admin"
 
 // CheckOnAdmin returns http.HandlerFunc
 // @Summary Return boolean value is user an admin
 // @Description Return boolean value is user an admin or not
-// @Tags admin
+// @Tags users
 // @Produce json
 // @Success 200 {object} BoolResponse
+// @Failure 401 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
-// @Router /admin [get]
+// @Router /user/is-admin [get]
 // @Security     BearerAuth
-func (h *AdminHandlers) CheckOnAdmin() http.HandlerFunc {
+func (h *UserHandlers) CheckOnAdmin() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userIDValue := r.Context().Value(jwt.UserIDKey)
 		userID, ok := userIDValue.(int)
@@ -30,7 +32,7 @@ func (h *AdminHandlers) CheckOnAdmin() http.HandlerFunc {
 			return
 		}
 
-		isAdmin, err := h.service.CheckUserOnAdminByID(r.Context(), userID)
+		isAdmin, err := h.userService.CheckUserOnAdminByID(r.Context(), userID)
 		if err != nil {
 			switch {
 			default:
@@ -38,7 +40,7 @@ func (h *AdminHandlers) CheckOnAdmin() http.HandlerFunc {
 				err = httputils.RespondWith500(w)
 			}
 
-			if err := httputils.RespondWith500(w); err != nil {
+			if err != nil {
 				h.log.Error("failed to send response", zap.Error(err))
 			}
 

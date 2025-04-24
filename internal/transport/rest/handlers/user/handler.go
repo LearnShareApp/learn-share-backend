@@ -22,6 +22,7 @@ type UserService interface {
 	GetUser(ctx context.Context, id int) (*entities.User, error)
 	EditUser(ctx context.Context, userID int, user *entities.User, avatarReader io.Reader, avatarSize int64) error
 	CheckUser(ctx context.Context, reqUser *entities.User) (int, error)
+	CheckUserOnAdminByID(ctx context.Context, id int) (bool, error)
 }
 
 type JwtService interface {
@@ -53,8 +54,8 @@ func (h *UserHandlers) SetupUserRoutes(router *chi.Mux, authMiddleware func(http
 	router.Group(func(r chi.Router) {
 		r.Use(authMiddleware)
 
-		r.Get(path.Join(userRoute, GetProtectedRoute), h.GetUserProtected())
-		r.Patch(path.Join(userRoute, EditRoute), h.EditUser())
-
+		r.Get(path.Join(userRoute, checkOnAdminRoute), h.CheckOnAdmin())
+		r.Get(path.Join(userRoute, getProtectedRoute), h.GetUserProtected())
+		r.Patch(path.Join(userRoute, editRoute), h.EditUser())
 	})
 }

@@ -1,8 +1,10 @@
 package handlers
 
 import (
-	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/handlers/admin"
 	"net/http"
+
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/handlers/admin"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/handlers/complaint"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/handlers/category"
 	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/handlers/image"
@@ -24,6 +26,7 @@ type Services interface {
 	lesson.LessonService
 	image.ImageService
 	category.CategoryService
+	complaint.ComplaintService
 	admin.AdminService
 }
 
@@ -70,6 +73,10 @@ func (h *Handlers) SetupRoutes(router *chi.Mux, authMiddleware func(http.Handler
 	var categoryService category.CategoryService = h.services
 	categoryHandlers := category.NewCategoryHandlers(categoryService, h.log)
 	categoryHandlers.SetupCategoryRoutes(router)
+
+	var complaintService complaint.ComplaintService = h.services
+	complaintHandlers := complaint.NewComplaintHandlers(complaintService, h.log)
+	complaintHandlers.SetupComplaintRoutes(router, authMiddleware)
 
 	var adminService admin.AdminService = h.services
 	adminHandlers := admin.NewAdminHandlers(adminService, h.log)
