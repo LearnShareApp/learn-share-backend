@@ -53,6 +53,63 @@ const docTemplate = `{
                             "$ref": "#/definitions/httputils.ErrorStruct"
                         }
                     },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/skills": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "returns the list of skills and have one flag unactive, if it's true, returns only anactive else =\u003e all (+ skill's teachers sort data as addtional list)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "get skill's list (and their teachers sort data)",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "flag for only unactive",
+                        "name": "unactive",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/admin.getSkillListResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ErrorStruct"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -1579,6 +1636,23 @@ const docTemplate = `{
                 }
             }
         },
+        "admin.getSkillListResponse": {
+            "type": "object",
+            "properties": {
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/admin.respSkill"
+                    }
+                },
+                "teachers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/admin.respTeacherShortData"
+                    }
+                }
+            }
+        },
         "admin.respComplaint": {
             "type": "object",
             "properties": {
@@ -1637,6 +1711,64 @@ const docTemplate = `{
                 "reported_surname": {
                     "type": "string",
                     "example": "Smith"
+                }
+            }
+        },
+        "admin.respSkill": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "type": "string",
+                    "example": "about me..."
+                },
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "rate": {
+                    "type": "number",
+                    "example": 5
+                },
+                "reviews_count": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "skill_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "video_card_link": {
+                    "type": "string",
+                    "example": "https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85"
+                }
+            }
+        },
+        "admin.respTeacherShortData": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string",
+                    "example": "uuid.png"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "surname": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -2179,6 +2311,10 @@ const docTemplate = `{
                 "category_name": {
                     "type": "string",
                     "example": "Category"
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": false
                 },
                 "rate": {
                     "type": "number",

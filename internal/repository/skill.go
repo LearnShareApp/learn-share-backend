@@ -115,15 +115,82 @@ func (r *Repository) GetSkillByID(ctx context.Context, id int) (*entities.Skill,
 	var skill entities.Skill
 	err = r.db.GetContext(ctx, &skill, query, args...)
 
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, internalErrs.ErrorSelectEmpty
-	}
-
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
+
 		return nil, fmt.Errorf("failed to find skill: %w", err)
 	}
 
 	return &skill, nil
+}
+
+func (r *Repository) GetAllSkills(ctx context.Context) ([]entities.Skill, error) {
+	query, args, err := r.sqlBuilder.
+		Select(
+			"skill_id",
+			"teacher_id",
+			"category_id",
+			"video_card_link",
+			"about",
+			"rate",
+			"total_rate_score",
+			"reviews_count",
+			"is_active",
+		).
+		From("skills").
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	var skills []entities.Skill
+	err = r.db.SelectContext(ctx, &skills, query, args...)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return skills, nil
+		}
+		return nil, fmt.Errorf("failed to find skills: %w", err)
+	}
+
+	return skills, nil
+}
+
+func (r *Repository) GetUnactiveSkills(ctx context.Context) ([]entities.Skill, error) {
+	query, args, err := r.sqlBuilder.
+		Select(
+			"skill_id",
+			"teacher_id",
+			"category_id",
+			"video_card_link",
+			"about",
+			"rate",
+			"total_rate_score",
+			"reviews_count",
+			"is_active",
+		).
+		From("skills").
+		Where(squirrel.Eq{"is_active": false}).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	var skills []entities.Skill
+	err = r.db.SelectContext(ctx, &skills, query, args...)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return skills, nil
+		}
+		return nil, fmt.Errorf("failed to find skills: %w", err)
+	}
+
+	return skills, nil
 }
 
 func (r *Repository) GetSkillsByTeacherID(ctx context.Context, teacherID int) ([]*entities.Skill, error) {

@@ -7,6 +7,17 @@ definitions:
           $ref: '#/definitions/admin.respComplaint'
         type: array
     type: object
+  admin.getSkillListResponse:
+    properties:
+      skills:
+        items:
+          $ref: '#/definitions/admin.respSkill'
+        type: array
+      teachers:
+        items:
+          $ref: '#/definitions/admin.respTeacherShortData'
+        type: array
+    type: object
   admin.respComplaint:
     properties:
       complainer_avatar:
@@ -51,6 +62,48 @@ definitions:
       reported_surname:
         example: Smith
         type: string
+    type: object
+  admin.respSkill:
+    properties:
+      about:
+        example: about me...
+        type: string
+      category_id:
+        example: 1
+        type: integer
+      is_active:
+        example: false
+        type: boolean
+      rate:
+        example: 5
+        type: number
+      reviews_count:
+        example: 1
+        type: integer
+      skill_id:
+        example: 1
+        type: integer
+      teacher_id:
+        example: 1
+        type: integer
+      video_card_link:
+        example: https://youtu.be/HIcSWuKMwOw?si=FtxN1QJU9ZWnXy85
+        type: string
+    type: object
+  admin.respTeacherShortData:
+    properties:
+      avatar:
+        example: uuid.png
+        type: string
+      name:
+        example: John
+        type: string
+      surname:
+        example: Smith
+        type: string
+      teacher_id:
+        example: 1
+        type: integer
     type: object
   category.getCategoriesResponse:
     description: get categories getCategoriesResponse.
@@ -439,6 +492,9 @@ definitions:
       category_name:
         example: Category
         type: string
+      is_active:
+        example: false
+        type: boolean
       rate:
         example: 5
         type: number
@@ -587,6 +643,10 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
         "500":
           description: Internal Server Error
           schema:
@@ -594,6 +654,40 @@ paths:
       security:
       - BearerAuth: []
       summary: get complaint's list
+      tags:
+      - admin
+  /admin/skills:
+    get:
+      description: returns the list of skills and have one flag unactive, if it's
+        true, returns only anactive else => all (+ skill's teachers sort data as addtional
+        list)
+      parameters:
+      - description: flag for only unactive
+        in: query
+        name: unactive
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/admin.getSkillListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: get skill's list (and their teachers sort data)
       tags:
       - admin
   /admin/skills/{id}/approve:

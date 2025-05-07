@@ -5,10 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	internalErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
+	"github.com/Masterminds/squirrel"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -177,9 +177,62 @@ func (r *Repository) GetShortStatTeacherByID(ctx context.Context, teacherId int)
 	return &stat, nil
 }
 
+func (r *Repository) GetShortTeacherDatasByIDs(ctx context.Context, teacherIDs map[int]bool) ([]entities.User, error) {
+	var ids []int
+	for id := range teacherIDs {
+		ids = append(ids, id)
+	}
+
+	query, args, err := r.sqlBuilder.
+		Select(
+			"t.teacher_id",
+			"t.user_id",
+			"u.name",
+			"u.surname",
+			"u.avatar",
+		).
+		From("teachers t").
+		InnerJoin("users u ON t.user_id = u.user_id").
+		Where(squirrel.Eq{"t.teacher_id": ids}).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	type shortTeacherData struct {
+		TeacherID int    `db:"teacher_id"`
+		UserID    int    `db:"user_id"`
+		Name      string `db:"name"`
+		Surname   string `db:"surname"`
+		Avatar    string `db:"avatar"`
+	}
+
+	var rows []shortTeacherData
+	if err := r.db.SelectContext(ctx, &rows, query, args...); err != nil {
+		return nil, fmt.Errorf("failed to execute teacher by ids: %w", err)
+	}
+
+	users := make([]entities.User, 0, len(rows))
+	for _, row := range rows {
+		users = append(users, entities.User{
+			ID:        row.UserID,
+			Name:      row.Name,
+			Surname:   row.Surname,
+			Avatar:    row.Avatar,
+			IsTeacher: true,
+			TeacherData: &entities.Teacher{
+				ID: row.TeacherID,
+			},
+		})
+	}
+
+	return users, nil
+}
+
 func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int, isUsersTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error) {
-	// Base query
-	baseQuery := `
+	// Build common teacher statistics CTE using native SQL since Squirrel doesn't support CTEs well
+	teacherStatsCTE := `
 	WITH teacher_stats AS (
 		SELECT
 			l.teacher_id,
@@ -188,71 +241,79 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		FROM lessons l
 		LEFT JOIN statuses st ON l.status_id = st.status_id
 		GROUP BY l.teacher_id
-	)
+	)`
 
-	SELECT
-		u.user_id,
-		u.email,
-		u.name,
-		u.surname,
-		u.registration_date,
-		u.birthdate,
-		u.avatar,
-		t.teacher_id,
-		t.rate,
-		t.reviews_count,
-		s.skill_id,
-		s.category_id,
-		s.video_card_link,
-		s.about,
-		s.rate,
-		s.total_rate_score,
-		s.reviews_count,
-		s.is_active,
-		c.name as category_name,
-		COALESCE(ts.count_of_finished_lesson, 0) as count_of_finished_lesson,
-		COALESCE(ts.count_of_students, 0) as count_of_students
-	FROM users u
-	INNER JOIN teachers t ON u.user_id = t.user_id
-	INNER JOIN skills s ON t.teacher_id = s.teacher_id
-	INNER JOIN categories c ON s.category_id = c.category_id
-	LEFT JOIN teacher_stats ts ON t.teacher_id = ts.teacher_id
-	LEFT JOIN lessons l ON t.teacher_id = l.teacher_id
-	LEFT JOIN statuses st ON l.status_id = st.status_id
-	WHERE s.is_active
-	`
+	// Create parameter map
+	namedParams := map[string]interface{}{
+		"finished_status_name": entities.FinishedStatusName,
+	}
 
-	// named params for query
-	namedParams := make(map[string]interface{})
-	namedParams["finished_status_name"] = entities.FinishedStatusName
+	// Build base query using Squirrel
+	baseQuery := r.sqlBuilder.
+		Select(
+			"u.user_id",
+			"u.email",
+			"u.name",
+			"u.surname",
+			"u.registration_date",
+			"u.birthdate",
+			"u.avatar",
+			"t.teacher_id",
+			"t.rate",
+			"t.reviews_count",
+			"s.skill_id",
+			"s.category_id",
+			"s.video_card_link",
+			"s.about",
+			"s.rate as skill_rate",
+			"s.total_rate_score",
+			"s.reviews_count as skill_reviews_count",
+			"s.is_active",
+			"c.name as category_name",
+			"COALESCE(ts.count_of_finished_lesson, 0) as count_of_finished_lesson",
+			"COALESCE(ts.count_of_students, 0) as count_of_students",
+		).
+		From("users u").
+		InnerJoin("teachers t ON u.user_id = t.user_id").
+		InnerJoin("skills s ON t.teacher_id = s.teacher_id").
+		InnerJoin("categories c ON s.category_id = c.category_id").
+		LeftJoin("teacher_stats ts ON t.teacher_id = ts.teacher_id").
+		LeftJoin("lessons l ON t.teacher_id = l.teacher_id").
+		LeftJoin("statuses st ON l.status_id = st.status_id").
+		Where(squirrel.Eq{"s.is_active": true})
 
-	var conditions []string
-
+	// Add conditions based on parameters
 	if isUsersTeachers {
-		conditions = append(conditions, "st.name = :finished_status_name")
-		conditions = append(conditions, "l.student_id = :user_id")
+		baseQuery = baseQuery.
+			Where(squirrel.Eq{"st.name": entities.FinishedStatusName}).
+			Where(squirrel.Eq{"l.student_id": userId})
 		namedParams["user_id"] = userId
 	}
 
 	if isFilteredByCategory {
-		conditions = append(conditions, "c.name = :category")
+		baseQuery = baseQuery.Where(squirrel.Eq{"c.name": category})
 		namedParams["category"] = category
 	}
 
-	query := baseQuery
-	if len(conditions) > 0 {
-		query += " AND " + strings.Join(conditions, " AND ")
+	// Get SQL and args from Squirrel
+	querySql, _, err := baseQuery.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	// prepare named query
-	namedQuery, args, err := sqlx.Named(query, namedParams)
+	// Combine CTE with main query
+	fullQuery := teacherStatsCTE + " " + querySql
+
+	// Convert to named query
+	namedQuery, args, err := sqlx.Named(fullQuery, namedParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build named query: %w", err)
 	}
 
-	// converting into $1, $2, ... PostgreSQL format
-	query = r.db.Rebind(namedQuery)
+	// Convert to PostgreSQL format
+	query := r.db.Rebind(namedQuery)
 
+	// Define result struct for scanning
 	type result struct {
 		entities.User
 		entities.Teacher
@@ -271,10 +332,10 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 
-	// Мапа для группировки результатов
+	// Map to group results
 	usersMap := make(map[int]*entities.User)
 
-	// Обработка результатов
+	// Process results
 	for _, row := range rows {
 		user, exists := usersMap[row.User.ID]
 		if !exists {
@@ -285,10 +346,12 @@ func (r *Repository) GetAllTeachersDataFiltered(ctx context.Context, userId int,
 		if user.TeacherData == nil {
 			user.IsTeacher = true
 			user.TeacherData = &entities.Teacher{
-				ID:          row.Teacher.ID,
-				UserID:      row.Teacher.UserID,
-				Skills:      make([]*entities.Skill, 0),
-				TeacherStat: row.TeacherStatistic,
+				ID:           row.Teacher.ID,
+				UserID:       row.Teacher.UserID,
+				Rate:         row.Teacher.Rate,
+				ReviewsCount: row.Teacher.ReviewsCount,
+				Skills:       make([]*entities.Skill, 0),
+				TeacherStat:  row.TeacherStatistic,
 			}
 		}
 
