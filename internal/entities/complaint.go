@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type Complaint struct {
-	ComplaintID  int       `db:"complaint_id"`
+	ID           int       `db:"complaint_id"`
 	ComplainerID int       `db:"complainer_id"`
 	ReportedID   int       `db:"reported_id"`
 	Reason       string    `db:"reason"`

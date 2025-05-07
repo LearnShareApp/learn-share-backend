@@ -87,6 +87,7 @@ func mappingResponse(users []entities.User) *getTeachersResponse {
 				About:         sk.About,
 				Rate:          sk.Rate,
 				ReviewsCount:  sk.ReviewsCount,
+				IsActive:      sk.IsActive,
 			}
 		}
 

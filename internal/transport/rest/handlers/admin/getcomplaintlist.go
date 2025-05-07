@@ -20,6 +20,7 @@ const getComplaintListRoute = "/complaints"
 // @Success 200 {object} getComplaintListResponse
 // @Failure 401 {object} httputils.ErrorStruct
 // @Failure 403 {object} httputils.ErrorStruct
+// @Failure 409 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
 // @Router /admin/complaints [get]
 // @Security     BearerAuth
@@ -77,7 +78,7 @@ func (h *AdminHandlers) GetAllComplaintList() http.HandlerFunc {
 
 		for i := range complaints {
 			resp.Complaints = append(resp.Complaints, respComplaint{
-				ComplaintID:       complaints[i].ComplaintID,
+				ComplaintID:       complaints[i].ID,
 				ComplainerID:      complaints[i].ComplainerID,
 				ComplainerName:    complaints[i].Complainer.Name,
 				ComplainerSurname: complaints[i].Complainer.Surname,

@@ -159,6 +159,7 @@ func mappingToResponse(user *entities.User) *getTeacherResponse {
 			About:         sk.About,
 			Rate:          sk.Rate,
 			ReviewsCount:  sk.ReviewsCount,
+			IsActive:      sk.IsActive,
 		})
 	}
 
@@ -189,4 +190,5 @@ type respSkill struct {
 	About         string  `json:"about"           example:"about me..."`
 	Rate          float32 `json:"rate"            example:"5"`
 	ReviewsCount  int     `json:"reviews_count"   example:"1"`
+	IsActive      bool    `json:"is_active"       example:"false"`
 }

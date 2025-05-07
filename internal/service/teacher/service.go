@@ -20,6 +20,7 @@ type Repository interface {
 	GetShortStatTeacherByID(ctx context.Context, id int) (*entities.TeacherStatistic, error)
 	GetSkillsByTeacherID(ctx context.Context, id int) ([]*entities.Skill, error)
 
+	GetShortTeacherDatasByIDs(ctx context.Context, teacherIDs map[int]bool) ([]entities.User, error)
 	GetAllTeachersDataFiltered(ctx context.Context, userID int, isUsersTeachers bool, category string, isFilteredByCategory bool) ([]entities.User, error)
 }
 

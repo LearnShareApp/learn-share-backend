@@ -18,6 +18,9 @@ type AdminService interface {
 	CheckUserOnAdminByID(ctx context.Context, id int) (bool, error)
 	ApproveTeacherSkill(ctx context.Context, skillID int) error
 	GetComplaintList(ctx context.Context) ([]*entities.Complaint, error)
+	GetSkillList(ctx context.Context) ([]entities.Skill, error)
+	GetUnactiveSkillList(ctx context.Context) ([]entities.Skill, error)
+	GetTeacherShortDataListByIDs(ctx context.Context, TeacherIDs []int) ([]entities.User, error)
 }
 
 type AdminHandlers struct {
@@ -39,6 +42,7 @@ func (h *AdminHandlers) SetupAdminRoutes(router *chi.Mux, authMiddleware func(ht
 		r.Use(authMiddleware)
 
 		r.Get(getComplaintListRoute, h.GetAllComplaintList())
+		r.Get(getSkillListRoute, h.GetSkillList())
 		r.Put(approveSkillRoute, h.ApproveSkill())
 	})
 
