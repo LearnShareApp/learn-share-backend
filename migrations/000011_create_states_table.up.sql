@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS public.states (
+    state_id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
