@@ -18,8 +18,8 @@ const (
 )
 
 // BookLesson returns http.HandlerFunc
-// @Summary Add Unconfirmed lesson (lesson request)
-// @Description Check is all data confirmed and if so create lesson with status "verification" (Unconfirmed)
+// @Summary Add new pending lesson (lesson request)
+// @Description Check is all data confirmed and if so create lesson request (pending state)
 // @Tags lessons
 // @Accept json
 // @Produce json
@@ -80,6 +80,8 @@ func (h *LessonHandlers) BookLesson() http.HandlerFunc {
 			case errors.Is(err, serviceErrors.ErrorCategoryNotFound):
 				err = httputils.RespondWith404(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorSkillUnregistered):
+				err = httputils.RespondWith404(w, err.Error())
+			case errors.Is(err, serviceErrors.ErrorSkillInactive):
 				err = httputils.RespondWith404(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorScheduleTimeNotFound):
 				err = httputils.RespondWith404(w, err.Error())

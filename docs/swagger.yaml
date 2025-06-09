@@ -186,6 +186,12 @@ definitions:
       lesson_id:
         example: 1
         type: integer
+      state_id:
+        example: 1
+        type: integer
+      state_name:
+        example: pending
+        type: string
       status:
         example: verification
         type: string
@@ -272,6 +278,12 @@ definitions:
       lesson_id:
         example: 1
         type: integer
+      state_id:
+        example: 1
+        type: integer
+      state_name:
+        example: pending
+        type: string
       status:
         example: verification
         type: string
@@ -308,6 +320,12 @@ definitions:
       lesson_id:
         example: 1
         type: integer
+      state_id:
+        example: 1
+        type: integer
+      state_name:
+        example: pending
+        type: string
       status:
         example: verification
         type: string
@@ -886,8 +904,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Check is all data confirmed and if so create lesson with status
-        "verification" (Unconfirmed)
+      description: Check is all data confirmed and if so create lesson request (pending
+        state)
       parameters:
       - description: LessonData
         in: body
@@ -922,7 +940,7 @@ paths:
             $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
-      summary: Add Unconfirmed lesson (lesson request)
+      summary: Add new pending lesson (lesson request)
       tags:
       - lessons
   /lessons/{id}:

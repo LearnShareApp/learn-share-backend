@@ -3,17 +3,19 @@ package entities
 import "time"
 
 type Lesson struct {
-	ID             int `db:"lesson_id"`
-	StudentID      int `db:"student_id"`
-	TeacherID      int `db:"teacher_id"`
-	CategoryID     int `db:"category_id"`
-	ScheduleTimeID int `db:"schedule_time_id"`
-	StatusID       int `db:"status_id"`
-	Price          int `db:"price"`
+	ID                 int `db:"lesson_id"`
+	StudentID          int `db:"student_id"`
+	TeacherID          int `db:"teacher_id"`
+	CategoryID         int `db:"category_id"`
+	ScheduleTimeID     int `db:"schedule_time_id"`
+	StatusID           int `db:"status_id"`
+	StateMachineItemID int `db:"state_machine_item_id"`
+	Price              int `db:"price"`
 
-	StatusName           string    `db:"-"`
-	CategoryName         string    `db:"-"`
-	ScheduleTimeDatetime time.Time `db:"-"`
-	StudentUserData      *User     `db:"-"` // info about student
-	TeacherUserData      *User     `db:"-"` // info about teacher (as user)
+	StateMachineItem     *StateMachineItem `db:"-"`
+	StudentUserData      *User             `db:"-"` // info about student
+	TeacherUserData      *User             `db:"-"` // info about teacher (as user)
+	StatusName           string            `db:"status_name"`
+	CategoryName         string            `db:"category_name"`
+	ScheduleTimeDatetime time.Time         `db:"schedule_time_datetime"`
 }

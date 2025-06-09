@@ -17,6 +17,7 @@ var (
 	ErrorSkillRegistered      = errors.New("skill already registered")
 	ErrorSkillNotFound        = errors.New("skill not found")
 	ErrorSkillAlreadyApproved = errors.New("skill already has been approved")
+	ErrorSkillInactive        = errors.New("skill is inactive")
 
 	ErrorCategoryNotFound = errors.New("category not found")
 

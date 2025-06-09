@@ -91,9 +91,9 @@ func (r *Repository) GetScheduleTimesByTeacherID(ctx context.Context, id int) ([
 	return times, nil
 }
 
-func bookScheduleTime(ctx context.Context, tx *sqlx.Tx, id int) error {
+func (r *Repository) bookActiveScheduleTimeByID(ctx context.Context, tx *sqlx.Tx, id int) error {
 	const query = `
-	UPDATE schedule_times SET is_available = false WHERE schedule_time_id = $1
+	UPDATE schedule_times SET is_available = false WHERE schedule_time_id = $1 AND is_available = true
 	`
 
 	_, err := tx.ExecContext(ctx, query, id)

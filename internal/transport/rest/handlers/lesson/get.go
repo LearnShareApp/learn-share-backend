@@ -71,6 +71,8 @@ func (h *LessonHandlers) GetLesson() http.HandlerFunc {
 
 			CategoryID:   lesson.CategoryID,
 			CategoryName: lesson.CategoryName,
+			StateID:      lesson.StateMachineItem.StateID,
+			StateName:    lesson.StateMachineItem.StateName,
 			Status:       lesson.StatusName,
 			Datetime:     lesson.ScheduleTimeDatetime,
 		}
@@ -101,6 +103,8 @@ type getLessonResponse struct {
 
 	CategoryID   int       `json:"category_id"   example:"1"`
 	CategoryName string    `json:"category_name" example:"Programming"`
+	StateID      int       `json:"state_id"      example:"1"`
+	StateName    string    `json:"state_name" example:"pending"`
 	Status       string    `json:"status"        example:"verification"`
 	Datetime     time.Time `json:"datetime"      example:"2025-02-01T09:00:00Z"`
 }

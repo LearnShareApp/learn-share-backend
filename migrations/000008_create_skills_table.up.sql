@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS public.skills (
         total_rate_score INTEGER NOT NULL DEFAULT 0,
         reviews_count INTEGER NOT NULL DEFAULT 0,
         is_active BOOLEAN NOT NULL DEFAULT FALSE,
-        state_machine_item_id INTEGER NOT NULL REFERENCES state_machines_items(item_id),
+--         state_machine_item_id INTEGER NOT NULL REFERENCES state_machines_items(item_id),
         CONSTRAINT unique_teacher_category UNIQUE (teacher_id, category_id)
 );

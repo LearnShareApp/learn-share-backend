@@ -421,7 +421,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Check is all data confirmed and if so create lesson with status \"verification\" (Unconfirmed)",
+                "description": "Check is all data confirmed and if so create lesson request (pending state)",
                 "consumes": [
                     "application/json"
                 ],
@@ -431,7 +431,7 @@ const docTemplate = `{
                 "tags": [
                     "lessons"
                 ],
-                "summary": "Add Unconfirmed lesson (lesson request)",
+                "summary": "Add new pending lesson (lesson request)",
                 "parameters": [
                     {
                         "description": "LessonData",
@@ -1885,6 +1885,14 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
+                "state_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "state_name": {
+                    "type": "string",
+                    "example": "pending"
+                },
                 "status": {
                     "type": "string",
                     "example": "verification"
@@ -2005,6 +2013,14 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
+                "state_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "state_name": {
+                    "type": "string",
+                    "example": "pending"
+                },
                 "status": {
                     "type": "string",
                     "example": "verification"
@@ -2053,6 +2069,14 @@ const docTemplate = `{
                 "lesson_id": {
                     "type": "integer",
                     "example": 1
+                },
+                "state_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "state_name": {
+                    "type": "string",
+                    "example": "pending"
                 },
                 "status": {
                     "type": "string",

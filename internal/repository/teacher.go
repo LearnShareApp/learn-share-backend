@@ -128,6 +128,32 @@ func (r *Repository) GetTeacherByUserID(ctx context.Context, id int) (*entities.
 	return &teacher, nil
 }
 
+func (r *Repository) GetUserIDByTeacherID(ctx context.Context, id int) (int, error) {
+	query, args, err := r.sqlBuilder.Select(
+		"user_id",
+	).
+		From("teachers").
+		Where(squirrel.Eq{"teacher_id": id}).
+		ToSql()
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to build sql query: %w", err)
+	}
+
+	var userID int
+	err = r.db.GetContext(ctx, &userID, query, args...)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, internalErrs.ErrorSelectEmpty
+		}
+
+		return 0, fmt.Errorf("failed to find teacher by user id: %w", err)
+	}
+
+	return userID, nil
+}
+
 func (r *Repository) GetTeacherByID(ctx context.Context, id int) (*entities.Teacher, error) {
 	const query = `
 		SELECT 

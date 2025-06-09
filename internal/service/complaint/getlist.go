@@ -3,11 +3,8 @@ package complaint
 import (
 	"context"
 	"fmt"
-	"sync"
-
-	"golang.org/x/sync/errgroup"
-
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
+	"github.com/LearnShareApp/learn-share-backend/pkg/workerpool"
 )
 
 func (s *ComplaintService) GetComplaintList(ctx context.Context) ([]*entities.Complaint, error) {
@@ -23,32 +20,10 @@ func (s *ComplaintService) GetComplaintList(ctx context.Context) ([]*entities.Co
 		users[c.ReportedID] = nil
 	}
 
-	var mu sync.Mutex
-	eg, ctx := errgroup.WithContext(ctx)
+	wp := workerpool.NewWorkerPool[entities.User](10)
+	err = wp.FillMap(ctx, users, s.repo.GetUserByID)
 
-	// limited count of parallel requests
-	sem := make(chan struct{}, 10)
-
-	for userID := range users {
-		userIDCopy := userID // local copy for gorutine (shadow variable)
-		eg.Go(func() error {
-			sem <- struct{}{}        // book slot
-			defer func() { <-sem }() // unbook slot
-
-			user, err := s.repo.GetUserByID(ctx, userIDCopy)
-			if err != nil {
-				return err
-			}
-
-			mu.Lock()
-			defer mu.Unlock()
-			users[userIDCopy] = user
-
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
+	if err != nil {
 		return nil, fmt.Errorf("failed to get info about users: %w", err)
 	}
 

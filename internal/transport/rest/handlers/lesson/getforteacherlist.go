@@ -74,6 +74,8 @@ func (h *LessonHandlers) GetForTeacherList() http.HandlerFunc {
 					StudentAvatar:  lessons[i].StudentUserData.Avatar,
 					CategoryID:     lessons[i].CategoryID,
 					CategoryName:   lessons[i].CategoryName,
+					StateID:        lessons[i].StateMachineItem.StateID,
+					StateName:      lessons[i].StateMachineItem.StateName,
 					Status:         lessons[i].StatusName,
 					Datetime:       lessons[i].ScheduleTimeDatetime,
 				}
@@ -100,6 +102,8 @@ type respTeacherLessons struct {
 	StudentAvatar  string    `json:"student_avatar"  example:"uuid.png"`
 	CategoryID     int       `json:"category_id"     example:"1"`
 	CategoryName   string    `json:"category_name"   example:"Programming"`
+	StateID        int       `json:"state_id"        example:"1"`
+	StateName      string    `json:"state_name"      example:"pending"`
 	Status         string    `json:"status"          example:"verification"`
 	Datetime       time.Time `json:"datetime"        example:"2025-02-01T09:00:00Z"`
 }

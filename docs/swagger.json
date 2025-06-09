@@ -415,7 +415,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Check is all data confirmed and if so create lesson with status \"verification\" (Unconfirmed)",
+                "description": "Check is all data confirmed and if so create lesson request (pending state)",
                 "consumes": [
                     "application/json"
                 ],
@@ -425,7 +425,7 @@
                 "tags": [
                     "lessons"
                 ],
-                "summary": "Add Unconfirmed lesson (lesson request)",
+                "summary": "Add new pending lesson (lesson request)",
                 "parameters": [
                     {
                         "description": "LessonData",
@@ -1879,6 +1879,14 @@
                     "type": "integer",
                     "example": 1
                 },
+                "state_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "state_name": {
+                    "type": "string",
+                    "example": "pending"
+                },
                 "status": {
                     "type": "string",
                     "example": "verification"
@@ -1999,6 +2007,14 @@
                     "type": "integer",
                     "example": 1
                 },
+                "state_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "state_name": {
+                    "type": "string",
+                    "example": "pending"
+                },
                 "status": {
                     "type": "string",
                     "example": "verification"
@@ -2047,6 +2063,14 @@
                 "lesson_id": {
                     "type": "integer",
                     "example": 1
+                },
+                "state_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "state_name": {
+                    "type": "string",
+                    "example": "pending"
                 },
                 "status": {
                     "type": "string",
