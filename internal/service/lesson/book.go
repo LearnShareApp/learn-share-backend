@@ -10,14 +10,8 @@ import (
 )
 
 func (s *LessonService) BookLesson(ctx context.Context, lesson *entities.Lesson) error {
-	// is student exists
-	exists, err := s.repo.IsUserExistsByID(ctx, lesson.StudentID)
-	if err != nil {
-		return fmt.Errorf("failed to check user existstance by id: %w", err)
-	}
-
-	if !exists {
-		return serviceErrs.ErrorUserNotFound
+	if err := s.validateUserExists(ctx, lesson.StudentID); err != nil {
+		return err
 	}
 
 	// is student != teacher
@@ -35,11 +29,10 @@ func (s *LessonService) BookLesson(ctx context.Context, lesson *entities.Lesson)
 	}
 
 	// is categories exists
-	exists, err = s.repo.IsCategoryExistsByID(ctx, lesson.CategoryID)
+	exists, err := s.repo.IsCategoryExistsByID(ctx, lesson.CategoryID)
 	if err != nil {
 		return fmt.Errorf("failed to check categories existstance by id: %w", err)
 	}
-
 	if !exists {
 		return serviceErrs.ErrorCategoryNotFound
 	}
@@ -52,7 +45,6 @@ func (s *LessonService) BookLesson(ctx context.Context, lesson *entities.Lesson)
 		}
 		return fmt.Errorf("failed to get skill by teacher and category: %w", err)
 	}
-
 	if !skill.IsActive {
 		return serviceErrs.ErrorSkillInactive
 	}

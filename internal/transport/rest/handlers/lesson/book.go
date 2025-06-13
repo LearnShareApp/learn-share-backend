@@ -82,7 +82,7 @@ func (h *LessonHandlers) BookLesson() http.HandlerFunc {
 			case errors.Is(err, serviceErrors.ErrorSkillUnregistered):
 				err = httputils.RespondWith404(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorSkillInactive):
-				err = httputils.RespondWith404(w, err.Error())
+				err = httputils.RespondWith404(w, "teacher's skill is inactive")
 			case errors.Is(err, serviceErrors.ErrorScheduleTimeNotFound):
 				err = httputils.RespondWith404(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorScheduleTimeForAnotherTeacher):

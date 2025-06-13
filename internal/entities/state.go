@@ -15,6 +15,6 @@ const (
 )
 
 type State struct {
-	ID   int    `db:"state_id"`
-	Name string `db:"name"`
+	ID   int       `db:"state_id"`
+	Name StateName `db:"name"`
 }

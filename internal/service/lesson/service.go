@@ -19,7 +19,11 @@ type Repository interface {
 	GetScheduleTimeByID(ctx context.Context, id int) (*entities.ScheduleTime, error)
 	BookLesson(ctx context.Context, scheduleTimeID, studentID, teacherID, categoryID int) error
 
+	GetStateByID(ctx context.Context, id int) (*entities.State, error)
+	GetStateIDByName(ctx context.Context, name entities.StateName) (int, error)
 	GetStateMachineItemByID(ctx context.Context, id int) (*entities.StateMachineItem, error)
+	CheckIsTransitionAvailable(ctx context.Context, stateMachineID, currentStateID, nextStateID int) (bool, error)
+	UpdateStateMachineItemState(ctx context.Context, stateMachineItemID, newStateID int) error
 
 	GetUserIDByTeacherID(ctx context.Context, id int) (int, error)
 	GetUserByID(ctx context.Context, id int) (*entities.User, error)

@@ -33,6 +33,9 @@ var (
 	ErrorNotRelatedTeacherToLesson = errors.New("teacher no related to this lesson")
 	ErrorFinishedLessonNotFound    = errors.New("finished lesson not found")
 
+	ErrorUnavailableOperationState  = errors.New("unavailable operation for this state")
+	ErrorUnavailableStateTransition = errors.New("unavailable such state transition")
+
 	ErrorStatusNonVerification        = errors.New("non-verification status")
 	ErrorStatusNonWaiting             = errors.New("non-waiting status")
 	ErrorStatusNonOngoing             = errors.New("non-ongoing status")

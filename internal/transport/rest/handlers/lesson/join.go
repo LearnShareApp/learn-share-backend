@@ -56,12 +56,10 @@ func (h *LessonHandlers) JoinToLesson() http.HandlerFunc {
 				err = httputils.RespondWith401(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorLessonNotFound):
 				err = httputils.RespondWith404(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorUserIsNotTeacher):
-				err = httputils.RespondWith403(w, "unavailable operation for students")
 			case errors.Is(err, serviceErrors.ErrorNotRelatedUserToLesson):
 				err = httputils.RespondWith403(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorStatusNonOngoing):
-				err = httputils.RespondWith403(w, "can start a lesson if only the lesson had a ongoing status")
+			case errors.Is(err, serviceErrors.ErrorUnavailableOperationState):
+				err = httputils.RespondWith403(w, "can join to the lesson only if it is ongoing")
 			default:
 				h.log.Error(err.Error())
 				err = httputils.RespondWith500(w)

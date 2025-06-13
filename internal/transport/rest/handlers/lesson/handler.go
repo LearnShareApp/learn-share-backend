@@ -14,8 +14,9 @@ const (
 )
 
 type LessonService interface {
-	ApproveLesson(ctx context.Context, userID int, lessonID int) error
 	BookLesson(ctx context.Context, lesson *entities.Lesson) error
+	PlanLesson(ctx context.Context, userID int, lessonID int) error
+	RejectLesson(ctx context.Context, userID int, lessonID int) error
 	CancelLesson(ctx context.Context, userID int, lessonID int) error
 	FinishLesson(ctx context.Context, userID int, lessonID int) error
 	JoinLesson(ctx context.Context, userID int, lessonID int) (string, error)
@@ -50,11 +51,13 @@ func (h *LessonHandlers) SetupLessonRoutes(router *chi.Mux, authMiddleware func(
 	lessonsRouter.Group(func(r chi.Router) {
 		r.Use(authMiddleware)
 
-		r.Put(approveRoute, h.ApproveLesson())
+		r.Put(planRoute, h.PlanLesson())
+		r.Put(rejectRoute, h.RejectLesson())
 		r.Put(cancelRoute, h.CancelLesson())
-		r.Put(finishRoute, h.FinishLesson())
 		r.Put(startRoute, h.StartLesson())
 		r.Get(joinRoute, h.JoinToLesson())
+		r.Put(finishRoute, h.FinishLesson())
+
 	})
 
 	router.Mount(lessonsRoute, lessonsRouter)

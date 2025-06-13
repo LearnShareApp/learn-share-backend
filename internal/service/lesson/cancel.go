@@ -2,77 +2,35 @@ package lesson
 
 import (
 	"context"
-	"errors"
-	"fmt"
-
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrs "github.com/LearnShareApp/learn-share-backend/internal/errors"
 )
 
-func (s *LessonService) CancelLesson(ctx context.Context, userID int, lessonID int) error {
-	// is user exists
-	exists, err := s.repo.IsUserExistsByID(ctx, userID)
+func (s *LessonService) CancelLesson(ctx context.Context, userID, lessonID int) error {
+	if err := s.validateUserExists(ctx, userID); err != nil {
+		return err
+	}
+
+	lesson, err := s.getLessonByID(ctx, lessonID)
 	if err != nil {
-		return fmt.Errorf("failed to check user existstance by id: %w", err)
+		return err
 	}
 
-	if !exists {
-		return serviceErrs.ErrorUserNotFound
-	}
-
-	// get lesson
-	lesson, err := s.repo.GetLessonByID(ctx, lessonID)
+	currentState, err := s.getLessonState(ctx, lesson)
 	if err != nil {
-		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
-			return serviceErrs.ErrorLessonNotFound
-		}
-
-		return fmt.Errorf("failed to get lesson by id: %w", err)
+		return err
 	}
 
-	// if user is not student => maybe he is a teacher (check it)
-	if lesson.StudentID != userID {
-		teacher, err := s.repo.GetTeacherByUserID(ctx, userID)
-		if err != nil {
-			// if it's not the teacher for this lesson either => error
-			if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
-				return serviceErrs.ErrorNotRelatedUserToLesson
-			}
+	switch currentState.Name {
+	case entities.Ongoing:
+		//only teacher
+		return s.changeLessonStateAsTeacher(ctx, userID, lessonID, entities.Cancel)
 
-			return fmt.Errorf("failed to get teacher by userID: %w", err)
-		}
+	case entities.Planned:
+		// teacher or student
+		return s.changeLessonStateAsAny(ctx, userID, lessonID, entities.Cancel)
 
-		if lesson.TeacherID != teacher.ID {
-			return serviceErrs.ErrorNotRelatedUserToLesson
-		}
+	default:
+		return serviceErrs.ErrorUnavailableStateTransition
 	}
-
-	// if we here => related user to lesson
-
-	//can cancel only if lesson isn't already canceled or finished
-	finishStatusID, err := s.repo.GetStatusIDByStatusName(ctx, entities.FinishedStatusName)
-	if err != nil {
-		return fmt.Errorf("failed to get status by status name: %w", err)
-	}
-
-	if lesson.StatusID == finishStatusID {
-		return serviceErrs.ErrorFinishedLessonCanNotBeCancel
-	}
-
-	// get cancel cancelStatusID
-	cancelStatusID, err := s.repo.GetStatusIDByStatusName(ctx, entities.CancelStatusName)
-	if err != nil {
-		return fmt.Errorf("failed to get status by status name: %w", err)
-	}
-
-	if lesson.StatusID == cancelStatusID {
-		return serviceErrs.ErrorLessonAlreadyCanceled
-	}
-
-	// change lesson status
-	if err = s.repo.ChangeLessonStatus(ctx, lessonID, cancelStatusID); err != nil {
-		return fmt.Errorf("failed to change lesson status: %w", err)
-	}
-
-	return nil
 }

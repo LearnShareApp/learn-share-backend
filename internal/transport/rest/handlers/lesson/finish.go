@@ -16,7 +16,7 @@ const (
 
 // FinishLesson returns http.HandlerFunc
 // @Summary Finished lesson
-// @Description Set lesson status "finished" if this user is a teacher to lesson and lesson's stats has been "ongoing"
+// @Description Set lesson in finished state if this user is a teacher to lesson and lesson state has been ongoing
 // @Tags lessons
 // @Produce json
 // @Param id path int true "LessonID"
@@ -24,6 +24,7 @@ const (
 // @Failure 400 {object} httputils.ErrorStruct
 // @Failure 401 {object} httputils.ErrorStruct
 // @Failure 403 {object} httputils.ErrorStruct
+// @Failure 404 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
 // @Router /lessons/{id}/finish [put]
 // @Security     BearerAuth
@@ -59,8 +60,8 @@ func (h *LessonHandlers) FinishLesson() http.HandlerFunc {
 				err = httputils.RespondWith403(w, "unavailable operation for students")
 			case errors.Is(err, serviceErrors.ErrorNotRelatedTeacherToLesson):
 				err = httputils.RespondWith403(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorStatusNonOngoing):
-				err = httputils.RespondWith403(w, "can finish a lesson if only the lesson had a ongoing status")
+			case errors.Is(err, serviceErrors.ErrorUnavailableStateTransition):
+				err = httputils.RespondWith403(w, "can finish a lesson if only the lesson had been ongoing")
 			default:
 				h.log.Error(err.Error())
 				err = httputils.RespondWith500(w)
