@@ -63,34 +63,6 @@ func (r *Repository) IsSkillExistsByTeacherIDAndCategoryID(ctx context.Context, 
 	return exists, nil
 }
 
-func (r *Repository) GetSkillIdByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (int, error) {
-	query, args, err := r.sqlBuilder.
-		Select("skill_id").
-		From("skills").
-		Where(squirrel.Eq{
-			"teacher_id":  teacherId,
-			"category_id": categoryId,
-		}).
-		ToSql()
-
-	if err != nil {
-		return 0, fmt.Errorf("failed to build query: %w", err)
-	}
-
-	var id int
-	err = r.db.GetContext(ctx, &id, query, args...)
-
-	if errors.Is(err, sql.ErrNoRows) {
-		return 0, internalErrs.ErrorSelectEmpty
-	}
-
-	if err != nil {
-		return 0, fmt.Errorf("failed to find skills: %w", err)
-	}
-
-	return id, nil
-}
-
 func (r *Repository) GetSkillByTeacherIDAndCategoryID(ctx context.Context, teacherID int, categoryID int) (*entities.Skill, error) {
 	query, args, err := r.sqlBuilder.
 		Select(

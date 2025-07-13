@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	addRoute = "/review"
+	createRoute = "/review"
 )
 
-// AddReview returns http.HandlerFunc
+// CreateReview returns http.HandlerFunc
 // @Summary Create review
 // @Description Create review if authorized user (student) had lesson with this teacher and this category
 // @Tags reviews
@@ -32,7 +32,7 @@ const (
 // @Failure 500 {object} httputils.ErrorStruct
 // @Router /review [post]
 // @Security     BearerAuth
-func (h *ReviewHandlers) AddReview() http.HandlerFunc {
+func (h *ReviewHandlers) CreateReview() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userIDValue := r.Context().Value(jwt.UserIDKey)
 		userID, ok := userIDValue.(int)
@@ -74,7 +74,7 @@ func (h *ReviewHandlers) AddReview() http.HandlerFunc {
 			Comment:    req.Comment,
 		}
 
-		err := h.reviewService.AddReview(r.Context(), review)
+		err := h.reviewService.CreateReview(r.Context(), review)
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):

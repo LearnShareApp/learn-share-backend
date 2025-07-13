@@ -7,7 +7,7 @@ const (
 	Approved   StateName = "approved"
 	Rejected   StateName = "rejected"
 	Planned    StateName = "planned"
-	Cancel     StateName = "cancel"
+	Cancelled  StateName = "cancelled"
 	Ongoing    StateName = "ongoing"
 	Finished   StateName = "finished"
 	Conflicted StateName = "conflicted"

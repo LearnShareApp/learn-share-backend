@@ -24,11 +24,11 @@ func (s *LessonService) CancelLesson(ctx context.Context, userID, lessonID int) 
 	switch currentState.Name {
 	case entities.Ongoing:
 		//only teacher
-		return s.changeLessonStateAsTeacher(ctx, userID, lessonID, entities.Cancel)
+		return s.changeLessonStateAsTeacher(ctx, userID, lessonID, entities.Cancelled)
 
 	case entities.Planned:
 		// teacher or student
-		return s.changeLessonStateAsAny(ctx, userID, lessonID, entities.Cancel)
+		return s.changeLessonStateAsAny(ctx, userID, lessonID, entities.Cancelled)
 
 	default:
 		return serviceErrs.ErrorUnavailableStateTransition

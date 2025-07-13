@@ -16,7 +16,7 @@ const (
 
 // CancelLesson returns http.HandlerFunc
 // @Summary Cancel lesson
-// @Description Set lesson in cancel state if this user related to lesson
+// @Description Set lesson in cancelled state if this user related to lesson
 // @Tags lessons
 // @Produce json
 // @Param id path int true "LessonID"

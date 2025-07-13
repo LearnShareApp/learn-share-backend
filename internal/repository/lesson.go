@@ -255,20 +255,31 @@ func (r *Repository) GetLessonsByStudentID(ctx context.Context, studentID int) (
 	return lessons, nil
 }
 
-func (r *Repository) IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx context.Context, teacherId int, studentId int, categoryId int) (bool, error) {
-	const query = `
-	SELECT EXISTS(
-		SELECT 1 FROM lessons l
-		LEFT JOIN statuses st ON l.status_id = st.status_id
-		WHERE l.teacher_id = $1 AND l.student_id = $2 AND l.category_id = $3 AND st.name = $4
-	)
-	`
+func (r *Repository) IsLessonExistsByArgs(ctx context.Context, teacherID int, studentID int, categoryID int, stateName entities.StateName) (bool, error) {
+	query, args, err := r.sqlBuilder.
+		Select("1").
+		From("lessons l").
+		InnerJoin("state_machines_items smi ON l.state_machine_item_id = smi.item_id").
+		InnerJoin("states ON smi.state_id = states.state_id").
+		Where(squirrel.Eq{
+			"l.teacher_id":  teacherID,
+			"l.student_id":  studentID,
+			"l.category_id": categoryID,
+			"states.name":   stateName,
+		}).
+		Prefix("SELECT EXISTS (").
+		Suffix(")").
+		ToSql()
+
+	if err != nil {
+		return false, fmt.Errorf("failed to build query: %w", err)
+	}
 
 	var exists bool
 
-	err := r.db.GetContext(ctx, &exists, query, teacherId, studentId, categoryId, entities.FinishedStatusName)
+	err = r.db.GetContext(ctx, &exists, query, args...)
 	if err != nil {
-		return false, fmt.Errorf("failed to check finished lesson existence by teacher id, student id and category id: %w", err)
+		return false, fmt.Errorf("failed find lesson by teacher_id, student_id, category_id and state name: %w", err)
 	}
 
 	return exists, nil

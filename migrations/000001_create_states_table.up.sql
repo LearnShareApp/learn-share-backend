@@ -11,7 +11,7 @@ VALUES
 
 
     (4, 'planned'), -- lesson (old waiting)
-    (5, 'cancel'), -- lesson mb skill
+    (5, 'cancelled'), -- lesson mb skill
     (6, 'ongoing'), -- lesson
     (7, 'finished'), -- lesson
     (8, 'conflicted'), -- lesson
