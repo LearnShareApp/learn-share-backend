@@ -15,14 +15,24 @@ type Repository interface {
 
 	GetTeacherByID(ctx context.Context, id int) (*entities.Teacher, error)
 	IsCategoryExistsByID(ctx context.Context, id int) (bool, error)
-	IsSkillExistsByTeacherIDAndCategoryID(ctx context.Context, teacherID int, categoryID int) (bool, error)
+	GetSkillByTeacherIDAndCategoryID(ctx context.Context, teacherID int, categoryID int) (*entities.Skill, error)
 	GetScheduleTimeByID(ctx context.Context, id int) (*entities.ScheduleTime, error)
-	CreateUnconfirmedLesson(ctx context.Context, lesson *entities.Lesson) error
+	BookLesson(ctx context.Context, scheduleTimeID, studentID, teacherID, categoryID int) error
 
+	GetStateByID(ctx context.Context, id int) (*entities.State, error)
+	GetStateIDByName(ctx context.Context, name entities.StateName) (int, error)
+	GetStateMachineItemByID(ctx context.Context, id int) (*entities.StateMachineItem, error)
+	CheckIsTransitionAvailable(ctx context.Context, stateMachineID, currentStateID, nextStateID int) (bool, error)
+	UpdateStateMachineItemState(ctx context.Context, stateMachineItemID, newStateID int) error
+
+	GetUserIDByTeacherID(ctx context.Context, id int) (int, error)
 	GetUserByID(ctx context.Context, id int) (*entities.User, error)
 
 	GetStudentLessonsByUserID(ctx context.Context, id int) ([]*entities.Lesson, error)
 	GetTeacherLessonsByTeacherID(ctx context.Context, id int) ([]*entities.Lesson, error)
+
+	GetLessonsByTeacherID(ctx context.Context, teacherID int) ([]*entities.Lesson, error)
+	GetLessonsByStudentID(ctx context.Context, studentID int) ([]*entities.Lesson, error)
 }
 
 type MeetCreator interface {

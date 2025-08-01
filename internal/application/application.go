@@ -114,6 +114,7 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 	jwtService := jwt.NewService(config.JwtSecretKey, jwt.WithIssuer("learn-share-backend"))
 	liveKitService := livekit.NewService(config.LiveKit)
 	minioService := minio.NewService(minioClient, config.Minio.Bucket)
+	commonService := common.NewService(repo)
 
 	userService := user.NewService(repo, minioService)
 	teacherService := teacher.NewService(repo)
@@ -124,7 +125,6 @@ func New(ctx context.Context, config *config.Config, log *zap.Logger) (*Applicat
 	categoryService := category.NewService(repo)
 	skillService := skill.NewService(repo)
 	complaintService := complaint.NewService(repo)
-	commonService := common.NewService(repo)
 
 	services := NewServices(
 		jwtService,

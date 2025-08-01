@@ -16,7 +16,7 @@ const (
 
 // StartLesson returns http.HandlerFunc
 // @Summary Start lesson
-// @Description generate meet token and set status to lesson "ongoing"
+// @Description set lesson in ongoing state and generate meet token.
 // @Tags lessons
 // @Produce json
 // @Param id path int true "LessonID"
@@ -60,8 +60,8 @@ func (h *LessonHandlers) StartLesson() http.HandlerFunc {
 				err = httputils.RespondWith403(w, "unavailable operation for students")
 			case errors.Is(err, serviceErrors.ErrorNotRelatedTeacherToLesson):
 				err = httputils.RespondWith403(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorStatusNonWaiting):
-				err = httputils.RespondWith403(w, "can start a lesson if only the lesson had a waiting status")
+			case errors.Is(err, serviceErrors.ErrorUnavailableStateTransition):
+				err = httputils.RespondWith403(w, "can plan a lesson if only the lesson had been planned")
 			default:
 				h.log.Error(err.Error())
 				err = httputils.RespondWith500(w)

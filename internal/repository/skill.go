@@ -63,32 +63,42 @@ func (r *Repository) IsSkillExistsByTeacherIDAndCategoryID(ctx context.Context, 
 	return exists, nil
 }
 
-func (r *Repository) GetSkillIdByTeacherIdAndCategoryId(ctx context.Context, teacherId int, categoryId int) (int, error) {
+func (r *Repository) GetSkillByTeacherIDAndCategoryID(ctx context.Context, teacherID int, categoryID int) (*entities.Skill, error) {
 	query, args, err := r.sqlBuilder.
-		Select("skill_id").
+		Select(
+			"skill_id",
+			"teacher_id",
+			"category_id",
+			"video_card_link",
+			"about",
+			"rate",
+			"total_rate_score",
+			"reviews_count",
+			"is_active",
+		).
 		From("skills").
 		Where(squirrel.Eq{
-			"teacher_id":  teacherId,
-			"category_id": categoryId,
+			"teacher_id":  teacherID,
+			"category_id": categoryID,
 		}).
 		ToSql()
 
 	if err != nil {
-		return 0, fmt.Errorf("failed to build query: %w", err)
+		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	var id int
-	err = r.db.GetContext(ctx, &id, query, args...)
-
-	if errors.Is(err, sql.ErrNoRows) {
-		return 0, internalErrs.ErrorSelectEmpty
-	}
+	var skill entities.Skill
+	err = r.db.GetContext(ctx, &skill, query, args...)
 
 	if err != nil {
-		return 0, fmt.Errorf("failed to find skills: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internalErrs.ErrorSelectEmpty
+		}
+
+		return nil, fmt.Errorf("failed to find skill: %w", err)
 	}
 
-	return id, nil
+	return &skill, nil
 }
 
 func (r *Repository) GetSkillByID(ctx context.Context, id int) (*entities.Skill, error) {

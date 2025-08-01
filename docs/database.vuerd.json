@@ -1,0 +1,93 @@
+{
+  "canvas": {
+    "version": "2.2.11",
+    "width": 2000,
+    "height": 2000,
+    "scrollTop": -0.8,
+    "scrollLeft": -173.8197916666662,
+    "zoomLevel": 0.9,
+    "show": {
+      "tableComment": false,
+      "columnComment": false,
+      "columnDataType": true,
+      "columnDefault": true,
+      "columnAutoIncrement": true,
+      "columnPrimaryKey": true,
+      "columnUnique": true,
+      "columnNotNull": true,
+      "relationship": true
+    },
+    "database": "PostgreSQL",
+    "databaseName": "",
+    "canvasType": "ERD",
+    "language": "GraphQL",
+    "tableCase": "pascalCase",
+    "columnCase": "camelCase",
+    "highlightTheme": "VS2015",
+    "bracketType": "none",
+    "setting": {
+      "relationshipDataTypeSync": true,
+      "relationshipOptimization": false,
+      "columnOrder": [
+        "columnName",
+        "columnDataType",
+        "columnNotNull",
+        "columnUnique",
+        "columnAutoIncrement",
+        "columnDefault",
+        "columnComment"
+      ]
+    },
+    "pluginSerializationMap": {}
+  },
+  "table": {
+    "tables": [
+      {
+        "name": "categories",
+        "comment": "",
+        "columns": [
+          {
+            "name": "id",
+            "comment": "",
+            "dataType": "integer",
+            "default": "",
+            "option": {
+              "autoIncrement": true,
+              "primaryKey": false,
+              "unique": true,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 60,
+              "widthDefault": 60
+            },
+            "id": "2ec5161e-0dae-493f-8187-aed07964d35e"
+          }
+        ],
+        "ui": {
+          "active": false,
+          "left": 272.8892,
+          "top": 73.2441,
+          "zIndex": 27,
+          "widthName": 61.97900390625,
+          "widthComment": 60
+        },
+        "visible": true,
+        "id": "6c6838ba-8628-48ce-9883-8bb7457622d2"
+      }
+    ],
+    "indexes": []
+  },
+  "memo": {
+    "memos": []
+  },
+  "relationship": {
+    "relationships": []
+  }
+}

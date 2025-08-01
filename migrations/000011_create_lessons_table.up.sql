@@ -1,11 +1,12 @@
 CREATE TABLE IF NOT EXISTS public.lessons (
         lesson_id SERIAL PRIMARY KEY,
-        student_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-        teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id) ON DELETE CASCADE,
-        category_id INTEGER NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
-        schedule_time_id INTEGER UNIQUE NOT NULL REFERENCES schedule_times(schedule_time_id) ON DELETE CASCADE,
+        student_id INTEGER NOT NULL REFERENCES users(user_id),
+        teacher_id INTEGER NOT NULL REFERENCES teachers(teacher_id),
+        category_id INTEGER NOT NULL REFERENCES categories(category_id),
+        schedule_time_id INTEGER UNIQUE NOT NULL REFERENCES schedule_times(schedule_time_id),
         price INTEGER NOT NULL DEFAULT 0,
-        status_id INTEGER DEFAULT NULL REFERENCES statuses(status_id) ON DELETE CASCADE
+        status_id INTEGER DEFAULT NULL REFERENCES statuses(status_id),
+        state_machine_item_id INTEGER NOT NULL REFERENCES state_machines_items(item_id)
 );
 
 -- Create function for default lesson status

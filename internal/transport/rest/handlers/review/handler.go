@@ -10,7 +10,7 @@ import (
 )
 
 type ReviewService interface {
-	AddReview(ctx context.Context, review *entities.Review) error
+	CreateReview(ctx context.Context, review *entities.Review) error
 	GetReviews(ctx context.Context, teacherID int) ([]*entities.Review, error)
 }
 
@@ -29,7 +29,7 @@ func NewReviewHandlers(reviewService ReviewService, log *zap.Logger) *ReviewHand
 func (h *ReviewHandlers) SetupReviewRoutes(router *chi.Mux, authMiddleware func(http.Handler) http.Handler) {
 	router.Group(func(r chi.Router) {
 		r.Use(authMiddleware)
-		r.Post(addRoute, h.AddReview())
+		r.Post(createRoute, h.CreateReview())
 	})
 
 	router.Get(getListRoute, h.GetReviewList())

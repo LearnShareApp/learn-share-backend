@@ -2,7 +2,6 @@ package review
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
@@ -13,8 +12,8 @@ type Repository interface {
 	IsUserExistsByID(ctx context.Context, userId int) (bool, error)
 	GetTeacherByID(ctx context.Context, teacherId int) (*entities.Teacher, error)
 	IsCategoryExistsByID(ctx context.Context, categoryID int) (bool, error)
-	GetSkillIdByTeacherIdAndCategoryId(ctx context.Context, teacherId, categoryId int) (int, error)
-	IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx context.Context, teacherId, studentId, categoryId int) (bool, error)
+	GetSkillByTeacherIDAndCategoryID(ctx context.Context, teacherID int, categoryID int) (*entities.Skill, error)
+	IsLessonExistsByArgs(ctx context.Context, teacherID int, studentID int, categoryID int, stateName entities.StateName) (bool, error)
 	CreateReview(ctx context.Context, review *entities.Review) error
 	IsTeacherExistsById(ctx context.Context, teacherID int) (bool, error)
 	GetReviewsByTeacherId(ctx context.Context, teacherID int) ([]*entities.Review, error)
@@ -28,84 +27,6 @@ func NewService(repo Repository) *ReviewService {
 	return &ReviewService{
 		repo: repo,
 	}
-}
-
-// AddReview create new review about teacher
-// Firstly check:
-// - is such user (student) exists
-// - is this teacher exists
-// - is user (student) and teacher the different user
-// - is category exists
-// - is teacher has such skill
-// - is user (student) have had finished lesson with this teacher on this category
-func (s *ReviewService) AddReview(ctx context.Context, review *entities.Review) error {
-	// is user exists
-	exists, err := s.repo.IsUserExistsByID(ctx, review.StudentID)
-	if err != nil {
-		return fmt.Errorf("failed to check user existstance by id: %w", err)
-	}
-
-	if !exists {
-		return serviceErrs.ErrorUserNotFound
-	}
-
-	// get teacher
-	teacher, err := s.repo.GetTeacherByID(ctx, review.TeacherID)
-	if err != nil {
-		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
-			return serviceErrs.ErrorTeacherNotFound
-		}
-
-		return fmt.Errorf("failed to get teacher by id: %w", err)
-	}
-
-	// is teacher != student
-	if teacher.UserID == review.StudentID {
-		return serviceErrs.ErrorStudentAndTeacherSame
-	}
-
-	// is category exists
-	exists, err = s.repo.IsCategoryExistsByID(ctx, review.CategoryID)
-	if err != nil {
-		return fmt.Errorf("failed to check category existstance by id: %w", err)
-	}
-
-	if !exists {
-		return serviceErrs.ErrorCategoryNotFound
-	}
-
-	// get skill id
-	skillId, err := s.repo.GetSkillIdByTeacherIdAndCategoryId(ctx, review.TeacherID, review.CategoryID)
-	if err != nil {
-		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
-			return serviceErrs.ErrorSkillUnregistered
-		}
-
-		return fmt.Errorf("failed to get skill id by teacher id and category id: %w", err)
-	}
-
-	review.SkillID = skillId
-
-	// is student has finished lesson with this teacher and this category
-	exists, err = s.repo.IsFinishedLessonExistsByTeacherIdAndStudentIdAndCategoryId(ctx, review.TeacherID, review.StudentID, review.CategoryID)
-	if err != nil {
-		return fmt.Errorf("failed to check finished lesson existence by teacher id, student id and category id: %w", err)
-	}
-
-	if !exists {
-		return serviceErrs.ErrorFinishedLessonNotFound
-	}
-
-	// create review
-	if err = s.repo.CreateReview(ctx, review); err != nil {
-		if errors.Is(err, serviceErrs.ErrorNonUniqueData) {
-			return serviceErrs.ErrorReviewExists
-		}
-
-		return fmt.Errorf("failed to create review: %w", err)
-	}
-
-	return nil
 }
 
 // GetReviews returns all reviews about the teacher.

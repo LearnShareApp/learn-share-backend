@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	cancelRoute = "/{id}/cancel"
+	rejectRoute = "/{id}/reject"
 )
 
-// CancelLesson returns http.HandlerFunc
-// @Summary Cancel lesson
-// @Description Set lesson in cancelled state if this user related to lesson
+// RejectLesson returns http.HandlerFunc
+// @Summary set lesson in rejected state
+// @Description Set reject new (pending) lesson if this user is a teacher to lesson
 // @Tags lessons
 // @Produce json
 // @Param id path int true "LessonID"
@@ -24,10 +24,11 @@ const (
 // @Failure 400 {object} httputils.ErrorStruct
 // @Failure 401 {object} httputils.ErrorStruct
 // @Failure 403 {object} httputils.ErrorStruct
+// @Failure 404 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
-// @Router /lessons/{id}/cancel [put]
+// @Router /lessons/{id}/reject [put]
 // @Security     BearerAuth
-func (h *LessonHandlers) CancelLesson() http.HandlerFunc {
+func (h *LessonHandlers) RejectLesson() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get userID from token
 		userIDValue := r.Context().Value(jwt.UserIDKey)
@@ -42,6 +43,7 @@ func (h *LessonHandlers) CancelLesson() http.HandlerFunc {
 
 		// get lesson id from path
 		lessonID, err := httputils.GetIntParamFromRequestPath(r, "id")
+
 		if err != nil {
 			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
 				h.log.Error("failed to send response", zap.Error(err))
@@ -49,21 +51,19 @@ func (h *LessonHandlers) CancelLesson() http.HandlerFunc {
 			return
 		}
 
-		err = h.lessonService.CancelLesson(r.Context(), userID, lessonID)
+		err = h.lessonService.RejectLesson(r.Context(), userID, lessonID)
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
 				err = httputils.RespondWith401(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorLessonNotFound):
 				err = httputils.RespondWith404(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorNotRelatedUserToLesson):
-				err = httputils.RespondWith403(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorUserIsNotTeacher):
-				err = httputils.RespondWith403(w, "cancel ongoing lesson is unavailable for student")
+				err = httputils.RespondWith403(w, "unavailable operation for students")
 			case errors.Is(err, serviceErrors.ErrorNotRelatedTeacherToLesson):
 				err = httputils.RespondWith403(w, err.Error())
 			case errors.Is(err, serviceErrors.ErrorUnavailableStateTransition):
-				err = httputils.RespondWith403(w, "cannot cancel lesson, unavailable state transition")
+				err = httputils.RespondWith403(w, "can reject a lesson if only the lesson had been pending")
 			default:
 				h.log.Error(err.Error())
 				err = httputils.RespondWith500(w)
@@ -72,12 +72,12 @@ func (h *LessonHandlers) CancelLesson() http.HandlerFunc {
 			if err != nil {
 				h.log.Error("failed to send response", zap.Error(err))
 			}
+
 			return
 		}
 
-		respondErr := httputils.SuccessRespondWith200(w, struct{}{})
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
+		if err = httputils.SuccessRespondWith200(w, struct{}{}); err != nil {
+			h.log.Error("failed to send response", zap.Error(err))
 		}
 	}
 }

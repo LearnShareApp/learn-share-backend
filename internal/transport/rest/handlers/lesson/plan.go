@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	approveRoute = "/{id}/approve"
+	planRoute = "/{id}/plan"
 )
 
-// ApproveLesson returns http.HandlerFunc
-// @Summary Approve lesson
-// @Description Set lesson status "waiting" if this user is a teacher to lesson and lesson hasn't been cancelled (was verification)
+// PlanLesson returns http.HandlerFunc
+// @Summary set lesson in planned state
+// @Description Set lesson in planned state if this user is a teacher to lesson and lesson was pending
 // @Tags lessons
 // @Produce json
 // @Param id path int true "LessonID"
@@ -26,9 +26,9 @@ const (
 // @Failure 403 {object} httputils.ErrorStruct
 // @Failure 404 {object} httputils.ErrorStruct
 // @Failure 500 {object} httputils.ErrorStruct
-// @Router /lessons/{id}/approve [put]
+// @Router /lessons/{id}/plan [put]
 // @Security     BearerAuth
-func (h *LessonHandlers) ApproveLesson() http.HandlerFunc {
+func (h *LessonHandlers) PlanLesson() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get userID from token
 		userIDValue := r.Context().Value(jwt.UserIDKey)
@@ -51,7 +51,7 @@ func (h *LessonHandlers) ApproveLesson() http.HandlerFunc {
 			return
 		}
 
-		err = h.lessonService.ApproveLesson(r.Context(), userID, lessonID)
+		err = h.lessonService.PlanLesson(r.Context(), userID, lessonID)
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
@@ -62,8 +62,8 @@ func (h *LessonHandlers) ApproveLesson() http.HandlerFunc {
 				err = httputils.RespondWith403(w, "unavailable operation for students")
 			case errors.Is(err, serviceErrors.ErrorNotRelatedTeacherToLesson):
 				err = httputils.RespondWith403(w, err.Error())
-			case errors.Is(err, serviceErrors.ErrorStatusNonVerification):
-				err = httputils.RespondWith403(w, "can approve a lesson if only the lesson had a verification status")
+			case errors.Is(err, serviceErrors.ErrorUnavailableStateTransition):
+				err = httputils.RespondWith403(w, "can plan a lesson if only the lesson had been pending")
 			default:
 				h.log.Error(err.Error())
 				err = httputils.RespondWith500(w)

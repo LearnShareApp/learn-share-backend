@@ -10,14 +10,8 @@ import (
 )
 
 func (s *LessonService) BookLesson(ctx context.Context, lesson *entities.Lesson) error {
-	// is student exists
-	exists, err := s.repo.IsUserExistsByID(ctx, lesson.StudentID)
-	if err != nil {
-		return fmt.Errorf("failed to check user existstance by id: %w", err)
-	}
-
-	if !exists {
-		return serviceErrs.ErrorUserNotFound
+	if err := s.validateUserExists(ctx, lesson.StudentID); err != nil {
+		return err
 	}
 
 	// is student != teacher
@@ -35,23 +29,24 @@ func (s *LessonService) BookLesson(ctx context.Context, lesson *entities.Lesson)
 	}
 
 	// is categories exists
-	exists, err = s.repo.IsCategoryExistsByID(ctx, lesson.CategoryID)
+	exists, err := s.repo.IsCategoryExistsByID(ctx, lesson.CategoryID)
 	if err != nil {
 		return fmt.Errorf("failed to check categories existstance by id: %w", err)
 	}
-
 	if !exists {
 		return serviceErrs.ErrorCategoryNotFound
 	}
 
-	// is teacher have such skill
-	exists, err = s.repo.IsSkillExistsByTeacherIDAndCategoryID(ctx, lesson.TeacherID, lesson.CategoryID)
+	// is teacher have such ACTIVE skill
+	skill, err := s.repo.GetSkillByTeacherIDAndCategoryID(ctx, lesson.TeacherID, lesson.CategoryID)
 	if err != nil {
-		return fmt.Errorf("failed to check skill existstance by id: %w", err)
+		if errors.Is(err, serviceErrs.ErrorSelectEmpty) {
+			return serviceErrs.ErrorSkillUnregistered
+		}
+		return fmt.Errorf("failed to get skill by teacher and category: %w", err)
 	}
-
-	if !exists {
-		return serviceErrs.ErrorSkillUnregistered
+	if !skill.IsActive {
+		return serviceErrs.ErrorSkillInactive
 	}
 
 	// is this time still available and owner is this teacher
@@ -72,13 +67,18 @@ func (s *LessonService) BookLesson(ctx context.Context, lesson *entities.Lesson)
 		return serviceErrs.ErrorScheduleTimeUnavailable
 	}
 
-	// create unconfirmed lesson
-	if err = s.repo.CreateUnconfirmedLesson(ctx, lesson); err != nil {
+	// book lesson
+	if err = s.repo.BookLesson(ctx,
+		lesson.ScheduleTimeID,
+		lesson.StudentID,
+		lesson.TeacherID,
+		lesson.CategoryID); err != nil {
+		// if some another booked faster between check and upd
 		if errors.Is(err, serviceErrs.ErrorNonUniqueData) {
 			return serviceErrs.ErrorLessonTimeBooked
 		}
 
-		return fmt.Errorf("failed to create unconfirmed lesson: %w", err)
+		return fmt.Errorf("failed to book lesson: %w", err)
 	}
 
 	return nil

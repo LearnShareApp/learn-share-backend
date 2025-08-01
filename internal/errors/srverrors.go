@@ -17,6 +17,7 @@ var (
 	ErrorSkillRegistered      = errors.New("skill already registered")
 	ErrorSkillNotFound        = errors.New("skill not found")
 	ErrorSkillAlreadyApproved = errors.New("skill already has been approved")
+	ErrorSkillInactive        = errors.New("skill is inactive")
 
 	ErrorCategoryNotFound = errors.New("category not found")
 
@@ -31,6 +32,9 @@ var (
 	ErrorNotRelatedUserToLesson    = errors.New("user no related to this lesson")
 	ErrorNotRelatedTeacherToLesson = errors.New("teacher no related to this lesson")
 	ErrorFinishedLessonNotFound    = errors.New("finished lesson not found")
+
+	ErrorUnavailableOperationState  = errors.New("unavailable operation for this state")
+	ErrorUnavailableStateTransition = errors.New("unavailable such state transition")
 
 	ErrorStatusNonVerification        = errors.New("non-verification status")
 	ErrorStatusNonWaiting             = errors.New("non-waiting status")

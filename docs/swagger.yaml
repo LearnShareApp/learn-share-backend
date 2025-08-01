@@ -186,6 +186,12 @@ definitions:
       lesson_id:
         example: 1
         type: integer
+      state_id:
+        example: 1
+        type: integer
+      state_name:
+        example: pending
+        type: string
       status:
         example: verification
         type: string
@@ -272,6 +278,12 @@ definitions:
       lesson_id:
         example: 1
         type: integer
+      state_id:
+        example: 1
+        type: integer
+      state_name:
+        example: pending
+        type: string
       status:
         example: verification
         type: string
@@ -308,6 +320,12 @@ definitions:
       lesson_id:
         example: 1
         type: integer
+      state_id:
+        example: 1
+        type: integer
+      state_name:
+        example: pending
+        type: string
       status:
         example: verification
         type: string
@@ -886,8 +904,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Check is all data confirmed and if so create lesson with status
-        "verification" (Unconfirmed)
+      description: Check is all data confirmed and if so create lesson request (pending
+        state)
       parameters:
       - description: LessonData
         in: body
@@ -922,7 +940,7 @@ paths:
             $ref: '#/definitions/httputils.ErrorStruct'
       security:
       - BearerAuth: []
-      summary: Add Unconfirmed lesson (lesson request)
+      summary: Add new pending lesson (lesson request)
       tags:
       - lessons
   /lessons/{id}:
@@ -956,49 +974,9 @@ paths:
       summary: Get lesson data by lesson's id
       tags:
       - lessons
-  /lessons/{id}/approve:
-    put:
-      description: Set lesson status "waiting" if this user is a teacher to lesson
-        and lesson hasn't been cancelled (was verification)
-      parameters:
-      - description: LessonID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/httputils.ErrorStruct'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/httputils.ErrorStruct'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/httputils.ErrorStruct'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/httputils.ErrorStruct'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/httputils.ErrorStruct'
-      security:
-      - BearerAuth: []
-      summary: Approve lesson
-      tags:
-      - lessons
   /lessons/{id}/cancel:
     put:
-      description: Set lesson status "cancelled" if this user related to lesson
+      description: Set lesson in cancel state if this user related to lesson
       parameters:
       - description: LessonID
         in: path
@@ -1033,8 +1011,8 @@ paths:
       - lessons
   /lessons/{id}/finish:
     put:
-      description: Set lesson status "finished" if this user is a teacher to lesson
-        and lesson's stats has been "ongoing"
+      description: Set lesson in finished state if this user is a teacher to lesson
+        and lesson state has been ongoing
       parameters:
       - description: LessonID
         in: path
@@ -1056,6 +1034,10 @@ paths:
             $ref: '#/definitions/httputils.ErrorStruct'
         "403":
           description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/httputils.ErrorStruct'
         "500":
@@ -1105,6 +1087,85 @@ paths:
       summary: Join the lesson
       tags:
       - lessons
+  /lessons/{id}/plan:
+    put:
+      description: Set lesson in planned state if this user is a teacher to lesson
+        and lesson was pending
+      parameters:
+      - description: LessonID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: set lesson in planned state
+      tags:
+      - lessons
+  /lessons/{id}/reject:
+    put:
+      description: Set reject new (pending) lesson if this user is a teacher to lesson
+      parameters:
+      - description: LessonID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputils.ErrorStruct'
+      security:
+      - BearerAuth: []
+      summary: set lesson in rejected state
+      tags:
+      - lessons
   /lessons/{id}/short-data:
     get:
       description: Return lesson short data by lesson's id
@@ -1138,7 +1199,7 @@ paths:
       - lessons
   /lessons/{id}/start:
     put:
-      description: generate meet token and set status to lesson "ongoing"
+      description: set lesson in ongoing state and generate meet token.
       parameters:
       - description: LessonID
         in: path
