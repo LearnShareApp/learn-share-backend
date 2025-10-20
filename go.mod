@@ -1,6 +1,6 @@
 module github.com/LearnShareApp/learn-share-backend
 
-go 1.23.4
+go 1.24.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -59,6 +59,7 @@ require (
 	github.com/nats-io/nats.go v1.38.0 // indirect
 	github.com/nats-io/nkeys v0.4.9 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
+	github.com/ory/kratos-client-go v1.3.4 // indirect
 	github.com/pion/datachannel v1.5.10 // indirect
 	github.com/pion/dtls/v3 v3.0.4 // indirect
 	github.com/pion/ice/v4 v4.0.3 // indirect
