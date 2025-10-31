@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"go.uber.org/zap"
 )
 
@@ -29,9 +29,8 @@ func (h *ReviewHandlers) GetReviewList() http.HandlerFunc {
 		teacherID, err := httputils.GetIntParamFromRequestPath(r, "id")
 		if err != nil {
 			h.log.Error("failed to parse id from URL path", zap.Error(err))
-			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "missed {id} param in url path", h.log)
+
 			return
 		}
 
@@ -39,15 +38,12 @@ func (h *ReviewHandlers) GetReviewList() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorTeacherNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
+				httputils.RespondWith500(w, h.log)
 			}
 
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
 			return
 		}
 
@@ -71,10 +67,8 @@ func (h *ReviewHandlers) GetReviewList() http.HandlerFunc {
 			})
 		}
 
-		respondErr := httputils.SuccessRespondWith200(w, resp)
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith200(w, resp, h.log)
+
 	}
 }
 

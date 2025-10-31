@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 )
@@ -35,36 +35,27 @@ func (h *TeacherHandlers) AddSkill() http.HandlerFunc {
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
 		var req addSkillRequest
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "failed to decode body", h.log)
 
 			return
 		}
 
 		if req.CategoryID == 0 || req.About == "" || req.VideoCardLink == "" {
-			var err error
-
 			switch {
 			case req.CategoryID == 0:
-				err = httputils.RespondWith400(w, "category_id is empty (required)")
+				httputils.RespondWith400(w, "category_id is empty (required)", h.log)
 			case req.About == "":
-				err = httputils.RespondWith400(w, "about is empty (required)")
+				httputils.RespondWith400(w, "about is empty (required)", h.log)
 			case req.VideoCardLink == "":
-				err = httputils.RespondWith400(w, "video_card_link is empty (required)")
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith400(w, "video_card_link is empty (required)", h.log)
 			}
 
 			return
@@ -74,26 +65,20 @@ func (h *TeacherHandlers) AddSkill() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorCategoryNotFound):
-				err = httputils.RespondWith400(w, err.Error())
+				httputils.RespondWith400(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorSkillRegistered):
-				err = httputils.RespondWithError(w, http.StatusConflict, err.Error())
+				httputils.RespondWith409(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
-			}
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
 		}
 
-		respondErr := httputils.SuccessRespondWith201(w, struct{}{})
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith201(w, struct{}{}, h.log)
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 )
@@ -38,31 +38,27 @@ func (h *ReviewHandlers) CreateReview() http.HandlerFunc {
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
 		var req addReviewRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "failed to decode body", h.log)
+
 			return
 		}
 
 		if req.TeacherID == 0 || req.CategoryID == 0 || req.Rate == 0 || req.Comment == "" {
-			if err := httputils.RespondWith400(w, "teacher_id, category_id, rate or comment are empty"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "teacher_id, category_id, rate or comment are empty", h.log)
+
 			return
 		}
 
 		if req.Rate > 5 {
-			if err := httputils.RespondWith400(w, "rate must be less or equal than 5"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "rate must be less or equal than 5", h.log)
+
 			return
 		}
 
@@ -78,34 +74,28 @@ func (h *ReviewHandlers) CreateReview() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorTeacherNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorStudentAndTeacherSame):
-				err = httputils.RespondWith403(w, "teacher can not review himself")
+				httputils.RespondWith403(w, "teacher can not review himself", h.log)
 			case errors.Is(err, serviceErrors.ErrorCategoryNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorSkillUnregistered):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorFinishedLessonNotFound):
-				err = httputils.RespondWith403(w, "You have not finished lesson with this teacher and this category")
+				httputils.RespondWith403(w, "You have not finished lesson with this teacher and this category", h.log)
 			case errors.Is(err, serviceErrors.ErrorReviewExists):
-				err = httputils.RespondWithError(w, http.StatusConflict, err.Error())
+				httputils.RespondWith409(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
+				httputils.RespondWith500(w, h.log)
 			}
 
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
 			return
 		}
 
-		respondErr := httputils.SuccessRespondWith201(w, struct{}{})
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith201(w, struct{}{}, h.log)
 	}
 }
 

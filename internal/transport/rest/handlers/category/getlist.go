@@ -3,8 +3,7 @@ package category
 import (
 	"net/http"
 
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
-	"go.uber.org/zap"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 )
 
 const Route = "/categories"
@@ -22,9 +21,7 @@ func (h *CategoryHandlers) GetCategoryList() http.HandlerFunc {
 		categories, err := h.categoryService.GetCategories(r.Context())
 		if err != nil {
 			h.log.Error(err.Error())
-			if err = httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
 			return
 		}
 
@@ -39,10 +36,7 @@ func (h *CategoryHandlers) GetCategoryList() http.HandlerFunc {
 			})
 		}
 
-		respondErr := httputils.SuccessRespondWith200(w, resp)
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith200(w, resp, h.log)
 	}
 }
 

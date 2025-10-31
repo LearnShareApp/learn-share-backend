@@ -5,11 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	"go.uber.org/zap"
-
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 )
 
 const LoginRoute = "/login"
@@ -31,16 +29,14 @@ func (h *UserHandlers) LoginUser() http.HandlerFunc {
 		var req loginRequest
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "failed to decode body", h.log)
+
 			return
 		}
 
 		if req.Email == "" || req.Password == "" {
-			if err := httputils.RespondWith400(w, "email or password is empty"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "email or password is empty", h.log)
+
 			return
 		}
 
@@ -54,16 +50,12 @@ func (h *UserHandlers) LoginUser() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorPasswordIncorrect):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
@@ -72,9 +64,7 @@ func (h *UserHandlers) LoginUser() http.HandlerFunc {
 		token, err := h.jwtService.GenerateJWTToken(userID)
 		if err != nil {
 			h.log.Error(err.Error())
-			if err = httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
 
 			return
 		}
@@ -82,10 +72,7 @@ func (h *UserHandlers) LoginUser() http.HandlerFunc {
 		var resp authResponse
 		resp.Token = token
 
-		respondErr := httputils.SuccessRespondWith200(w, resp)
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith200(w, resp, h.log)
 	}
 }
 

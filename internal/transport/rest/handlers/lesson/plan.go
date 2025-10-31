@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 )
@@ -35,9 +35,8 @@ func (h *LessonHandlers) PlanLesson() http.HandlerFunc {
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
@@ -45,9 +44,8 @@ func (h *LessonHandlers) PlanLesson() http.HandlerFunc {
 		lessonID, err := httputils.GetIntParamFromRequestPath(r, "id")
 
 		if err != nil {
-			if err := httputils.RespondWith400(w, "missed {id} param in url path"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "missed {id} param in url path", h.log)
+
 			return
 		}
 
@@ -55,29 +53,23 @@ func (h *LessonHandlers) PlanLesson() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorLessonNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorUserIsNotTeacher):
-				err = httputils.RespondWith403(w, "unavailable operation for students")
+				httputils.RespondWith403(w, "unavailable operation for students", h.log)
 			case errors.Is(err, serviceErrors.ErrorNotRelatedTeacherToLesson):
-				err = httputils.RespondWith403(w, err.Error())
+				httputils.RespondWith403(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorUnavailableStateTransition):
-				err = httputils.RespondWith403(w, "can plan a lesson if only the lesson had been pending")
+				httputils.RespondWith403(w, "can plan a lesson if only the lesson had been pending", h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
 		}
 
-		if err = httputils.SuccessRespondWith200(w, struct{}{}); err != nil {
-			h.log.Error("failed to send response", zap.Error(err))
-		}
+		httputils.SuccessRespondWith200(w, struct{}{}, h.log)
 	}
 }

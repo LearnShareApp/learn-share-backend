@@ -5,7 +5,7 @@ import (
 	"time"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 )
@@ -30,28 +30,21 @@ func (h *AdminHandlers) GetAllComplaintList() http.HandlerFunc {
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
 
 			return
 		}
 
 		isAdmin, err := h.service.CheckUserOnAdminByID(r.Context(), userID)
-
 		if err != nil {
 			h.log.Error("failed to check user on admin", zap.Error(err))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
 
 			return
 		}
 
 		if !isAdmin {
-			if err := httputils.RespondWith403(w, serviceErrors.ErrorNotAdmin.Error()); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith403(w, serviceErrors.ErrorNotAdmin.Error(), h.log)
 
 			return
 		}
@@ -62,11 +55,7 @@ func (h *AdminHandlers) GetAllComplaintList() http.HandlerFunc {
 			switch {
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
@@ -95,9 +84,7 @@ func (h *AdminHandlers) GetAllComplaintList() http.HandlerFunc {
 			})
 		}
 
-		if err = httputils.SuccessRespondWith200(w, resp); err != nil {
-			h.log.Error("failed to send response", zap.Error(err))
-		}
+		httputils.SuccessRespondWith200(w, resp, h.log)
 	}
 }
 

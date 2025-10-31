@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 )
@@ -31,9 +31,8 @@ func (h *TeacherHandlers) BecomeTeacher() http.HandlerFunc {
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
@@ -42,24 +41,17 @@ func (h *TeacherHandlers) BecomeTeacher() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorTeacherExists):
-				err = httputils.RespondWithError(w, http.StatusConflict, err.Error())
+				httputils.RespondWith409(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
 		}
 
-		respondErr := httputils.SuccessRespondWith201(w, struct{}{})
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith201(w, struct{}{}, h.log)
 	}
 }

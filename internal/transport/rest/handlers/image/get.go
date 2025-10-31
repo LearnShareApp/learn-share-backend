@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"go.uber.org/zap"
 )
 
@@ -32,26 +32,20 @@ func (h *ImageHandlers) GetImage() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		filename := r.URL.Query().Get("filename")
 		if filename == "" {
-			if err := httputils.RespondWith400(w, "missing filename parameter"); err != nil {
-				h.log.Error("failed to respond with 400", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "missing filename parameter", h.log)
 
 			return
 		}
 
 		extension := strings.TrimPrefix(filepath.Ext(filename), ".")
 		if extension == "" {
-			if err := httputils.RespondWith400(w, "missing extension in filename"); err != nil {
-				h.log.Error("failed to respond with 400", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "missing extension in filename", h.log)
 
 			return
 		}
 
 		if !slices.Contains(SupportedExtension, extension) {
-			if err := httputils.RespondWith400(w, "unsupported extension"); err != nil {
-				h.log.Error("failed to respond with 400", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "unsupported file extension", h.log)
 			return
 		}
 
@@ -67,22 +61,19 @@ func (h *ImageHandlers) GetImage() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorImageNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorIncorrectFileFormat):
-				err = httputils.RespondWith400(w, err.Error())
+				httputils.RespondWith400(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
+				httputils.RespondWith500(w, h.log)
 			}
 
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
 			return
 		}
 
 		if err := httputils.RespondWithImage(w, http.StatusOK, reader, extension); err != nil {
-			h.log.Error("failed to send response", zap.Error(err))
+			h.log.Error("response error", zap.Error(err))
 		}
 	}
 }

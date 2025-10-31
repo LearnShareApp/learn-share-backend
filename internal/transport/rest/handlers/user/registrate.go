@@ -12,8 +12,8 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/imgutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 )
 
 const RegistrationRoute = "/signup"
@@ -36,23 +36,20 @@ func (h *UserHandlers) RegistrationUser() http.HandlerFunc {
 		var req registrationRequest
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "failed to decode body", h.log)
+
 			return
 		}
 
 		if req.Email == "" || req.Password == "" || req.Name == "" || req.Surname == "" {
-			if err := httputils.RespondWith400(w, "email, name, surname or password is empty"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "email, name, surname or password is empty", h.log)
+
 			return
 		}
 
-		if req.Birthdate.Before(time.Date(1900, 01, 01, 0, 0, 0, 0, time.UTC)) {
-			if err := httputils.RespondWith400(w, "birthdate is missed or too old"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+		if req.Birthdate.Before(time.Date(1920, 01, 01, 0, 0, 0, 0, time.UTC)) {
+			httputils.RespondWith400(w, "birthdate is missed or too old", h.log)
+
 			return
 		}
 
@@ -64,25 +61,22 @@ func (h *UserHandlers) RegistrationUser() http.HandlerFunc {
 			imageBytes, err := imgutils.DecodeImage(req.Avatar)
 
 			if err != nil {
-				if err = httputils.RespondWith400(w, err.Error()); err != nil {
-					h.log.Error("failed to send response", zap.Error(err))
-				}
+				httputils.RespondWith400(w, err.Error(), h.log)
+
 				return
 			}
 
 			width, height, err := imgutils.GetImageDimensions(imageBytes)
 			if err != nil {
 				h.log.Error("failed to get image dimension", zap.Error(err))
-				if err = httputils.RespondWith500(w); err != nil {
-					h.log.Error("failed to send response", zap.Error(err))
-				}
+				httputils.RespondWith500(w, h.log)
+
 				return
 			}
 
 			if err = imgutils.CheckDimension(1, 1, width, height); err != nil {
-				if err = httputils.RespondWith400(w, err.Error()); err != nil {
-					h.log.Error("failed to send response", zap.Error(err))
-				}
+				httputils.RespondWith400(w, err.Error(), h.log)
+
 				return
 			}
 			avatarReader = bytes.NewReader(imageBytes)
@@ -109,16 +103,12 @@ func (h *UserHandlers) RegistrationUser() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserExists):
-				err = httputils.RespondWithError(w, http.StatusConflict, err.Error())
+				httputils.RespondWith409(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorPasswordTooShort):
-				err = httputils.RespondWith400(w, err.Error())
+				httputils.RespondWith400(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
@@ -128,9 +118,7 @@ func (h *UserHandlers) RegistrationUser() http.HandlerFunc {
 		token, err := h.jwtService.GenerateJWTToken(userID)
 		if err != nil {
 			h.log.Error(err.Error())
-			if err = httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
 
 			return
 		}
@@ -138,10 +126,7 @@ func (h *UserHandlers) RegistrationUser() http.HandlerFunc {
 		var resp authResponse
 		resp.Token = token
 
-		respondErr := httputils.SuccessRespondWith201(w, resp)
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith201(w, resp, h.log)
 	}
 }
 

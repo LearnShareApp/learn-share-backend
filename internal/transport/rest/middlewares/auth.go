@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
@@ -26,18 +26,16 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 			// get authorization header
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
-				if err := httputils.RespondWith401(w, "missed Authorization header (required)"); err != nil {
-					log.Error("failed to write response", zap.Error(err))
-				}
+				httputils.RespondWith401(w, "missed Authorization header (required)", log)
+
 				return
 			}
 
 			// check header format (Bearer Token)
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || parts[0] != "Bearer" {
-				if err := httputils.RespondWith401(w, "Invalid token format"); err != nil {
-					log.Error("failed to write response", zap.Error(err))
-				}
+				httputils.RespondWith401(w, "Invalid token format", log)
+
 				return
 			}
 
@@ -49,16 +47,14 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 			if err != nil {
 				if errors.Is(err, validator.GetExpiredError()) {
 					log.Error("token expired", zap.Error(err))
-					if err = httputils.RespondWith401(w, "token expired"); err != nil {
-						log.Error("failed to write response", zap.Error(err))
-					}
+					httputils.RespondWith401(w, "token expired", log)
+
 					return
 				}
 
 				log.Error("failed to validate token", zap.Error(err))
-				if err = httputils.RespondWith401(w, "Failed to validate token"); err != nil {
-					log.Error("failed to write response", zap.Error(err))
-				}
+				httputils.RespondWith401(w, "Failed to validate token", log)
+
 				return
 			}
 
@@ -66,9 +62,7 @@ func JWTMiddleware(validator TokenValidator, log *zap.Logger) func(http.Handler)
 			userID, err := validator.ExtractUserID(claims)
 			if err != nil {
 				log.Error("failed to extract user ID", zap.Error(err))
-				if err = httputils.RespondWith401(w, "Invalid token: missing field: user_id"); err != nil {
-					log.Error("failed to write response", zap.Error(err))
-				}
+				httputils.RespondWith401(w, "Invalid token: missing field: user_id", log)
 				return
 			}
 

@@ -12,8 +12,8 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
 	"github.com/LearnShareApp/learn-share-backend/internal/imgutils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 )
 
@@ -42,35 +42,30 @@ func (h *UserHandlers) EditUser() http.HandlerFunc {
 		id, ok := userIDValue.(int)
 		if !ok || id == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
 		var req editUserRequest
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "failed to decode body", h.log)
+
 			return
 		}
 
-		if req.Name == "" &&
-			req.Surname == "" &&
-			req.Avatar == "" &&
-			req.Birthdate.Before(time.Date(0001, 01, 01, 0, 0, 0, 1, time.UTC)) {
-			if err := httputils.RespondWith400(w, "all fields are empty"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
-			return
+		if req.Name == "" {
+			httputils.RespondWith400(w, "field \"name\" is required", h.log)
 		}
 
-		if req.Birthdate.After(time.Date(0001, 01, 01, 0, 0, 0, 1, time.UTC)) && req.Birthdate.Before(time.Date(1900, 01, 01, 0, 0, 0, 1, time.UTC)) {
-			if err := httputils.RespondWith400(w, "birthdate is too old"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+		if req.Surname == "" {
+			httputils.RespondWith400(w, "field \"surname\" is required", h.log)
+		}
+
+		if req.Birthdate.Before(time.Date(1920, 01, 01, 0, 0, 0, 1, time.UTC)) {
+			httputils.RespondWith400(w, "birth date is too old or empty", h.log)
+
 			return
 		}
 
@@ -82,25 +77,22 @@ func (h *UserHandlers) EditUser() http.HandlerFunc {
 			imageBytes, err := imgutils.DecodeImage(req.Avatar)
 
 			if err != nil {
-				if err = httputils.RespondWith400(w, err.Error()); err != nil {
-					h.log.Error("failed to send response", zap.Error(err))
-				}
+				httputils.RespondWith400(w, err.Error(), h.log)
+
 				return
 			}
 
 			width, height, err := imgutils.GetImageDimensions(imageBytes)
 			if err != nil {
 				h.log.Error("failed to get image dimension", zap.Error(err))
-				if err = httputils.RespondWith500(w); err != nil {
-					h.log.Error("failed to send response", zap.Error(err))
-				}
+				httputils.RespondWith500(w, h.log)
+
 				return
 			}
 
 			if err = imgutils.CheckDimension(1, 1, width, height); err != nil {
-				if err = httputils.RespondWith400(w, err.Error()); err != nil {
-					h.log.Error("failed to send response", zap.Error(err))
-				}
+				httputils.RespondWith400(w, err.Error(), h.log)
+
 				return
 			}
 			avatarReader = bytes.NewReader(imageBytes)
@@ -124,22 +116,16 @@ func (h *UserHandlers) EditUser() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
+				httputils.RespondWith500(w, h.log)
 			}
 
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
 			return
 		}
 
-		respondErr := httputils.SuccessRespondWith200(w, struct{}{})
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith200(w, struct{}{}, h.log)
 	}
 }
 

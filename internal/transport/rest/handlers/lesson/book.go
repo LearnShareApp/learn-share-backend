@@ -9,7 +9,7 @@ import (
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
 	serviceErrors "github.com/LearnShareApp/learn-share-backend/internal/errors"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"go.uber.org/zap"
 )
 
@@ -38,25 +38,22 @@ func (h *LessonHandlers) BookLesson() http.HandlerFunc {
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
 		var req bookLessonRequest
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			if err = httputils.RespondWith400(w, "failed to decode body"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "failed to decode body", h.log)
+
 			return
 		}
 
 		if req.TeacherID == 0 || req.CategoryID == 0 || req.ScheduleTimeID == 0 {
-			if err := httputils.RespondWith400(w, "teacher_id, category_id or schedule_time_id is empty (required)"); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith400(w, "teacher_id, category_id or schedule_time_id is empty (required)", h.log)
+
 			return
 		}
 
@@ -72,41 +69,34 @@ func (h *LessonHandlers) BookLesson() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, serviceErrors.ErrorUserNotFound):
-				err = httputils.RespondWith401(w, err.Error())
+				httputils.RespondWith401(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorTeacherNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorStudentAndTeacherSame):
-				err = httputils.RespondWith400(w, err.Error())
+				httputils.RespondWith400(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorCategoryNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorSkillUnregistered):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorSkillInactive):
-				err = httputils.RespondWith404(w, "teacher's skill is inactive")
+				httputils.RespondWith404(w, "teacher's skill is inactive", h.log)
 			case errors.Is(err, serviceErrors.ErrorScheduleTimeNotFound):
-				err = httputils.RespondWith404(w, err.Error())
+				httputils.RespondWith404(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorScheduleTimeForAnotherTeacher):
-				err = httputils.RespondWith400(w, err.Error())
+				httputils.RespondWith400(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorScheduleTimeUnavailable):
-				err = httputils.RespondWith400(w, err.Error())
+				httputils.RespondWith400(w, err.Error(), h.log)
 			case errors.Is(err, serviceErrors.ErrorLessonTimeBooked):
-				err = httputils.RespondWithError(w, http.StatusConflict, err.Error())
+				httputils.RespondWith409(w, err.Error(), h.log)
 			default:
 				h.log.Error(err.Error())
-				err = httputils.RespondWith500(w)
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
 		}
 
-		respondErr := httputils.SuccessRespondWith201(w, struct{}{})
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith201(w, struct{}{}, h.log)
 	}
 }
 

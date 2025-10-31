@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/LearnShareApp/learn-share-backend/internal/entities"
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 )
@@ -32,9 +32,8 @@ func (h *TeacherHandlers) GetTeacherList() http.HandlerFunc {
 		id, ok := userIDValue.(int)
 		if !ok || id == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
@@ -55,18 +54,14 @@ func (h *TeacherHandlers) GetTeacherList() http.HandlerFunc {
 
 		if err != nil {
 			h.log.Error(err.Error())
-			if err = httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
 		resp := mappingResponse(teachers)
 
-		respondErr := httputils.SuccessRespondWith200(w, resp)
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith200(w, resp, h.log)
 	}
 }
 

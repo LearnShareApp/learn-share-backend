@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 type ErrorStruct struct {
@@ -65,50 +67,66 @@ func RespondWithError(w http.ResponseWriter, code int, message string) error {
 		})
 }
 
-func RespondWith400(w http.ResponseWriter, message string) error {
-	return RespondWithError(w,
+func RespondWith400(w http.ResponseWriter, message string, log *zap.Logger) {
+	if err := RespondWithError(w,
 		http.StatusBadRequest,
-		message)
+		message); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }
 
-func RespondWith401(w http.ResponseWriter, message string) error {
-	return RespondWithError(w,
+func RespondWith401(w http.ResponseWriter, message string, log *zap.Logger) {
+	if err := RespondWithError(w,
 		http.StatusUnauthorized,
-		message)
+		message); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }
 
-func RespondWith403(w http.ResponseWriter, message string) error {
-	return RespondWithError(w,
+func RespondWith403(w http.ResponseWriter, message string, log *zap.Logger) {
+	if err := RespondWithError(w,
 		http.StatusForbidden,
-		message)
+		message); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }
 
-func RespondWith404(w http.ResponseWriter, message string) error {
-	return RespondWithError(w,
+func RespondWith404(w http.ResponseWriter, message string, log *zap.Logger) {
+	if err := RespondWithError(w,
 		http.StatusNotFound,
-		message)
+		message); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }
 
-func RespondWith409(w http.ResponseWriter, message string) error {
-	return RespondWithError(w,
+func RespondWith409(w http.ResponseWriter, message string, log *zap.Logger) {
+	if err := RespondWithError(w,
 		http.StatusConflict,
-		message)
+		message); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }
 
-func RespondWith500(w http.ResponseWriter) error {
-	return RespondWithError(w,
+func RespondWith500(w http.ResponseWriter, log *zap.Logger) {
+	if err := RespondWithError(w,
 		http.StatusInternalServerError,
-		http.StatusText(http.StatusInternalServerError))
+		http.StatusText(http.StatusInternalServerError)); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }
 
-func SuccessRespondWith200(w http.ResponseWriter, payload interface{}) error {
-	return RespondWithJSON(w,
+func SuccessRespondWith200(w http.ResponseWriter, payload interface{}, log *zap.Logger) {
+	if err := RespondWithJSON(w,
 		http.StatusOK,
-		payload)
+		payload); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }
 
-func SuccessRespondWith201(w http.ResponseWriter, payload interface{}) error {
-	return RespondWithJSON(w,
+func SuccessRespondWith201(w http.ResponseWriter, payload interface{}, log *zap.Logger) {
+	if err := RespondWithJSON(w,
 		http.StatusCreated,
-		payload)
+		payload); err != nil {
+		log.Error("response error", zap.Error(err))
+	}
 }

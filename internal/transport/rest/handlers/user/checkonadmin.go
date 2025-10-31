@@ -3,7 +3,7 @@ package user
 import (
 	"net/http"
 
-	"github.com/LearnShareApp/learn-share-backend/internal/httputils"
+	"github.com/LearnShareApp/learn-share-backend/internal/transport/rest/httputils"
 	"github.com/LearnShareApp/learn-share-backend/pkg/jwt"
 	"go.uber.org/zap"
 )
@@ -26,9 +26,8 @@ func (h *UserHandlers) CheckOnAdmin() http.HandlerFunc {
 		userID, ok := userIDValue.(int)
 		if !ok || userID == 0 {
 			h.log.Error("invalid or missing user ID in context", zap.Any("value", userIDValue))
-			if err := httputils.RespondWith500(w); err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
-			}
+			httputils.RespondWith500(w, h.log)
+
 			return
 		}
 
@@ -37,11 +36,7 @@ func (h *UserHandlers) CheckOnAdmin() http.HandlerFunc {
 			switch {
 			default:
 				h.log.Error("failed to check user on admin", zap.Error(err))
-				err = httputils.RespondWith500(w)
-			}
-
-			if err != nil {
-				h.log.Error("failed to send response", zap.Error(err))
+				httputils.RespondWith500(w, h.log)
 			}
 
 			return
@@ -49,10 +44,7 @@ func (h *UserHandlers) CheckOnAdmin() http.HandlerFunc {
 
 		resp := BoolResponse{IsAdmin: isAdmin}
 
-		respondErr := httputils.SuccessRespondWith200(w, resp)
-		if respondErr != nil {
-			h.log.Error("failed to send response", zap.Error(respondErr))
-		}
+		httputils.SuccessRespondWith200(w, resp, h.log)
 	}
 }
 
